@@ -1,0 +1,11 @@
+# Starship Agentic Configuration
+# This file controls the command sequence for interactive mode
+
+commands:
+  - "vessel tour-ship"
+  - vessel:
+      commission-ship:
+        template: "django-galaxy"
+        name: "my-starship-project"
+  - "mission define"
+  - "architecture review-schematics --type=system"
