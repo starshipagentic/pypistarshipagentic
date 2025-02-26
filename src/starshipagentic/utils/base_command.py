@@ -74,8 +74,12 @@ class BaseCommand:
             # Check if --help is in the arguments
             if '--help' in sys.argv or '-h' in sys.argv:
                 # Get the original command name and group
-                cmd_name = command_func.__name__.replace('_', '-')
-                
+                # Check if command_func is a Click Command object or a function
+                if hasattr(command_func, 'name'):
+                    cmd_name = command_func.name
+                else:
+                    cmd_name = command_func.__name__.replace('_', '-')
+        
                 # Try to get the parent group name
                 try:
                     parent_command = command_func.__click_params__[0].parent
@@ -103,7 +107,10 @@ class BaseCommand:
                     cli.add_command(command_func)
                     
                     # Run the CLI with the command name as the first argument
-                    cmd_name = command_func.__name__.replace('_', '-')
+                    if hasattr(command_func, 'name'):
+                        cmd_name = command_func.name
+                    else:
+                        cmd_name = command_func.__name__.replace('_', '-')
                     new_argv = [sys.argv[0], cmd_name] + sys.argv[1:]
                     return cli(new_argv[1:])
                 else:

@@ -342,9 +342,10 @@ def main(ctx, all_commands, commands_list):
                 table.add_column("Description", style="white")
                 table.add_column("Options", style="dim")
                 
-                # Get all commands for this group
+                # Get all commands for this group from the registry directly
                 commands = command_registry.get_all_commands(group_name)
-                for cmd_name, cmd_data in commands.items():
+                for cmd_name in sorted(commands.keys()):
+                    cmd_data = commands[cmd_name]
                     # Get aliases from registry (which uses pyproject.toml)
                     aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
                     aliases_str = ", ".join(aliases) if aliases else "None"
