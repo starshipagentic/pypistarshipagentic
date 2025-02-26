@@ -107,6 +107,12 @@ def display_ship_visualization(initial_ship_name):
     # Set up the display
     width, height = 800, 600
     screen = pygame.display.set_mode((width, height))
+    
+    # Available ships and current selection
+    available_ships = list(SHIP_CONFIGS.keys())
+    current_ship_index = available_ships.index(initial_ship_name.lower()) if initial_ship_name.lower() in available_ships else 0
+    ship_name = available_ships[current_ship_index]
+    
     pygame.display.set_caption(f"Starship Agentic - {ship_name.capitalize()}")
     
     # Set up colors
@@ -115,11 +121,6 @@ def display_ship_visualization(initial_ship_name):
     BUTTON_COLOR = (60, 60, 100)
     BUTTON_HOVER = (80, 80, 120)
     BUTTON_TEXT = (240, 240, 240)
-    
-    # Available ships and current selection
-    available_ships = list(SHIP_CONFIGS.keys())
-    current_ship_index = available_ships.index(initial_ship_name.lower()) if initial_ship_name.lower() in available_ships else 0
-    ship_name = available_ships[current_ship_index]
     
     # Get ship configuration
     ship_config = SHIP_CONFIGS[ship_name]
