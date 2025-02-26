@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "starshipagentic"
+version = "0.1.0"
+description = "AI-assisted software development with a Star Trek-inspired interface"
+readme = "README.md"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Code Generators",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "rich>=10.0.0",
+    "requests>=2.25.0",
+    "tinydb>=4.5.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/starshipagentic"
+"Bug Tracker" = "https://github.com/yourusername/starshipagentic/issues"
+
+[project.scripts]
+# Main command
+starshipagentic = "starshipagentic.cli:main"
+
+# Direct command aliases
+tour = "starshipagentic.commands.vessel_cmds:tour_ship_command"
+commission = "starshipagentic.commands.vessel_cmds:commission_ship_command"
+mission = "starshipagentic.commands.mission_cmds:mission_brief_command"
+expand = "starshipagentic.commands.mission_cmds:expand_mission_command"
+schematics = "starshipagentic.commands.architecture_cmds:review_schematics_command"
+calibrate = "starshipagentic.commands.architecture_cmds:calibrate_technology_command"
+navigation = "starshipagentic.commands.navigation_cmds:plot_navigation_command"
+waypoints = "starshipagentic.commands.navigation_cmds:set_waypoints_command"
+authorize = "starshipagentic.commands.transmission_cmds:authorize_codes_command"
+scan = "starshipagentic.commands.transmission_cmds:scan_sector_command"
+transmission = "starshipagentic.commands.transmission_cmds:receive_transmission_command"
+warp = "starshipagentic.commands.exploration_cmds:warp_speed_command"
+trycoder = "starshipagentic.commands.exploration_cmds:trycoder_command"
+engage = "starshipagentic.commands.exploration_cmds:engage_command"
+photons = "starshipagentic.commands.weapons_cmds:fire_photons_command"
+lasers = "starshipagentic.commands.weapons_cmds:aim_lasers_command"
+shields = "starshipagentic.commands.weapons_cmds:shields_up_command"
+checkpoint = "starshipagentic.commands.engineering_cmds:create_checkpoint_command"
+restore = "starshipagentic.commands.engineering_cmds:restore_checkpoint_command"
+inspect = "starshipagentic.commands.engineering_cmds:inspect_vessel_command"
+complexity = "starshipagentic.commands.engineering_cmds:complexity_report_command"
+supernova = "starshipagentic.commands.cosmic_cmds:supernova_command"
+teleport = "starshipagentic.commands.git_cmds:teleport_command"
+search = "starshipagentic.commands.mcars_cmds:search_command"
+transport = "starshipagentic.commands.mcars_cmds:transport_command"
+droid = "starshipagentic.commands.droid_cmds:droid_splain_command"
+splain = "starshipagentic.commands.droid_cmds:man_splain_command"
