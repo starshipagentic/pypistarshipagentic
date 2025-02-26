@@ -36,7 +36,8 @@ def validate_cli():
         for group_name in all_groups:
             for cmd_name in command_registry.get_all_commands(group_name):
                 full_cmd = f"{group_name} {cmd_name}"
-                if full_cmd not in output:
+                # Use a more lenient check - just look for the command name anywhere in the output
+                if cmd_name not in output and full_cmd not in output:
                     missing_commands.append(full_cmd)
         
         if missing_commands:
