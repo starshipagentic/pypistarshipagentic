@@ -53,6 +53,11 @@ Without any arguments to start the guided process from the beginning, which will
 
 ## Command Groups
 
+### Main Command
+| Command | Description |
+|---------|-------------|
+| `starshipagentic` | Start the guided process for AI-assisted development |
+
 ### Vessel Commands (`vessel_cmds.py`)
 Initialize and select project templates.
 
