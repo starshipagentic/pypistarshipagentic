@@ -44,6 +44,19 @@ def commission_ship(template, name):
     console.print(f"Creating project: {name}")
     console.print("[green]Ship commissioned successfully![/green]")
 
+@vessel_group.command(name="visualize-ship")
+@click.option("--ship", default="enterprise", help="Ship to visualize")
+def visualize_ship(ship):
+    """Launch a Pygame visualization of the specified ship."""
+    console.print(f"[bold]Launching visualization for {ship}...[/bold]")
+    
+    try:
+        from starshipagentic.visualization import launch_visualization
+        launch_visualization(ship)
+    except ImportError:
+        console.print("[red]Pygame visualization requires additional dependencies.[/red]")
+        console.print("Install with: [bold]pip install pygame[/bold]")
+
 # Command entry points for direct invocation
 def tour_ship_command():
     """Entry point for the 'tour' command."""
@@ -52,3 +65,7 @@ def tour_ship_command():
 def commission_ship_command():
     """Entry point for the 'commission' command."""
     return commission_ship(sys.argv[1:])
+
+def visualize_ship_command():
+    """Entry point for the 'visualize' command."""
+    return visualize_ship(sys.argv[1:])
