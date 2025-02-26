@@ -12,6 +12,9 @@ from rich.table import Table
 from rich.markdown import Markdown
 from functools import update_wrapper
 
+# Import command registry
+from starshipagentic.utils.command_registry import command_registry
+
 # Import command groups
 from starshipagentic.commands import (
     vessel_cmds,
@@ -92,14 +95,17 @@ def enhance_group_help(group, name):
         theme_color = GROUP_THEMES.get(name, "white")
         icon = GROUP_ICONS.get(name, "🚀")
         
+        # Get group info from registry
+        group_info = command_registry.get_group_info(name)
+        
         # Group header with icon and styled name
         header = f"{icon} {name.upper()} COMMANDS"
         console.print(Panel(header, style=f"bold {theme_color}"))
         
-        # Group description
-        if group.help:
-            console.print(Markdown(f"**Description:** {group.help}"))
-            console.print("")
+        # Group description - use registry description if available, otherwise use Click group help
+        description = group_info.get('description') or group.help or "No description"
+        console.print(Markdown(f"**Description:** {description}"))
+        console.print("")
         
         # Commands table
         table = Table(show_header=True, header_style=f"bold {theme_color}")
@@ -111,6 +117,11 @@ def enhance_group_help(group, name):
         # Add commands to table
         for cmd_name in sorted(group.commands):
             cmd = group.commands[cmd_name]
+            
+            # Get command info from registry
+            cmd_info = command_registry.get_command_info(name, cmd_name)
+            
+            # Get options from Click command
             options = []
             for param in cmd.params:
                 if isinstance(param, click.Option):
@@ -119,15 +130,18 @@ def enhance_group_help(group, name):
                         opt_str += " (required)"
                     options.append(opt_str)
             
-            # Get aliases
-            aliases = getattr(cmd, 'aliases', [])
+            # Get aliases from registry
+            aliases = cmd_info.get('aliases', [])
             aliases_str = ", ".join(aliases) if aliases else "None"
+            
+            # Get description from registry or Click command
+            description = cmd_info.get('description') or cmd.help or "No description"
             
             options_str = ", ".join(options) if options else "None"
             table.add_row(
                 f"{name} {cmd_name}",
                 aliases_str,
-                cmd.help or "No description",
+                description,
                 options_str
             )
         
@@ -156,25 +170,14 @@ def display_available_commands():
     table.add_column("Description", style="green")
     table.add_column("Example Command", style="bright_blue")
     
-    # Add each command group with description and example
-    command_groups = [
-        ("vessel", vessel_cmds.vessel_group.help, "vessel tour-ship"),
-        ("mission", mission_cmds.mission_group.help, "mission define"),
-        ("architecture", architecture_cmds.architecture_group.help, "architecture review-schematics"),
-        ("navigation", navigation_cmds.navigation_group.help, "navigation plot-navigation"),
-        ("transmission", transmission_cmds.transmission_group.help, "transmission scan-sector"),
-        ("exploration", exploration_cmds.exploration_group.help, "exploration warp-speed"),
-        ("weapons", weapons_cmds.weapons_group.help, "weapons shields-up"),
-        ("engineering", engineering_cmds.engineering_group.help, "engineering analyze"),
-        ("cosmic", cosmic_cmds.cosmic_group.help, "cosmic supernova"),
-        ("git", git_cmds.git_group.help, "git teleport"),
-        ("mcars", mcars_cmds.mcars_group.help, "mcars search"),
-        ("droid", droid_cmds.droid_group.help, "droid droid-splain"),
-    ]
-    
-    for group, help_text, example in command_groups:
-        icon = GROUP_ICONS.get(group, "🚀")
-        table.add_row(group, icon, help_text or "No description", example)
+    # Add each command group with description and example from registry
+    for group_name in command_registry.get_all_groups():
+        group_info = command_registry.get_group_info(group_name)
+        icon = GROUP_ICONS.get(group_name, "🚀")
+        description = group_info.get('description', 'No description')
+        example = command_registry.get_example_command(group_name)
+        
+        table.add_row(group_name, icon, description, example)
     
     console.print(table)
     
@@ -191,47 +194,32 @@ def display_all_commands():
     table.add_column("Command", style="cyan")
     table.add_column("Description", style="green")
     
-    # Add commands from each group
-    command_groups = [
-        (vessel_cmds.vessel_group, "vessel"),
-        (mission_cmds.mission_group, "mission"),
-        (architecture_cmds.architecture_group, "architecture"),
-        (navigation_cmds.navigation_group, "navigation"),
-        (transmission_cmds.transmission_group, "transmission"),
-        (exploration_cmds.exploration_group, "exploration"),
-        (weapons_cmds.weapons_group, "weapons"),
-        (engineering_cmds.engineering_group, "engineering"),
-        (cosmic_cmds.cosmic_group, "cosmic"),
-        (git_cmds.git_group, "git"),
-        (mcars_cmds.mcars_group, "mcars"),
-        (droid_cmds.droid_group, "droid"),
-    ]
-    
-    for group, prefix in command_groups:
-        theme_color = GROUP_THEMES.get(prefix, "white")
-        icon = GROUP_ICONS.get(prefix, "🚀")
+    # Add commands from each group using the registry
+    for group_name in command_registry.get_all_groups():
+        group_info = command_registry.get_group_info(group_name)
+        theme_color = GROUP_THEMES.get(group_name, "white")
+        icon = GROUP_ICONS.get(group_name, "🚀")
         
         # Add a header row for the group
-        table.add_row(f"[bold {theme_color}]{icon} {prefix.upper()}[/bold {theme_color}]", 
-                     f"[italic]{group.help or 'No description'}[/italic]")
+        table.add_row(
+            f"[bold {theme_color}]{icon} {group_name.upper()}[/bold {theme_color}]", 
+            f"[italic]{group_info.get('description', 'No description')}[/italic]"
+        )
         
         # Add each command in the group
-        for cmd_name in sorted(group.commands):
-            cmd = group.commands[cmd_name]
-            # Get aliases
-            aliases = getattr(cmd, 'aliases', [])
+        commands = group_info.get('commands', {})
+        for cmd_name in sorted(commands.keys()):
+            cmd_data = commands[cmd_name]
+            aliases = cmd_data.get('aliases', [])
             aliases_str = ", ".join(aliases) if aliases else ""
             
-            command_text = f"  {prefix} {cmd_name}"
-            description = cmd.help or "No description"
+            command_text = f"  {group_name} {cmd_name}"
+            description = cmd_data.get('description', 'No description')
             
             if aliases_str:
                 description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
                 
-            table.add_row(
-                command_text,
-                description
-            )
+            table.add_row(command_text, description)
     
     console.print(table)
 
@@ -327,14 +315,8 @@ class StarshipAgenticCLI(click.Group):
 
 def load_commands_list():
     """Load commands list from YAML file."""
-    commands_list_path = Path(__file__).parent / "commands-list.yml"
-    if commands_list_path.exists():
-        try:
-            with open(commands_list_path, 'r') as f:
-                return yaml.safe_load(f)
-        except Exception as e:
-            console.print(f"[bold red]Error loading commands list: {e}[/bold red]")
-    return {}
+    # Use the command registry to get the commands
+    return command_registry._commands
 
 @click.group(cls=StarshipAgenticCLI, invoke_without_command=True)
 @click.version_option()
