@@ -2,11 +2,30 @@
 
 A command-line toolkit for AI-assisted software development using a Star Trek-inspired interface.
 
+## Why Starship Agentic?
+
+Starship Agentic transforms the software development process into an engaging, Star Trek-inspired journey. It combines:
+
+- **AI-powered development** - Leverage LLMs to generate, test, and fix code automatically
+- **Guided workflow** - Follow a structured process from project initialization to deployment
+- **Intuitive interface** - Use familiar Star Trek terminology for development tasks
+- **Automated testing** - Run BDD and unit tests with AI-assisted error correction
+- **Project management** - Track progress and maintain code quality throughout development
+
+Whether you're building a new application or maintaining existing code, Starship Agentic helps you navigate the development universe more efficiently.
+
 ## Installation
 
 ```bash
 pip install starshipagentic
 ```
+
+## Requirements
+
+- Python 3.8 or higher
+- Git
+- Internet connection (for AI-assisted features)
+- API keys for specific LLM services (optional)
 
 ## Command Overview
 
@@ -23,6 +42,8 @@ Each command is also available as a direct alias:
 ```
 <command-alias> [options]
 ```
+
+You can also simply run `starshipagentic` without any arguments to start the guided process from the beginning, which will help you navigate through the available commands.
 
 ## Command Groups
 
@@ -141,6 +162,33 @@ checkpoint --message "Completed user authentication"
 complexity
 ```
 
+## Examples
+
+```bash
+# Start the guided process
+starshipagentic
+
+# Browse available project templates
+starshipagentic vessel tour-ship
+# or simply
+tour
+
+# Initialize a new project
+commission --template django
+
+# Generate BDD features
+navigation
+
+# Run tests with AI fixing
+warp --iterations 3
+
+# Create a project checkpoint
+checkpoint --message "Completed user authentication"
+
+# Generate code complexity report
+complexity
+```
+
 ## Development
 
 To contribute to Starship Agentic:
@@ -150,6 +198,18 @@ git clone https://github.com/yourusername/starshipagentic.git
 cd starshipagentic
 pip install -e .
 ```
+
+## Roadmap
+
+Future features planned for Starship Agentic:
+
+- **Universal Translator** - Convert code between different programming languages
+- **Holodeck** - Interactive visualization of project architecture and dependencies
+- **Prime Directive** - Automated code quality enforcement and best practices
+- **Replicator** - Generate boilerplate code for common patterns
+- **Away Team** - Collaborative development features for team projects
+- **Temporal Mechanics** - Advanced project versioning and branching strategies
+- **Federation Integration** - Connect with additional AI services and development tools
 
 ## License
 
