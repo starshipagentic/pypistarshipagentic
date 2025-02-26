@@ -2,6 +2,7 @@
 
 import click
 import sys
+import subprocess
 from rich.console import Console
 
 console = Console()
@@ -53,8 +54,52 @@ def inspect_vessel(system):
 def complexity_report(threshold):
     """Generate code complexity metrics."""
     console.print("[bold]Generating complexity report...[/bold]")
-    console.print(f"Threshold set to: {threshold}")
-    console.print("[green]Report generated![/green]")
+    
+    try:
+        # Check if radon is installed
+        import importlib.util
+        if importlib.util.find_spec("radon") is None:
+            console.print("[bold red]Error:[/bold red] Radon is not installed.")
+            console.print("Install with: [bold]pip install radon[/bold]")
+            return
+        
+        # Run Maintainability Index analysis
+        console.print("\n[bold green]Maintainability Index Analysis:[/bold green]")
+        mi_result = subprocess.run(
+            ["radon", "mi", "."], 
+            capture_output=True, 
+            text=True
+        )
+        
+        if mi_result.returncode == 0:
+            console.print(mi_result.stdout)
+        else:
+            console.print(f"[bold red]Error running Maintainability Index analysis:[/bold red]\n{mi_result.stderr}")
+        
+        # Run Cyclomatic Complexity analysis
+        console.print("\n[bold green]Cyclomatic Complexity Analysis:[/bold green]")
+        console.print(f"[italic]Showing functions with complexity above threshold: {threshold}[/italic]")
+        
+        cc_result = subprocess.run(
+            ["radon", "cc", ".", "-a", "-s", f"--min={threshold}", "--exclude-code=venv"], 
+            capture_output=True, 
+            text=True
+        )
+        
+        if cc_result.returncode == 0:
+            if cc_result.stdout.strip():
+                console.print(cc_result.stdout)
+            else:
+                console.print("[green]No functions found with complexity above the threshold.[/green]")
+        else:
+            console.print(f"[bold red]Error running Cyclomatic Complexity analysis:[/bold red]\n{cc_result.stderr}")
+            
+        console.print("\n[bold blue]Complexity analysis complete.[/bold blue]")
+        console.print("[italic]For more information about complexity metrics, run: [bold]splain code complexity[/bold][/italic]")
+        
+    except Exception as e:
+        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        console.print("Make sure radon is installed: [bold]pip install radon[/bold]")
 
 # Command entry points for direct invocation
 def create_checkpoint_command():
@@ -71,4 +116,8 @@ def inspect_vessel_command():
 
 def complexity_report_command():
     """Entry point for the 'complexity' command."""
-    return complexity_report(sys.argv[1:])
+    # Parse arguments for the complexity command
+    args = []
+    if len(sys.argv) > 1:
+        args = sys.argv[1:]
+    return complexity_report(args)
