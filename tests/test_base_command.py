@@ -1,6 +1,7 @@
 """Tests for the BaseCommand class."""
 
 import pytest
+import click
 from unittest.mock import patch, MagicMock
 from starshipagentic.utils.base_command import BaseCommand
 
