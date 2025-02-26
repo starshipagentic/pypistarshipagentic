@@ -130,8 +130,8 @@ def enhance_group_help(group, name):
                         opt_str += " (required)"
                     options.append(opt_str)
             
-            # Get aliases from registry
-            aliases = cmd_info.get('aliases', [])
+            # Get aliases from registry (which now uses pyproject.toml)
+            aliases = command_registry.get_aliases_for_command(name, cmd_name)
             aliases_str = ", ".join(aliases) if aliases else "None"
             
             # Get description from registry or Click command
@@ -210,7 +210,7 @@ def display_all_commands():
         commands = group_info.get('commands', {})
         for cmd_name in sorted(commands.keys()):
             cmd_data = commands[cmd_name]
-            aliases = cmd_data.get('aliases', [])
+            aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
             aliases_str = ", ".join(aliases) if aliases else ""
             
             command_text = f"  {group_name} {cmd_name}"

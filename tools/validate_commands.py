@@ -64,12 +64,54 @@ def get_implemented_commands():
         for cmd_name, cmd_obj in group_obj.commands.items():
             implemented_commands[group_name]["commands"][cmd_name] = {
                 "description": cmd_obj.help,
-                "aliases": getattr(cmd_obj, "aliases", []),
+                "aliases": [],  # Will be populated from pyproject.toml
                 "options": [
                     f"--{param.name}" for param in cmd_obj.params 
                     if isinstance(param, click.Option)
                 ]
             }
+    
+    # Add aliases from pyproject.toml
+    try:
+        import tomli
+    except ImportError:
+        import tomllib as tomli
+        
+    pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
+    if pyproject_path.exists():
+        with open(pyproject_path, "rb") as f:
+            pyproject = tomli.load(f)
+        
+        # Extract aliases from project.scripts
+        scripts = pyproject.get("project", {}).get("scripts", {})
+        for alias, target in scripts.items():
+            # Skip the main command
+            if alias == "starshipagentic":
+                continue
+                
+            # Parse the target to get the group and command
+            # Format is typically: "starshipagentic.commands.group_cmds:command_name_command"
+            try:
+                module_path, func_name = target.split(":")
+                group_name = module_path.split(".")[-1].replace("_cmds", "")
+                
+                # The command function name typically ends with "_command"
+                # and is derived from the actual command name
+                cmd_func_name = func_name.replace("_command", "")
+                
+                # Convert function name to command name (replace underscores with hyphens)
+                cmd_name = cmd_func_name.replace("_", "-")
+                
+                # Add the alias to the appropriate command
+                if group_name in implemented_commands:
+                    for command_name, command_data in implemented_commands[group_name]["commands"].items():
+                        # Check if this is the right command by comparing hyphenated names
+                        if command_name.replace("-", "_") == cmd_func_name:
+                            implemented_commands[group_name]["commands"][command_name]["aliases"].append(alias)
+                            break
+            except (ValueError, KeyError, IndexError):
+                # Skip entries that don't match the expected format
+                continue
     
     return implemented_commands
 

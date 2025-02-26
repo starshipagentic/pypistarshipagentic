@@ -45,12 +45,68 @@ class CommandRegistry:
         return all_commands
     
     def get_aliases_map(self):
-        """Return a mapping of aliases to their full commands."""
+        """Return a mapping of aliases to their full commands.
+        
+        Uses pyproject.toml as the source of truth for aliases.
+        """
         aliases_map = {}
-        for group_name, group_data in self._commands.items():
-            for cmd_name, cmd_data in group_data.get('commands', {}).items():
-                for alias in cmd_data.get('aliases', []):
-                    aliases_map[alias] = (group_name, cmd_name)
+        
+        # First try to get aliases from pyproject.toml (source of truth)
+        try:
+            import tomli
+        except ImportError:
+            try:
+                import tomllib as tomli
+            except ImportError:
+                # If neither tomli nor tomllib is available, fall back to YAML
+                for group_name, group_data in self._commands.items():
+                    for cmd_name, cmd_data in group_data.get('commands', {}).items():
+                        for alias in cmd_data.get('aliases', []):
+                            aliases_map[alias] = (group_name, cmd_name)
+                return aliases_map
+        
+        # Load aliases from pyproject.toml
+        pyproject_path = Path(__file__).parent.parent.parent.parent / "pyproject.toml"
+        if pyproject_path.exists():
+            with open(pyproject_path, "rb") as f:
+                pyproject = tomli.load(f)
+            
+            # Extract aliases from project.scripts
+            scripts = pyproject.get("project", {}).get("scripts", {})
+            for alias, target in scripts.items():
+                # Skip the main command
+                if alias == "starshipagentic":
+                    continue
+                    
+                # Parse the target to get the group and command
+                # Format is typically: "starshipagentic.commands.group_cmds:command_name_command"
+                try:
+                    module_path, func_name = target.split(":")
+                    group_name = module_path.split(".")[-1].replace("_cmds", "")
+                    
+                    # The command function name typically ends with "_command"
+                    # and is derived from the actual command name
+                    cmd_func_name = func_name.replace("_command", "")
+                    
+                    # Convert function name to command name (replace underscores with hyphens)
+                    cmd_name = cmd_func_name.replace("_", "-")
+                    
+                    # Find the actual command name in the YAML that matches this function name
+                    for command_name in self._commands.get(group_name, {}).get('commands', {}):
+                        if command_name.replace("-", "_") == cmd_func_name:
+                            aliases_map[alias] = (group_name, command_name)
+                            break
+                except (ValueError, KeyError, IndexError):
+                    # Skip entries that don't match the expected format
+                    continue
+        
+        # Fall back to YAML if no aliases were found in pyproject.toml
+        if not aliases_map:
+            for group_name, group_data in self._commands.items():
+                for cmd_name, cmd_data in group_data.get('commands', {}).items():
+                    for alias in cmd_data.get('aliases', []):
+                        aliases_map[alias] = (group_name, cmd_name)
+        
         return aliases_map
     
     def get_example_command(self, group_name):
@@ -63,6 +119,49 @@ class CommandRegistry:
         # Get first command as example
         cmd_name = next(iter(commands.keys()), "")
         return f"{group_name} {cmd_name}"
+    
+    def get_aliases_for_command(self, group_name, command_name):
+        """Get aliases for a specific command from pyproject.toml."""
+        aliases = []
+        
+        # Try to get aliases from pyproject.toml (source of truth)
+        try:
+            import tomli
+        except ImportError:
+            try:
+                import tomllib as tomli
+            except ImportError:
+                # If neither tomli nor tomllib is available, fall back to YAML
+                cmd_info = self.get_command_info(group_name, command_name)
+                return cmd_info.get("aliases", [])
+        
+        # Load aliases from pyproject.toml
+        pyproject_path = Path(__file__).parent.parent.parent.parent / "pyproject.toml"
+        if pyproject_path.exists():
+            with open(pyproject_path, "rb") as f:
+                pyproject = tomli.load(f)
+            
+            # Convert command name to function name (replace hyphens with underscores)
+            cmd_func_name = command_name.replace("-", "_")
+            
+            # Extract aliases from project.scripts
+            scripts = pyproject.get("project", {}).get("scripts", {})
+            for alias, target in scripts.items():
+                # Skip the main command
+                if alias == "starshipagentic":
+                    continue
+                
+                # Check if this target matches our command
+                target_pattern = f"starshipagentic.commands.{group_name}_cmds:{cmd_func_name}_command"
+                if target_pattern in target:
+                    aliases.append(alias)
+        
+        # Fall back to YAML if no aliases were found in pyproject.toml
+        if not aliases:
+            cmd_info = self.get_command_info(group_name, command_name)
+            aliases = cmd_info.get("aliases", [])
+        
+        return aliases
     
     def validate_commands(self):
         """Validate that all commands in YAML have implementations."""

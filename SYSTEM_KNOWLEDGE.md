@@ -8,10 +8,11 @@ The Starship Agentic CLI uses a unique approach to implement command aliases:
 
 ### How Aliases Work
 
-1. **Entry Points in pyproject.toml**:
+1. **Entry Points in pyproject.toml** (SOURCE OF TRUTH):
    - Aliases are implemented as separate executable entry points in `pyproject.toml`
    - Each alias is a direct script that calls the corresponding command function
    - Example: `mission = "starshipagentic.commands.mission_cmds:mission_brief_command"`
+   - This is the DEFINITIVE source of truth for aliases in the system
 
 2. **Base Command Wrapper**:
    - The `BaseCommand.parse_args_for_command()` function creates wrappers for direct command invocation
@@ -20,7 +21,7 @@ The Starship Agentic CLI uses a unique approach to implement command aliases:
 
 3. **Documentation in commands-list.yml**:
    - The `commands-list.yml` file documents the relationships between commands and their aliases
-   - This is for documentation purposes only and doesn't affect functionality
+   - This should be kept in sync with pyproject.toml but is not the source of truth
 
 ### Important Notes
 
@@ -28,6 +29,7 @@ The Starship Agentic CLI uses a unique approach to implement command aliases:
 - When you run an alias (e.g., `mission`), you're executing a separate script, not using Click's command structure
 - The main CLI (`starshipagentic`) uses Click's standard command groups and commands
 - Do NOT use `aliases=[]` parameter in Click command decorators - Click doesn't support this
+- All validation tools and documentation generators should use pyproject.toml as the source of truth for aliases
 
 ### Example
 
