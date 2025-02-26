@@ -32,29 +32,32 @@ def test_get_param_value_opt_overrides_arg():
 def test_get_param_value_from_prompt(mock_prompt):
     """Test getting parameter value from prompt when both arg and opt are None."""
     mock_prompt.return_value = "prompt_value"
-    base_cmd = BaseCommand()
-    result = base_cmd.get_param_value(None, None, "param", "Prompt text")
-    assert result == "prompt_value"
-    mock_prompt.assert_called_once_with("param", "Prompt text", choices=None, default=None)
+    with patch('sys.modules', {}):  # Remove pytest from sys.modules for this test
+        base_cmd = BaseCommand()
+        result = base_cmd.get_param_value(None, None, "param", "Prompt text")
+        assert result == "prompt_value"
+        mock_prompt.assert_called_once_with("param", "Prompt text", choices=None, default=None)
 
 @patch('starshipagentic.utils.interactive.prompt_for_missing_param')
 def test_get_param_value_with_choices(mock_prompt):
     """Test getting parameter value with choices."""
     mock_prompt.return_value = "choice1"
-    base_cmd = BaseCommand()
-    choices = ["choice1", "choice2"]
-    result = base_cmd.get_param_value(None, None, "param", "Prompt text", choices=choices)
-    assert result == "choice1"
-    mock_prompt.assert_called_once_with("param", "Prompt text", choices=choices, default=None)
+    with patch('sys.modules', {}):  # Remove pytest from sys.modules for this test
+        base_cmd = BaseCommand()
+        choices = ["choice1", "choice2"]
+        result = base_cmd.get_param_value(None, None, "param", "Prompt text", choices=choices)
+        assert result == "choice1"
+        mock_prompt.assert_called_once_with("param", "Prompt text", choices=choices, default=None)
 
 @patch('starshipagentic.utils.interactive.prompt_for_missing_param')
 def test_get_param_value_with_default(mock_prompt):
     """Test getting parameter value with default."""
     mock_prompt.return_value = "default_value"
-    base_cmd = BaseCommand()
-    result = base_cmd.get_param_value(None, None, "param", "Prompt text", default="default_value")
-    assert result == "default_value"
-    mock_prompt.assert_called_once_with("param", "Prompt text", choices=None, default="default_value")
+    with patch('sys.modules', {}):  # Remove pytest from sys.modules for this test
+        base_cmd = BaseCommand()
+        result = base_cmd.get_param_value(None, None, "param", "Prompt text", default="default_value")
+        assert result == "default_value"
+        mock_prompt.assert_called_once_with("param", "Prompt text", choices=None, default="default_value")
 
 def test_parse_args_for_command():
     """Test parsing arguments for a command."""

@@ -26,9 +26,10 @@ def test_mission_brief_with_detailed_flag(runner):
 def test_mission_brief_interactive(mock_prompt, runner):
     """Test mission-brief command with interactive prompt."""
     mock_prompt.return_value = "Interactive blog platform"
-    result = runner.invoke(mission_group, ["mission-brief"])
-    assert result.exit_code == 0
-    assert "Generating mission brief for: Interactive blog platform" in result.output
+    with patch('sys.modules', {'pytest': None}):  # Temporarily remove pytest from sys.modules
+        result = runner.invoke(mission_group, ["mission-brief"])
+        assert result.exit_code == 0
+        assert "Generating mission brief for: Interactive blog platform" in result.output
 
 def test_expand_mission_with_focus(runner):
     """Test expand-mission command with focus provided."""
@@ -40,6 +41,7 @@ def test_expand_mission_with_focus(runner):
 def test_expand_mission_interactive(mock_prompt, runner):
     """Test expand-mission command with interactive prompt."""
     mock_prompt.return_value = "database-schema"
-    result = runner.invoke(mission_group, ["expand-mission"])
-    assert result.exit_code == 0
-    assert "Expanding mission details for: database-schema" in result.output
+    with patch('sys.modules', {'pytest': None}):  # Temporarily remove pytest from sys.modules
+        result = runner.invoke(mission_group, ["expand-mission"])
+        assert result.exit_code == 0
+        assert "Expanding mission details for: database-schema" in result.output
