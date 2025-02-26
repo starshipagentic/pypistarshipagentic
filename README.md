@@ -169,7 +169,9 @@ starshipagentic vessel tour-ship
 tour
 
 # Initialize a new project
-commission --template django
+commission django  # Shorthand with positional argument
+# or
+commission  # Interactive prompt will ask for template
 
 # Generate BDD features
 navigation

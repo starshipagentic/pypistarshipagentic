@@ -4,6 +4,7 @@ import click
 import sys
 import subprocess
 from rich.console import Console
+from starshipagentic.utils.interactive import prompt_for_missing_param
 
 console = Console()
 
@@ -13,8 +14,19 @@ def engineering_group():
     pass
 
 @engineering_group.command(name="create-checkpoint")
-@click.option("--message", "-m", help="Checkpoint message")
-def create_checkpoint(message):
+@click.argument("message", required=False)
+@click.option("--message", "-m", "message_opt", help="Checkpoint message")
+def create_checkpoint(message, message_opt):
+    # Use the option value if provided, otherwise use the argument
+    message = message_opt or message
+    
+    # If message is not provided, prompt for it
+    if not message:
+        message = prompt_for_missing_param(
+            "message",
+            "Enter a message for this checkpoint:",
+            default="Checkpoint " + click.get_current_context().command_path
+        )
     """Save project state."""
     console.print("[bold]Creating project checkpoint...[/bold]")
     
@@ -25,7 +37,18 @@ def create_checkpoint(message):
 
 @engineering_group.command(name="restore-checkpoint")
 @click.argument("checkpoint", required=False)
-def restore_checkpoint(checkpoint):
+@click.option("--checkpoint", "checkpoint_opt", help="Checkpoint to restore")
+def restore_checkpoint(checkpoint, checkpoint_opt):
+    # Use the option value if provided, otherwise use the argument
+    checkpoint = checkpoint_opt or checkpoint
+    
+    # If checkpoint is not provided, prompt for it
+    if not checkpoint:
+        checkpoint = prompt_for_missing_param(
+            "checkpoint",
+            "Which checkpoint would you like to restore?",
+            default="latest"
+        )
     """Roll back to saved state."""
     console.print("[bold]Restoring from checkpoint...[/bold]")
     
@@ -37,8 +60,23 @@ def restore_checkpoint(checkpoint):
     console.print("[green]Checkpoint restored![/green]")
 
 @engineering_group.command(name="inspect-vessel")
-@click.option("--system", help="Specific system to inspect")
-def inspect_vessel(system):
+@click.argument("system", required=False)
+@click.option("--system", "system_opt", help="Specific system to inspect")
+def inspect_vessel(system, system_opt):
+    # Use the option value if provided, otherwise use the argument
+    system = system_opt or system
+    
+    # Available systems
+    systems = ["database", "frontend", "api", "auth", "all"]
+    
+    # If system is not provided, prompt for it
+    if not system:
+        system = prompt_for_missing_param(
+            "system",
+            "Which system would you like to inspect?",
+            choices=systems,
+            default="all"
+        )
     """Run framework-specific integrity checks."""
     console.print("[bold]Inspecting vessel systems...[/bold]")
     
@@ -50,8 +88,20 @@ def inspect_vessel(system):
     console.print("[green]Inspection complete![/green]")
 
 @engineering_group.command(name="complexity-report")
-@click.option("--threshold", type=int, default=10, help="Complexity threshold")
-def complexity_report(threshold):
+@click.argument("threshold", required=False, type=int)
+@click.option("--threshold", "threshold_opt", type=int, default=10, help="Complexity threshold")
+def complexity_report(threshold, threshold_opt):
+    # Use the option value if provided, otherwise use the argument
+    threshold = threshold_opt if threshold_opt is not None else threshold
+    
+    # If threshold is not provided, prompt for it
+    if threshold is None:
+        threshold_str = prompt_for_missing_param(
+            "threshold",
+            "Enter complexity threshold (higher = show only more complex functions):",
+            default="10"
+        )
+        threshold = int(threshold_str)
     """Generate code complexity metrics."""
     console.print("[bold]Generating complexity report...[/bold]")
     
@@ -104,20 +154,29 @@ def complexity_report(threshold):
 # Command entry points for direct invocation
 def create_checkpoint_command():
     """Entry point for the 'checkpoint' command."""
-    return create_checkpoint(sys.argv[1:])
+    # Extract first argument as message if provided
+    message = sys.argv[1] if len(sys.argv) > 1 else None
+    return create_checkpoint(message, None)
 
 def restore_checkpoint_command():
     """Entry point for the 'restore' command."""
-    return restore_checkpoint(sys.argv[1:])
+    # Extract first argument as checkpoint if provided
+    checkpoint = sys.argv[1] if len(sys.argv) > 1 else None
+    return restore_checkpoint(checkpoint, None)
 
 def inspect_vessel_command():
     """Entry point for the 'inspect' command."""
-    return inspect_vessel(sys.argv[1:])
+    # Extract first argument as system if provided
+    system = sys.argv[1] if len(sys.argv) > 1 else None
+    return inspect_vessel(system, None)
 
 def complexity_report_command():
     """Entry point for the 'complexity' command."""
-    # Parse arguments for the complexity command
-    args = []
+    # Extract first argument as threshold if provided
+    threshold = None
     if len(sys.argv) > 1:
-        args = sys.argv[1:]
-    return complexity_report(args)
+        try:
+            threshold = int(sys.argv[1])
+        except ValueError:
+            pass
+    return complexity_report(threshold, None)
