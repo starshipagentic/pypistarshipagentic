@@ -149,6 +149,14 @@ Code repository and search system.
 | `search` | - | Search code repository database |
 | `transport` | - | Store code snippets with AI-generated summaries |
 
+### Droid Commands (`droid_cmds.py`)
+Explanation and assistance commands.
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `droid-splain` | `droid` | Explain the last error or report |
+| `man-splain` | `splain` | Search and explain a specified topic |
+
 ## Examples
 
 ```bash
