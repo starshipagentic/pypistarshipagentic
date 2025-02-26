@@ -71,6 +71,23 @@ class BaseCommand:
                 
                 return command_func(**kwargs)
             
+            # Check if --help is in the arguments
+            if '--help' in sys.argv or '-h' in sys.argv:
+                # Get the original command name and group
+                cmd_name = command_func.__name__.replace('_', '-')
+                
+                # Try to get the parent group name
+                try:
+                    parent_command = command_func.__click_params__[0].parent
+                    if parent_command:
+                        group_name = parent_command.name
+                        from rich.console import Console
+                        console = Console()
+                        console.print(f"\n[bold]This is an alias for:[/bold] starshipagentic {group_name} {cmd_name}")
+                        console.print(f"For full documentation, use: [bold]starshipagentic {group_name} {cmd_name} --help[/bold]\n")
+                except (AttributeError, IndexError):
+                    pass
+            
             # For normal execution, use Click's main function to properly handle arguments
             # This avoids having to reimplement Click's argument parsing logic
             try:
