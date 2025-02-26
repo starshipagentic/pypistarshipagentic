@@ -53,109 +53,120 @@ Without any arguments to start the guided process from the beginning, which will
 
 ## Command Groups
 
-### Main Command
-| Command | Description |
-|---------|-------------|
-| `starshipagentic` | Start the guided process for AI-assisted development |
+# Command Reference
 
-### Vessel Commands (`vessel_cmds.py`)
-Initialize and select project templates.
+## Vessel Commands
+
+Initialize and select project templates
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `tour-ship` | `tour` | Browse available ship templates/frameworks |
-| `commission-ship` | `commission` | Clone template and run initialization |
+| `vessel tour-ship` | `tour` | Browse available ship templates/frameworks |
+| `vessel commission-ship` | `commission` | Clone template and run initialization |
+| `vessel visualize-ship` | `` | Launch a Pygame visualization of the specified ship |
 
-### Mission Commands (`mission_cmds.py`)
-Define and expand project requirements.
+## Mission Commands
 
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `mission-brief` | `mission` | Generate initial project documentation |
-| `expand-mission` | `expand` | Elaborate on project requirements |
-
-### Architecture Commands (`architecture_cmds.py`)
-Review and configure system architecture.
+Define and expand project requirements
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `review-schematics` | `schematics` | Review state diagrams and DDD docs |
-| `calibrate-technology` | `calibrate` | Configure tech stack settings |
+| `mission mission-brief` | `mission` | Define project mission and requirements |
+| `mission expand-mission` | `expand` | Expand existing requirements |
 
-### Navigation Commands (`navigation_cmds.py`)
-Plan feature implementation.
+## Architecture Commands
 
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `plot-navigation` | `navigation` | Generate and review BDD Gherkin features |
-| `set-waypoints` | `waypoints` | Create prioritized feature implementation plan |
-
-### Transmission Commands (`transmission_cmds.py`)
-Manage external data and API connections.
+Review and configure system architecture
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `authorize-codes` | `authorize` | Configure API keys and service credentials |
-| `scan-sector` | `scan` | Search for relevant topic URLs |
-| `receive-transmission` | `transmission` | Scrape or input information from URLs |
+| `architecture review-schematics` | `schematics` | Review system architecture diagrams (MD documents for state diagram and DDD) |
+| `architecture calibrate-technology` | `calibrate` | Configure technology stack |
 
-### Exploration Commands (`exploration_cmds.py`)
-Execute and test your implementation.
+## Navigation Commands
 
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `warp-speed` | `warp` | Run BDD tests with AI fixing loop |
-| `trycoder` | - | Run unit tests with AI fixing loop |
-| `engage` | - | Run complete test-fix cycles for all waypoints |
-
-### Weapons Commands (`weapons_cmds.py`)
-Remove problematic code and tests.
+Plan feature implementation
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `fire-photons` | `photons` | Remove problematic test steps |
-| `aim-lasers` | `lasers` | Remove problematic code sections |
-| `shields-up` | `shields` | Placeholder for defensive operations |
+| `navigation plot-navigation` | `navigation` | Generate and review BDD gherkin feature files |
+| `navigation set-waypoints` | `waypoints` | Create order for working on features (project plan checklist) |
 
-### Engineering Commands (`engineering_cmds.py`)
-Manage project state and analyze code quality.
+## Transmission Commands
 
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `create-checkpoint` | `checkpoint` | Save project state |
-| `restore-checkpoint` | `restore` | Roll back to saved state |
-| `inspect-vessel` | `inspect` | Run framework-specific integrity checks |
-| `complexity-report` | `complexity` | Generate code complexity metrics |
-
-### Cosmic Commands (`cosmic_cmds.py`)
-Special operations.
+Manage external data and API connections
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `supernova` | - | Clean up Git repositories and metadata |
+| `transmission authorize-codes` | `authorize` | Configure API credentials needed for features |
+| `transmission scan-sector` | `scan` | Search for topic to find URLs for scraping |
+| `transmission receive-transmission` | `transmission` | Scrape or directly input information from a known URL |
 
-### Git Commands (`git_cmds.py`)
-Git-related operations.
+## Exploration Commands
 
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `teleport` | - | Create new Git repo from code sections |
-
-### MCARS Commands (`mcars_cmds.py`)
-Code repository and search system.
+Execute and test your implementation
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `search` | - | Search code repository database |
-| `transport` | - | Store code snippets with AI-generated summaries |
+| `exploration warp-speed` | `warp` | Top-down BDD behave driven loop (get behave errors and feed to AI to fix) |
+| `exploration trycoder` | `trycoder` | Bottom-up unit test driven loop (get errors and feed to AI to fix) |
+| `exploration engage` | `engage` | Run warp cycle and trycoder to repeat full set of waypoints N times |
 
-### Droid Commands (`droid_cmds.py`)
-Explanation and assistance commands.
+## Weapons Commands
+
+Remove problematic code and tests
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `droid-splain` | `droid` | Explain the last error or report |
-| `man-splain` | `splain` | Search and explain a specified topic |
+| `weapons fire-photons` | `photons` | Remove specified steps that are causing trouble |
+| `weapons aim-lasers` | `lasers` | Remove specified code that is causing trouble |
+| `weapons shields-up` | `shields` | Protect code from changes (placeholder) |
+
+## Engineering Commands
+
+Manage project state and analyze code quality
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `engineering create-checkpoint` | `checkpoint` | Create a copy of entire folder and/or git tags |
+| `engineering restore-checkpoint` | `restore` | Roll code back to checkpoint (git or folder copy) |
+| `engineering inspect-vessel` | `inspect` | Run framework-specific checks to report on integrity |
+| `engineering complexity-report` | `complexity` | Run radon mi and radon cc to report on code complexity issues |
+
+## Cosmic Commands
+
+Special operations
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `cosmic supernova` | `supernova` | Remove all git stuff (searches through all sub-folders) |
+
+## Git Commands
+
+Git-related operations
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `git teleport` | `teleport` | Take pieces of code and make a new git repo almost automatically |
+
+## Mcars Commands
+
+Code repository and search system
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `mcars search` | `search` | Search for code in the MCARS database |
+| `mcars transport` | `transport` | Store pointers/copies of code with AI-generated summaries in tinydb |
+
+## Droid Commands
+
+Explanation and assistance commands
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `droid droid-splain` | `droid` | Get explanation from droid assistant |
+| `droid man-splain` | `splain` | Get manual page for a topic |
+
 
 ## Examples
 
