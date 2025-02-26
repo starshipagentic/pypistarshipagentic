@@ -168,22 +168,34 @@ starshipagentic vessel tour-ship
 # or simply
 tour
 
-# Initialize a new project
-commission django  # Shorthand with positional argument
-# or
-commission  # Interactive prompt will ask for template
+# Initialize a new project (three equivalent ways)
+commission django-galaxy
+# or with named parameters
+commission --template django-galaxy --name myproject
+# or interactively (will prompt for missing information)
+commission
 
 # Generate BDD features
 navigation
+# or with parameters
+navigation gherkin
 
 # Run tests with AI fixing
+warp 3  # shorthand for 3 iterations
+# or with named parameters
 warp --iterations 3
 
 # Create a project checkpoint
+checkpoint "Completed user authentication"
+# or with named parameters
 checkpoint --message "Completed user authentication"
+# or interactively
+checkpoint
 
 # Generate code complexity report
 complexity
+# or with threshold parameter
+complexity 15
 ```
 
 ## Development
