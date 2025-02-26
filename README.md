@@ -43,7 +43,13 @@ Each command is also available as a direct alias:
 <command-alias> [options]
 ```
 
-You can also simply run `starshipagentic` without any arguments to start the guided process from the beginning, which will help you navigate through the available commands.
+You can also simply run:
+
+```
+starshipagentic
+```
+
+Without any arguments to start the guided process from the beginning, which will help you navigate through the available commands.
 
 ## Command Groups
 
@@ -137,30 +143,6 @@ Code repository and search system.
 |---------|-------|-------------|
 | `search` | - | Search code repository database |
 | `transport` | - | Store code snippets with AI-generated summaries |
-
-## Examples
-
-```bash
-# Browse available project templates
-starshipagentic vessel tour-ship
-# or simply
-tour
-
-# Initialize a new project
-commission --template django
-
-# Generate BDD features
-navigation
-
-# Run tests with AI fixing
-warp --iterations 3
-
-# Create a project checkpoint
-checkpoint --message "Completed user authentication"
-
-# Generate code complexity report
-complexity
-```
 
 ## Examples
 
