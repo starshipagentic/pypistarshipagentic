@@ -65,8 +65,28 @@ def sync_aliases():
     # Check for aliases in pyproject.toml that aren't in commands-list.yml
     for alias, target in list(scripts.items()):
         if alias != "starshipagentic" and alias not in expected_aliases:
-            # Don't automatically remove aliases, just report them
-            removed_aliases.append(f"{alias} -> {target}")
+            # Try to find the command this alias points to
+            try:
+                module_path, func_name = target.split(":")
+                group_name = module_path.split(".")[-1].replace("_cmds", "")
+                cmd_func_name = func_name.replace("_command", "")
+                cmd_name = cmd_func_name.replace("_", "-")
+                
+                # Check if this command exists in the registry
+                if group_name in commands and cmd_name in commands[group_name].get('commands', {}):
+                    # Add this alias to the command in commands-list.yml
+                    if 'aliases' not in commands[group_name]['commands'][cmd_name]:
+                        commands[group_name]['commands'][cmd_name]['aliases'] = []
+                    
+                    if alias not in commands[group_name]['commands'][cmd_name]['aliases']:
+                        commands[group_name]['commands'][cmd_name]['aliases'].append(alias)
+                        updated_aliases.append(f"{alias}: Added to {group_name} {cmd_name}")
+                else:
+                    # Don't automatically remove aliases, just report them
+                    removed_aliases.append(f"{alias} -> {target}")
+            except (ValueError, KeyError, IndexError):
+                # Don't automatically remove aliases, just report them
+                removed_aliases.append(f"{alias} -> {target}")
     
     # Update pyproject.toml if there were changes
     if added_aliases or updated_aliases:
@@ -76,6 +96,12 @@ def sync_aliases():
         print(f"✅ Updated pyproject.toml with {len(added_aliases)} new and {len(updated_aliases)} modified aliases")
     else:
         print("✅ No changes needed in pyproject.toml")
+    
+    # Update commands-list.yml if we added aliases to it
+    if updated_aliases:
+        with open(commands_path, 'w') as f:
+            yaml.dump(commands, f, sort_keys=False, default_flow_style=False)
+        print(f"✅ Updated commands-list.yml with {len(updated_aliases)} aliases")
     
     # Report changes
     if added_aliases:

@@ -342,9 +342,16 @@ def main(ctx, all_commands, commands_list):
                 table.add_column("Description", style="white")
                 table.add_column("Options", style="dim")
                 
-                for cmd_name, cmd_data in group_data.get('commands', {}).items():
+                # Get all commands for this group
+                commands = command_registry.get_all_commands(group_name)
+                for cmd_name, cmd_data in commands.items():
+                    # Get aliases from registry (which uses pyproject.toml)
+                    aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
+                    aliases_str = ", ".join(aliases) if aliases else "None"
+                    
+                    # Get options
                     options_str = "\n".join(cmd_data.get('options', [])) or "None"
-                    aliases_str = ", ".join(cmd_data.get('aliases', [])) or "None"
+                    
                     table.add_row(
                         f"{group_name} {cmd_name}",
                         aliases_str,

@@ -84,12 +84,12 @@ exploration:
       description: "Bottom-up unit test driven loop (get errors and feed to AI to fix)"
       options:
         - "--verbose: Show detailed test output"
-      aliases: []
+      aliases: ["trycoder"]
     engage:
       description: "Run warp cycle and trycoder to repeat full set of waypoints N times"
       options:
         - "--cycles: Number of full test cycles"
-      aliases: []
+      aliases: ["engage"]
 
 weapons:
   description: "Remove problematic code and tests"
@@ -129,31 +129,31 @@ cosmic:
       description: "Remove all git stuff (searches through all sub-folders)"
       options:
         - "--force: Force removal without confirmation"
-      aliases: []
+      aliases: ["supernova"]
 
 git:
   description: "Git-related operations"
   commands:
     teleport:
       description: "Take pieces of code and make a new git repo almost automatically"
-      aliases: []
+      aliases: ["teleport"]
 
 mcars:
   description: "Code repository and search system"
   commands:
     search:
       description: "Search for code in the MCARS database"
-      aliases: []
+      aliases: ["search"]
     transport:
       description: "Store pointers/copies of code with AI-generated summaries in tinydb"
-      aliases: []
+      aliases: ["transport"]
 
 droid:
   description: "Explanation and assistance commands"
   commands:
     droid-splain:
       description: "Get explanation from droid assistant"
-      aliases: []
+      aliases: ["droid"]
     man-splain:
       description: "Get manual page for a topic"
-      aliases: []
+      aliases: ["splain"]
