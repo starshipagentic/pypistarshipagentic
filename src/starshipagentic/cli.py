@@ -104,6 +104,7 @@ def enhance_group_help(group, name):
         # Commands table
         table = Table(show_header=True, header_style=f"bold {theme_color}")
         table.add_column("Command", style=f"{theme_color}")
+        table.add_column("Aliases", style="yellow")
         table.add_column("Description", style="white")
         table.add_column("Options", style="dim")
         
@@ -118,15 +119,14 @@ def enhance_group_help(group, name):
                         opt_str += " (required)"
                     options.append(opt_str)
             
-            # Check for aliases
+            # Get aliases
             aliases = getattr(cmd, 'aliases', [])
-            command_name = f"{name} {cmd_name}"
-            if aliases:
-                command_name += f" (aliases: {', '.join(aliases)})"
+            aliases_str = ", ".join(aliases) if aliases else "None"
             
             options_str = ", ".join(options) if options else "None"
             table.add_row(
-                command_name,
+                f"{name} {cmd_name}",
+                aliases_str,
                 cmd.help or "No description",
                 options_str
             )
@@ -218,15 +218,19 @@ def display_all_commands():
         # Add each command in the group
         for cmd_name in sorted(group.commands):
             cmd = group.commands[cmd_name]
-            # Check for aliases
+            # Get aliases
             aliases = getattr(cmd, 'aliases', [])
+            aliases_str = ", ".join(aliases) if aliases else ""
+            
             command_text = f"  {prefix} {cmd_name}"
-            if aliases:
-                command_text += f" (aliases: {', '.join(aliases)})"
+            description = cmd.help or "No description"
+            
+            if aliases_str:
+                description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
                 
             table.add_row(
                 command_text,
-                cmd.help or "No description"
+                description
             )
     
     console.print(table)
@@ -352,18 +356,18 @@ def main(ctx, all_commands, commands_list):
                 # Create a table for commands in this group
                 table = Table(show_header=True, header_style=f"bold {theme_color}")
                 table.add_column("Command", style=f"{theme_color}")
+                table.add_column("Aliases", style="yellow")
                 table.add_column("Description", style="white")
                 table.add_column("Options", style="dim")
-                table.add_column("Aliases", style="yellow")
                 
                 for cmd_name, cmd_data in group_data.get('commands', {}).items():
                     options_str = "\n".join(cmd_data.get('options', [])) or "None"
                     aliases_str = ", ".join(cmd_data.get('aliases', [])) or "None"
                     table.add_row(
                         f"{group_name} {cmd_name}",
+                        aliases_str,
                         cmd_data.get('description', 'No description'),
-                        options_str,
-                        aliases_str
+                        options_str
                     )
                 
                 console.print(table)

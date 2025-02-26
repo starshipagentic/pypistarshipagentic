@@ -14,13 +14,13 @@ def vessel_group():
     """Initialize and select project templates."""
     pass
 
-@vessel_group.command(name="tour-ship")
+@vessel_group.command(name="tour-ship", aliases=["tour"])
 @click.argument("category", required=False)
 @click.option("--category", "category_opt", help="Filter templates by category")
 def tour_ship(category, category_opt):
+    """Browse available ship templates/frameworks."""
     # Use the option value if provided, otherwise use the argument
     category = category_opt or category
-    """Browse available ship templates/frameworks."""
     console.print("[bold]Available ship templates:[/bold]")
     
     templates = [
@@ -37,7 +37,7 @@ def tour_ship(category, category_opt):
     for template in templates:
         console.print(f"[green]{template['name']}[/green]: {template['description']}")
 
-@vessel_group.command(name="commission-ship")
+@vessel_group.command(name="commission-ship", aliases=["commission"])
 @click.argument("template", required=False)
 @click.option("--template", "template_opt", help="Project template to use")
 @click.option("--name", help="Project name")

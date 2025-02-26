@@ -8,13 +8,13 @@ vessel:
       description: "Browse available ship templates/frameworks"
       options:
         - "--category: Filter templates by category"
-      aliases: []
+      aliases: ["tour"]
     commission-ship:
       description: "Clone template and run initialization"
       options:
         - "--template: Project template to use"
         - "--name: Project name"
-      aliases: []
+      aliases: ["commission"]
     visualize-ship:
       description: "Launch a Pygame visualization of the specified ship"
       options:
@@ -24,69 +24,69 @@ vessel:
 mission:
   description: "Define and expand project requirements"
   commands:
-    define:
+    mission-brief:
       description: "Define project mission and requirements"
-      aliases: []
-    expand:
+      aliases: ["mission"]
+    expand-mission:
       description: "Expand existing requirements"
-      aliases: []
+      aliases: ["expand"]
 
 architecture:
   description: "Review and configure system architecture"
   commands:
     review-schematics:
-      description: "Review system architecture diagrams"
+      description: "Review system architecture diagrams (MD documents for state diagram and DDD)"
       options:
         - "--type: Type of diagram to review"
-      aliases: []
+      aliases: ["schematics"]
     calibrate-technology:
       description: "Configure technology stack"
       options:
         - "--stack: Technology stack to configure"
-      aliases: []
+      aliases: ["calibrate"]
 
 navigation:
   description: "Plan feature implementation"
   commands:
     plot-navigation:
-      description: "Plan feature implementation order"
+      description: "Generate and review BDD gherkin feature files"
       options:
         - "--format: Output format for features"
-      aliases: []
+      aliases: ["navigation"]
     set-waypoints:
-      description: "Set implementation milestones"
+      description: "Create order for working on features (project plan checklist)"
       options:
         - "--priority: Prioritization method"
-      aliases: []
+      aliases: ["waypoints"]
 
 transmission:
   description: "Manage external data and API connections"
   commands:
     authorize-codes:
-      description: "Configure API credentials"
+      description: "Configure API credentials needed for features"
       options:
         - "--service: Service to configure"
-      aliases: []
+      aliases: ["authorize"]
     scan-sector:
-      description: "Search for information on a topic"
-      aliases: []
+      description: "Search for topic to find URLs for scraping"
+      aliases: ["scan"]
     receive-transmission:
-      description: "Download data from a URL"
-      aliases: []
+      description: "Scrape or directly input information from a known URL"
+      aliases: ["transmission"]
 
 exploration:
   description: "Execute and test your implementation"
   commands:
     warp-speed:
-      description: "Run performance tests"
-      aliases: []
+      description: "Top-down BDD behave driven loop (get behave errors and feed to AI to fix)"
+      aliases: ["warp"]
     trycoder:
-      description: "Run test suite"
+      description: "Bottom-up unit test driven loop (get errors and feed to AI to fix)"
       options:
         - "--verbose: Show detailed test output"
       aliases: []
     engage:
-      description: "Execute implementation"
+      description: "Run warp cycle and trycoder to repeat full set of waypoints N times"
       options:
         - "--cycles: Number of full test cycles"
       aliases: []
@@ -95,29 +95,38 @@ weapons:
   description: "Remove problematic code and tests"
   commands:
     fire-photons:
-      description: "Remove specified code"
-      aliases: []
+      description: "Remove specified steps that are causing trouble"
+      aliases: ["photons"]
     aim-lasers:
-      description: "Target specific code sections"
-      aliases: []
+      description: "Remove specified code that is causing trouble"
+      aliases: ["lasers"]
     shields-up:
-      description: "Protect code from changes"
+      description: "Protect code from changes (placeholder)"
       options:
         - "--level: Shield strength (0-100)"
-      aliases: []
+      aliases: ["shields"]
 
 engineering:
   description: "Manage project state and analyze code quality"
   commands:
-    analyze:
-      description: "Analyze code quality"
-      aliases: []
+    create-checkpoint:
+      description: "Create a copy of entire folder and/or git tags"
+      aliases: ["checkpoint"]
+    restore-checkpoint:
+      description: "Roll code back to checkpoint (git or folder copy)"
+      aliases: ["restore"]
+    inspect-vessel:
+      description: "Run framework-specific checks to report on integrity"
+      aliases: ["inspect"]
+    complexity-report:
+      description: "Run radon mi and radon cc to report on code complexity issues"
+      aliases: ["complexity"]
 
 cosmic:
   description: "Special operations"
   commands:
     supernova:
-      description: "Remove all generated files"
+      description: "Remove all git stuff (searches through all sub-folders)"
       options:
         - "--force: Force removal without confirmation"
       aliases: []
@@ -126,17 +135,17 @@ git:
   description: "Git-related operations"
   commands:
     teleport:
-      description: "Move files between branches"
+      description: "Take pieces of code and make a new git repo almost automatically"
       aliases: []
 
 mcars:
   description: "Code repository and search system"
   commands:
     search:
-      description: "Search for code examples"
+      description: "Search for code in the MCARS database"
       aliases: []
     transport:
-      description: "Save code to repository"
+      description: "Store pointers/copies of code with AI-generated summaries in tinydb"
       aliases: []
 
 droid:
