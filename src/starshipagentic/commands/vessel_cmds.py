@@ -4,8 +4,10 @@ import click
 import sys
 from rich.console import Console
 from starshipagentic.utils.interactive import prompt_for_missing_param
+from starshipagentic.utils.base_command import BaseCommand
 
 console = Console()
+base_cmd = BaseCommand()
 
 @click.group(name="vessel")
 def vessel_group():
@@ -89,25 +91,6 @@ def visualize_ship(ship, ship_opt):
         console.print("Install with: [bold]pip install pygame[/bold]")
 
 # Command entry points for direct invocation
-def tour_ship_command():
-    """Entry point for the 'tour' command."""
-    # Extract first argument as category if provided
-    category = sys.argv[1] if len(sys.argv) > 1 else None
-    return tour_ship(category, None)
-
-def commission_ship_command():
-    """Entry point for the 'commission' command."""
-    # Extract first argument as template if provided
-    template = sys.argv[1] if len(sys.argv) > 1 else None
-    # Look for --name option
-    name = None
-    for i, arg in enumerate(sys.argv[1:]):
-        if arg == "--name" and i+1 < len(sys.argv)-1:
-            name = sys.argv[i+2]
-    return commission_ship(template, None, name)
-
-def visualize_ship_command():
-    """Entry point for the 'visualize' command."""
-    # Extract first argument as ship if provided
-    ship = sys.argv[1] if len(sys.argv) > 1 else None
-    return visualize_ship(ship, None)
+tour_ship_command = base_cmd.parse_args_for_command(tour_ship)
+commission_ship_command = base_cmd.parse_args_for_command(commission_ship)
+visualize_ship_command = base_cmd.parse_args_for_command(visualize_ship)

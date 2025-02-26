@@ -4,8 +4,10 @@ import click
 import sys
 from rich.console import Console
 from starshipagentic.utils.interactive import prompt_for_missing_param
+from starshipagentic.utils.base_command import BaseCommand
 
 console = Console()
+base_cmd = BaseCommand()
 
 @click.group(name="mission")
 def mission_group():
@@ -65,16 +67,5 @@ def expand_mission(focus, focus_opt):
     console.print("[green]Mission expanded successfully![/green]")
 
 # Command entry points for direct invocation
-def mission_brief_command():
-    """Entry point for the 'mission' command."""
-    # Extract first argument as idea if provided
-    idea = sys.argv[1] if len(sys.argv) > 1 else None
-    # Check for --detailed flag
-    detailed = "--detailed" in sys.argv or "-d" in sys.argv
-    return mission_brief(idea, None, detailed)
-
-def expand_mission_command():
-    """Entry point for the 'expand' command."""
-    # Extract first argument as focus if provided
-    focus = sys.argv[1] if len(sys.argv) > 1 else None
-    return expand_mission(focus, None)
+mission_brief_command = base_cmd.parse_args_for_command(mission_brief)
+expand_mission_command = base_cmd.parse_args_for_command(expand_mission)

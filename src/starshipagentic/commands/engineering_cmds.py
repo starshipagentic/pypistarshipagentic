@@ -5,8 +5,10 @@ import sys
 import subprocess
 from rich.console import Console
 from starshipagentic.utils.interactive import prompt_for_missing_param
+from starshipagentic.utils.base_command import BaseCommand
 
 console = Console()
+base_cmd = BaseCommand()
 
 @click.group(name="engineering")
 def engineering_group():
@@ -152,31 +154,7 @@ def complexity_report(threshold, threshold_opt):
         console.print("Make sure radon is installed: [bold]pip install radon[/bold]")
 
 # Command entry points for direct invocation
-def create_checkpoint_command():
-    """Entry point for the 'checkpoint' command."""
-    # Extract first argument as message if provided
-    message = sys.argv[1] if len(sys.argv) > 1 else None
-    return create_checkpoint(message, None)
-
-def restore_checkpoint_command():
-    """Entry point for the 'restore' command."""
-    # Extract first argument as checkpoint if provided
-    checkpoint = sys.argv[1] if len(sys.argv) > 1 else None
-    return restore_checkpoint(checkpoint, None)
-
-def inspect_vessel_command():
-    """Entry point for the 'inspect' command."""
-    # Extract first argument as system if provided
-    system = sys.argv[1] if len(sys.argv) > 1 else None
-    return inspect_vessel(system, None)
-
-def complexity_report_command():
-    """Entry point for the 'complexity' command."""
-    # Extract first argument as threshold if provided
-    threshold = None
-    if len(sys.argv) > 1:
-        try:
-            threshold = int(sys.argv[1])
-        except ValueError:
-            pass
-    return complexity_report(threshold, None)
+create_checkpoint_command = base_cmd.parse_args_for_command(create_checkpoint)
+restore_checkpoint_command = base_cmd.parse_args_for_command(restore_checkpoint)
+inspect_vessel_command = base_cmd.parse_args_for_command(inspect_vessel)
+complexity_report_command = base_cmd.parse_args_for_command(complexity_report)

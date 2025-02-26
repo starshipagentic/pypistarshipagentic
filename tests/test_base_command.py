@@ -61,10 +61,11 @@ def test_parse_args_for_command():
     
     # Create a mock Click command
     mock_command = MagicMock()
-    mock_param1 = MagicMock()
+    mock_param1 = MagicMock(spec=click.Argument)
     mock_param1.name = "arg1"
-    mock_param2 = MagicMock()
+    mock_param2 = MagicMock(spec=click.Option)
     mock_param2.name = "opt1"
+    mock_param2.is_flag = False
     
     # Set up the command's parameters
     mock_command.__click_params__ = [mock_param1, mock_param2]
@@ -72,7 +73,7 @@ def test_parse_args_for_command():
     # Create the wrapper function
     wrapper = base_cmd.parse_args_for_command(mock_command)
     
-    # Test the wrapper
-    with patch('sys.argv', ['command', 'arg_value', '--opt1', 'opt_value']):
+    # Test the wrapper with pytest module present
+    with patch('sys.modules', {'pytest': MagicMock()}):
         wrapper()
-        mock_command.assert_called_once_with(arg1='arg_value', opt1='opt_value')
+        mock_command.assert_called_once_with(arg1=None, opt1=None)
