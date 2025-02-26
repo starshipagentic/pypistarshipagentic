@@ -118,9 +118,15 @@ def enhance_group_help(group, name):
                         opt_str += " (required)"
                     options.append(opt_str)
             
+            # Check for aliases
+            aliases = getattr(cmd, 'aliases', [])
+            command_name = f"{name} {cmd_name}"
+            if aliases:
+                command_name += f" (aliases: {', '.join(aliases)})"
+            
             options_str = ", ".join(options) if options else "None"
             table.add_row(
-                f"{name} {cmd_name}",
+                command_name,
                 cmd.help or "No description",
                 options_str
             )
@@ -212,8 +218,14 @@ def display_all_commands():
         # Add each command in the group
         for cmd_name in sorted(group.commands):
             cmd = group.commands[cmd_name]
+            # Check for aliases
+            aliases = getattr(cmd, 'aliases', [])
+            command_text = f"  {prefix} {cmd_name}"
+            if aliases:
+                command_text += f" (aliases: {', '.join(aliases)})"
+                
             table.add_row(
-                f"  {prefix} {cmd_name}",
+                command_text,
                 cmd.help or "No description"
             )
     
@@ -228,6 +240,8 @@ def load_config():
         Path.home() / ".config" / "starshipagentic.yml",
         Path("starshipagentic.yaml"),
         Path("starshipagentic.yml"),
+        # Look for config in the package directory
+        Path(__file__).parent / "starshipagentic.yml",
     ]
     
     for config_path in config_paths:
@@ -293,6 +307,7 @@ def interactive_mode():
     
     # Option to show all commands
     console.print("\nTo see all available commands: [bold]starshipagentic --all-commands[/bold]")
+    console.print("To see commands from YAML file: [bold]starshipagentic --commands-list[/bold]")
     console.print("To get started, try: [bold]starshipagentic vessel tour-ship[/bold]")
 
 class StarshipAgenticCLI(click.Group):
@@ -306,12 +321,56 @@ class StarshipAgenticCLI(click.Group):
         # Skip the default Click help formatting
         return
 
+def load_commands_list():
+    """Load commands list from YAML file."""
+    commands_list_path = Path(__file__).parent / "commands-list.yml"
+    if commands_list_path.exists():
+        try:
+            with open(commands_list_path, 'r') as f:
+                return yaml.safe_load(f)
+        except Exception as e:
+            console.print(f"[bold red]Error loading commands list: {e}[/bold red]")
+    return {}
+
 @click.group(cls=StarshipAgenticCLI, invoke_without_command=True)
 @click.version_option()
 @click.option('--all-commands', is_flag=True, help='Show all available commands')
+@click.option('--commands-list', is_flag=True, help='Show commands list from YAML file')
 @click.pass_context
-def main(ctx, all_commands):
+def main(ctx, all_commands, commands_list):
     """Starship Agentic - AI-assisted software development with a Star Trek-inspired interface."""
+    if commands_list:
+        display_welcome()
+        cmd_list = load_commands_list()
+        if cmd_list:
+            console.print(Panel("Commands List from YAML", style="bold green"))
+            for group_name, group_data in cmd_list.items():
+                theme_color = GROUP_THEMES.get(group_name, "white")
+                icon = GROUP_ICONS.get(group_name, "🚀")
+                console.print(f"\n[bold {theme_color}]{icon} {group_name.upper()}[/bold {theme_color}]: {group_data.get('description', '')}")
+                
+                # Create a table for commands in this group
+                table = Table(show_header=True, header_style=f"bold {theme_color}")
+                table.add_column("Command", style=f"{theme_color}")
+                table.add_column("Description", style="white")
+                table.add_column("Options", style="dim")
+                table.add_column("Aliases", style="yellow")
+                
+                for cmd_name, cmd_data in group_data.get('commands', {}).items():
+                    options_str = "\n".join(cmd_data.get('options', [])) or "None"
+                    aliases_str = ", ".join(cmd_data.get('aliases', [])) or "None"
+                    table.add_row(
+                        f"{group_name} {cmd_name}",
+                        cmd_data.get('description', 'No description'),
+                        options_str,
+                        aliases_str
+                    )
+                
+                console.print(table)
+        else:
+            console.print("[bold red]Commands list not found or empty.[/bold red]")
+        return
+        
     if all_commands:
         display_welcome()
         display_all_commands()

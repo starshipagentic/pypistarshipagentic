@@ -1,0 +1,150 @@
+# Starship Agentic Commands List
+# This file documents all available commands and their groupings
+
+vessel:
+  description: "Initialize and select project templates"
+  commands:
+    tour-ship:
+      description: "Browse available ship templates/frameworks"
+      options:
+        - "--category: Filter templates by category"
+      aliases: []
+    commission-ship:
+      description: "Clone template and run initialization"
+      options:
+        - "--template: Project template to use"
+        - "--name: Project name"
+      aliases: []
+    visualize-ship:
+      description: "Launch a Pygame visualization of the specified ship"
+      options:
+        - "--ship: Ship to visualize"
+      aliases: []
+
+mission:
+  description: "Define and expand project requirements"
+  commands:
+    define:
+      description: "Define project mission and requirements"
+      aliases: []
+    expand:
+      description: "Expand existing requirements"
+      aliases: []
+
+architecture:
+  description: "Review and configure system architecture"
+  commands:
+    review-schematics:
+      description: "Review system architecture diagrams"
+      options:
+        - "--type: Type of diagram to review"
+      aliases: []
+    calibrate-technology:
+      description: "Configure technology stack"
+      options:
+        - "--stack: Technology stack to configure"
+      aliases: []
+
+navigation:
+  description: "Plan feature implementation"
+  commands:
+    plot-navigation:
+      description: "Plan feature implementation order"
+      options:
+        - "--format: Output format for features"
+      aliases: []
+    set-waypoints:
+      description: "Set implementation milestones"
+      options:
+        - "--priority: Prioritization method"
+      aliases: []
+
+transmission:
+  description: "Manage external data and API connections"
+  commands:
+    authorize-codes:
+      description: "Configure API credentials"
+      options:
+        - "--service: Service to configure"
+      aliases: []
+    scan-sector:
+      description: "Search for information on a topic"
+      aliases: []
+    receive-transmission:
+      description: "Download data from a URL"
+      aliases: []
+
+exploration:
+  description: "Execute and test your implementation"
+  commands:
+    warp-speed:
+      description: "Run performance tests"
+      aliases: []
+    trycoder:
+      description: "Run test suite"
+      options:
+        - "--verbose: Show detailed test output"
+      aliases: []
+    engage:
+      description: "Execute implementation"
+      options:
+        - "--cycles: Number of full test cycles"
+      aliases: []
+
+weapons:
+  description: "Remove problematic code and tests"
+  commands:
+    fire-photons:
+      description: "Remove specified code"
+      aliases: []
+    aim-lasers:
+      description: "Target specific code sections"
+      aliases: []
+    shields-up:
+      description: "Protect code from changes"
+      options:
+        - "--level: Shield strength (0-100)"
+      aliases: []
+
+engineering:
+  description: "Manage project state and analyze code quality"
+  commands:
+    analyze:
+      description: "Analyze code quality"
+      aliases: []
+
+cosmic:
+  description: "Special operations"
+  commands:
+    supernova:
+      description: "Remove all generated files"
+      options:
+        - "--force: Force removal without confirmation"
+      aliases: []
+
+git:
+  description: "Git-related operations"
+  commands:
+    teleport:
+      description: "Move files between branches"
+      aliases: []
+
+mcars:
+  description: "Code repository and search system"
+  commands:
+    search:
+      description: "Search for code examples"
+      aliases: []
+    transport:
+      description: "Save code to repository"
+      aliases: []
+
+droid:
+  description: "Explanation and assistance commands"
+  commands:
+    droid-splain:
+      description: "Get explanation from droid assistant"
+      aliases: []
+    man-splain:
+      description: "Get manual page for a topic"
+      aliases: []
