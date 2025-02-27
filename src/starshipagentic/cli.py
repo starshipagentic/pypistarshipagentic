@@ -207,19 +207,36 @@ def display_all_commands():
         )
         
         # Add each command in the group
-        commands = group_info.get('commands', {})
-        for cmd_name in sorted(commands.keys()):
-            cmd_data = commands[cmd_name]
-            aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
-            aliases_str = ", ".join(aliases) if aliases else ""
-            
-            command_text = f"  {group_name} {cmd_name}"
-            description = cmd_data.get('description', 'No description')
-            
-            if aliases_str:
-                description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
+        # Get commands directly from the Click command groups to ensure all are included
+        group_obj = main.get_command(None, group_name)
+        if group_obj:
+            for cmd_name in sorted(group_obj.commands.keys()):
+                cmd_data = command_registry.get_command_info(group_name, cmd_name)
+                aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
+                aliases_str = ", ".join(aliases) if aliases else ""
                 
-            table.add_row(command_text, description)
+                command_text = f"  {group_name} {cmd_name}"
+                description = cmd_data.get('description', 'No description') if cmd_data else group_obj.commands[cmd_name].help or "No description"
+                
+                if aliases_str:
+                    description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
+                    
+                table.add_row(command_text, description)
+        else:
+            # Fallback to registry if Click group not found
+            commands = group_info.get('commands', {})
+            for cmd_name in sorted(commands.keys()):
+                cmd_data = commands[cmd_name]
+                aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
+                aliases_str = ", ".join(aliases) if aliases else ""
+                
+                command_text = f"  {group_name} {cmd_name}"
+                description = cmd_data.get('description', 'No description')
+                
+                if aliases_str:
+                    description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
+                    
+                table.add_row(command_text, description)
     
     console.print(table)
 
@@ -321,48 +338,61 @@ def load_commands_list():
 @click.group(cls=StarshipAgenticCLI, invoke_without_command=True)
 @click.version_option()
 @click.option('--all-commands', is_flag=True, help='Show all available commands')
-@click.option('--commands-list', is_flag=True, help='Show commands list from YAML file')
+@click.option('--commands-list', is_flag=True, help='Show all commands from implementation')
 @click.pass_context
 def main(ctx, all_commands, commands_list):
     """Starship Agentic - AI-assisted software development with a Star Trek-inspired interface."""
     if commands_list:
         display_welcome()
-        cmd_list = load_commands_list()
-        if cmd_list:
-            console.print(Panel("Commands List from YAML", style="bold green"))
-            for group_name, group_data in cmd_list.items():
-                theme_color = GROUP_THEMES.get(group_name, "white")
-                icon = GROUP_ICONS.get(group_name, "🚀")
-                console.print(f"\n[bold {theme_color}]{icon} {group_name.upper()}[/bold {theme_color}]: {group_data.get('description', '')}")
+        console.print(Panel("Complete Commands List", style="bold green"))
+        
+        # Get all command groups from the main CLI
+        for group_name in sorted(main.commands.keys()):
+            group_obj = main.commands[group_name]
+            group_data = command_registry.get_group_info(group_name)
+            
+            theme_color = GROUP_THEMES.get(group_name, "white")
+            icon = GROUP_ICONS.get(group_name, "🚀")
+            console.print(f"\n[bold {theme_color}]{icon} {group_name.upper()}[/bold {theme_color}]: {group_data.get('description', '') or group_obj.help or 'No description'}")
+            
+            # Create a table for commands in this group
+            table = Table(show_header=True, header_style=f"bold {theme_color}")
+            table.add_column("Command", style=f"{theme_color}")
+            table.add_column("Aliases", style="yellow")
+            table.add_column("Description", style="white")
+            table.add_column("Options", style="dim")
+            
+            # Get commands directly from the Click command group
+            for cmd_name in sorted(group_obj.commands.keys()):
+                cmd_obj = group_obj.commands[cmd_name]
+                cmd_data = command_registry.get_command_info(group_name, cmd_name)
                 
-                # Create a table for commands in this group
-                table = Table(show_header=True, header_style=f"bold {theme_color}")
-                table.add_column("Command", style=f"{theme_color}")
-                table.add_column("Aliases", style="yellow")
-                table.add_column("Description", style="white")
-                table.add_column("Options", style="dim")
+                # Get aliases from registry
+                aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
+                aliases_str = ", ".join(aliases) if aliases else "None"
                 
-                # Get all commands for this group from the registry directly
-                commands = command_registry.get_all_commands(group_name)
-                for cmd_name in sorted(commands.keys()):
-                    cmd_data = commands[cmd_name]
-                    # Get aliases from registry (which uses pyproject.toml)
-                    aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
-                    aliases_str = ", ".join(aliases) if aliases else "None"
-                    
-                    # Get options
-                    options_str = "\n".join(cmd_data.get('options', [])) or "None"
-                    
-                    table.add_row(
-                        f"{group_name} {cmd_name}",
-                        aliases_str,
-                        cmd_data.get('description', 'No description'),
-                        options_str
-                    )
+                # Get description from registry or Click command
+                description = (cmd_data.get('description') if cmd_data else None) or cmd_obj.help or "No description"
                 
-                console.print(table)
-        else:
-            console.print("[bold red]Commands list not found or empty.[/bold red]")
+                # Get options from Click command
+                options = []
+                for param in cmd_obj.params:
+                    if isinstance(param, click.Option):
+                        opt_str = f"--{param.name}"
+                        if param.required:
+                            opt_str += " (required)"
+                        options.append(opt_str)
+                
+                options_str = "\n".join(options) or "None"
+                
+                table.add_row(
+                    f"{group_name} {cmd_name}",
+                    aliases_str,
+                    description,
+                    options_str
+                )
+            
+            console.print(table)
         return
         
     if all_commands:
