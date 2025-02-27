@@ -29,8 +29,21 @@ def generate_test_sequence():
     for group_name in command_registry.get_all_groups():
         commands = command_registry.get_all_commands(group_name)
         if commands and len(sequence) < 3:  # Limit to 3 commands for testing
-            # Add the first command from each group
-            sequence.append(f"{group_name} {commands[0]}")
+            # Get the first command from the list or dictionary
+            if isinstance(commands, list) and len(commands) > 0:
+                first_cmd = commands[0]
+            elif isinstance(commands, dict) and len(commands) > 0:
+                first_cmd = list(commands.keys())[0]
+            else:
+                continue  # Skip if no commands
+                
+            # Add parameters for commands that require them
+            if group_name == "vessel" and first_cmd == "commission-ship":
+                sequence.append(f"{group_name} {first_cmd} --template=django-galaxy --name=test-project")
+            elif group_name == "mission" and first_cmd == "mission-brief":
+                sequence.append(f"{group_name} {first_cmd} --idea='Test project'")
+            else:
+                sequence.append(f"{group_name} {first_cmd}")
     
     return sequence
 

@@ -39,8 +39,14 @@ def get_commands_from_registry():
     test_commands = []
     for group_name in command_registry.get_all_groups():
         for cmd_name in command_registry.get_all_commands(group_name):
-            # Basic command without options
-            test_commands.append(f"{group_name} {cmd_name}")
+            # Add parameters for commands that require them to avoid interactive prompts
+            if group_name == "vessel" and cmd_name == "commission-ship":
+                test_commands.append(f"{group_name} {cmd_name} --template=django-galaxy --name=test-project")
+            elif group_name == "mission" and cmd_name == "mission-brief":
+                test_commands.append(f"{group_name} {cmd_name} --idea='Test project'")
+            else:
+                # Basic command without options
+                test_commands.append(f"{group_name} {cmd_name}")
     
     return test_commands
 
