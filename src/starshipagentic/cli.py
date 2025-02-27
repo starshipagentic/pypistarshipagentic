@@ -275,26 +275,44 @@ def run_command_sequence(commands):
         if isinstance(cmd_info, str):
             # Simple command without args
             cmd_parts = cmd_info.split()
-            cmd_name = cmd_parts[0]
-            cmd_args = cmd_parts[1:] if len(cmd_parts) > 1 else []
             console.print(f"[bold cyan]> starshipagentic {cmd_info}[/bold cyan]")
             # Execute command
-            sys.argv = ["starshipagentic", cmd_name] + cmd_args
+            sys.argv = ["starshipagentic"] + cmd_parts
             main(standalone_mode=False)
         elif isinstance(cmd_info, dict):
             # Command with args as dict
-            cmd_name = list(cmd_info.keys())[0]
-            cmd_args = []
-            for k, v in cmd_info[cmd_name].items():
-                if v is True:
-                    cmd_args.append(f"--{k}")
-                elif v is not None:
-                    cmd_args.append(f"--{k}={v}")
+            group_name = list(cmd_info.keys())[0]
+            group_value = cmd_info[group_name]
             
-            console.print(f"[bold cyan]> starshipagentic {cmd_name} {' '.join(cmd_args)}[/bold cyan]")
-            # Execute command
-            sys.argv = ["starshipagentic", cmd_name] + cmd_args
-            main(standalone_mode=False)
+            if isinstance(group_value, dict) and len(group_value) == 1:
+                # This is a nested command structure: group -> command -> options
+                cmd_name = list(group_value.keys())[0]
+                options = group_value[cmd_name]
+                
+                cmd_args = []
+                for k, v in options.items():
+                    if v is True:
+                        cmd_args.append(f"--{k}")
+                    elif v is not None:
+                        cmd_args.append(f"--{k}={v}")
+                
+                console.print(f"[bold cyan]> starshipagentic {group_name} {cmd_name} {' '.join(cmd_args)}[/bold cyan]")
+                # Execute command
+                sys.argv = ["starshipagentic", group_name, cmd_name] + cmd_args
+                main(standalone_mode=False)
+            else:
+                # This is a simple command with options
+                cmd_args = []
+                for k, v in group_value.items():
+                    if v is True:
+                        cmd_args.append(f"--{k}")
+                    elif v is not None:
+                        cmd_args.append(f"--{k}={v}")
+                
+                console.print(f"[bold cyan]> starshipagentic {group_name} {' '.join(cmd_args)}[/bold cyan]")
+                # Execute command
+                sys.argv = ["starshipagentic", group_name] + cmd_args
+                main(standalone_mode=False)
 
 def interactive_mode():
     """Start interactive guided process."""
