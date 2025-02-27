@@ -89,7 +89,7 @@ def test_mixed_commands():
                     "name": "test-project"
                 }
             }},
-            "mission define"
+            "mission mission-brief"
         ]
     }
     

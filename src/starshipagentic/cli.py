@@ -272,47 +272,51 @@ def run_command_sequence(commands):
     console.print(Panel("Running Command Sequence", style="bold green"))
     
     for cmd_info in commands:
-        if isinstance(cmd_info, str):
-            # Simple command without args
-            cmd_parts = cmd_info.split()
-            console.print(f"[bold cyan]> starshipagentic {cmd_info}[/bold cyan]")
-            # Execute command
-            sys.argv = ["starshipagentic"] + cmd_parts
-            main(standalone_mode=False)
-        elif isinstance(cmd_info, dict):
-            # Command with args as dict
-            group_name = list(cmd_info.keys())[0]
-            group_value = cmd_info[group_name]
-            
-            if isinstance(group_value, dict) and len(group_value) == 1:
-                # This is a nested command structure: group -> command -> options
-                cmd_name = list(group_value.keys())[0]
-                options = group_value[cmd_name]
-                
-                cmd_args = []
-                for k, v in options.items():
-                    if v is True:
-                        cmd_args.append(f"--{k}")
-                    elif v is not None:
-                        cmd_args.append(f"--{k}={v}")
-                
-                console.print(f"[bold cyan]> starshipagentic {group_name} {cmd_name} {' '.join(cmd_args)}[/bold cyan]")
+        try:
+            if isinstance(cmd_info, str):
+                # Simple command without args
+                cmd_parts = cmd_info.split()
+                console.print(f"[bold cyan]> starshipagentic {cmd_info}[/bold cyan]")
                 # Execute command
-                sys.argv = ["starshipagentic", group_name, cmd_name] + cmd_args
+                sys.argv = ["starshipagentic"] + cmd_parts
                 main(standalone_mode=False)
-            else:
-                # This is a simple command with options
-                cmd_args = []
-                for k, v in group_value.items():
-                    if v is True:
-                        cmd_args.append(f"--{k}")
-                    elif v is not None:
-                        cmd_args.append(f"--{k}={v}")
+            elif isinstance(cmd_info, dict):
+                # Command with args as dict
+                group_name = list(cmd_info.keys())[0]
+                group_value = cmd_info[group_name]
                 
-                console.print(f"[bold cyan]> starshipagentic {group_name} {' '.join(cmd_args)}[/bold cyan]")
-                # Execute command
-                sys.argv = ["starshipagentic", group_name] + cmd_args
-                main(standalone_mode=False)
+                if isinstance(group_value, dict) and len(group_value) == 1:
+                    # This is a nested command structure: group -> command -> options
+                    cmd_name = list(group_value.keys())[0]
+                    options = group_value[cmd_name]
+                    
+                    cmd_args = []
+                    for k, v in options.items():
+                        if v is True:
+                            cmd_args.append(f"--{k}")
+                        elif v is not None:
+                            cmd_args.append(f"--{k}={v}")
+                    
+                    console.print(f"[bold cyan]> starshipagentic {group_name} {cmd_name} {' '.join(cmd_args)}[/bold cyan]")
+                    # Execute command
+                    sys.argv = ["starshipagentic", group_name, cmd_name] + cmd_args
+                    main(standalone_mode=False)
+                else:
+                    # This is a simple command with options
+                    cmd_args = []
+                    for k, v in group_value.items():
+                        if v is True:
+                            cmd_args.append(f"--{k}")
+                        elif v is not None:
+                            cmd_args.append(f"--{k}={v}")
+                    
+                    console.print(f"[bold cyan]> starshipagentic {group_name} {' '.join(cmd_args)}[/bold cyan]")
+                    # Execute command
+                    sys.argv = ["starshipagentic", group_name] + cmd_args
+                    main(standalone_mode=False)
+        except Exception as e:
+            console.print(f"[bold red]Command failed: {e}[/bold red]")
+            console.print("[yellow]Continuing with next command...[/yellow]")
 
 def interactive_mode():
     """Start interactive guided process."""

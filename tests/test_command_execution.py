@@ -40,7 +40,7 @@ def test_basic_commands():
         "vessel tour-ship",
         "vessel commission-ship --template=django-galaxy --name=test-project",
         "vessel visualize-ship --ship=enterprise",
-        "mission define",
+        "mission mission-brief",
         "architecture review-schematics --type=system"
     ]
     

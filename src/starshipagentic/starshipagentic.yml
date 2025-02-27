@@ -7,5 +7,5 @@ commands:
       commission-ship:
         template: "django-galaxy"
         name: "my-starship-project"
-  - "mission define"
+  - "mission mission-brief"
   - "architecture review-schematics --type=system"
