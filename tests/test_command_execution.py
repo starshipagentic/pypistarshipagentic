@@ -32,17 +32,34 @@ def run_command(command):
         console.print(f"[red]✗ Exception: {str(e)}[/red]")
         return False, str(e)
 
+def get_commands_from_registry():
+    """Get all commands from the command registry."""
+    from starshipagentic.utils.command_registry import command_registry
+    
+    test_commands = []
+    for group_name in command_registry.get_all_groups():
+        for cmd_name in command_registry.get_all_commands(group_name):
+            # Basic command without options
+            test_commands.append(f"{group_name} {cmd_name}")
+    
+    return test_commands
+
 def test_basic_commands():
     """Test basic command functionality."""
     console.print(Panel("Testing Basic Commands", style="bold green"))
     
-    commands = [
-        "vessel tour-ship",
+    # Get commands dynamically from registry
+    all_commands = get_commands_from_registry()
+    
+    # Add some commands with options for more thorough testing
+    commands_with_options = [
         "vessel commission-ship --template=django-galaxy --name=test-project",
         "vessel visualize-ship --ship=enterprise",
-        "mission mission-brief",
         "architecture review-schematics --type=system"
     ]
+    
+    # Use a subset of commands for faster testing
+    commands = all_commands[:2] + commands_with_options
     
     results = []
     for cmd in commands:
@@ -51,15 +68,39 @@ def test_basic_commands():
     
     return results
 
+def get_aliases_from_registry():
+    """Get all aliases from the command registry."""
+    from starshipagentic.utils.command_registry import command_registry
+    
+    test_aliases = []
+    for group_name in command_registry.get_all_groups():
+        for cmd_name in command_registry.get_all_commands(group_name):
+            aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
+            for alias in aliases:
+                test_aliases.append(alias)
+    
+    return test_aliases
+
 def test_aliases():
     """Test command aliases."""
     console.print(Panel("Testing Command Aliases", style="bold yellow"))
     
-    aliases = [
-        "tour",  # Alias for vessel tour-ship
-        "commission --template=django-galaxy --name=test-project",  # Alias for vessel commission-ship
-        "schematics --type=system"  # Alias for architecture review-schematics
+    # Get aliases dynamically from registry
+    all_aliases = get_aliases_from_registry()
+    
+    # Add some aliases with options for more thorough testing
+    aliases_with_options = [
+        "commission --template=django-galaxy --name=test-project",
+        "schematics --type=system"
     ]
+    
+    # Use a subset of aliases for faster testing
+    aliases = all_aliases[:3] if len(all_aliases) >= 3 else all_aliases
+    if "tour" in all_aliases and "tour" not in aliases:
+        aliases[0] = "tour"  # Ensure we test the tour alias if available
+    
+    # Add aliases with options
+    aliases.extend(aliases_with_options)
     
     results = []
     for cmd in aliases:

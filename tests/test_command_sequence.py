@@ -20,15 +20,35 @@ def create_test_config(config_data):
         yaml.dump(config_data, temp)
         return temp.name
 
+def generate_test_sequence():
+    """Generate a test sequence using available commands."""
+    from starshipagentic.utils.command_registry import command_registry
+    
+    # Get a representative command from each group
+    sequence = []
+    for group_name in command_registry.get_all_groups():
+        commands = command_registry.get_all_commands(group_name)
+        if commands and len(sequence) < 3:  # Limit to 3 commands for testing
+            # Add the first command from each group
+            sequence.append(f"{group_name} {commands[0]}")
+    
+    return sequence
+
 def test_string_commands():
     """Test command sequences with string commands."""
     console.print(Panel("Testing String Commands", style="bold green"))
     
+    # Generate dynamic test sequence
+    dynamic_commands = generate_test_sequence()
+    
+    # Ensure we have at least these specific commands for visualization testing
+    specific_commands = [
+        "vessel tour-ship",
+        "vessel visualize-ship --ship=enterprise"
+    ]
+    
     config = {
-        'commands': [
-            "vessel tour-ship",
-            "vessel visualize-ship --ship=enterprise"
-        ]
+        'commands': specific_commands + [cmd for cmd in dynamic_commands if cmd not in specific_commands][:1]
     }
     
     config_path = create_test_config(config)
@@ -80,17 +100,28 @@ def test_mixed_commands():
     """Test command sequences with mixed string and dictionary commands."""
     console.print(Panel("Testing Mixed Commands", style="bold blue"))
     
+    # Generate dynamic test sequence
+    dynamic_commands = generate_test_sequence()
+    
+    # Always include these specific commands for consistent testing
+    commands = [
+        "vessel tour-ship",
+        {"vessel": {
+            "commission-ship": {
+                "template": "django-galaxy",
+                "name": "test-project"
+            }
+        }}
+    ]
+    
+    # Add one more command from the dynamic list if available
+    if dynamic_commands and "vessel" not in dynamic_commands[0]:
+        commands.append(dynamic_commands[0])
+    else:
+        commands.append("mission mission-brief")
+    
     config = {
-        'commands': [
-            "vessel tour-ship",
-            {"vessel": {
-                "commission-ship": {
-                    "template": "django-galaxy",
-                    "name": "test-project"
-                }
-            }},
-            "mission mission-brief"
-        ]
+        'commands': commands
     }
     
     config_path = create_test_config(config)
