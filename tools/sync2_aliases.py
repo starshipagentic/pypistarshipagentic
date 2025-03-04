@@ -118,6 +118,15 @@ def update_group_init(group):
     content += ']\n\n'
     for pkg in packages:
         content += f"from . import {pkg}\n"
+    content += f'''
+
+def run_group():
+    """Entry point for running the {group} command group directly."""
+    import sys
+    from starshipagentic.cli import main as cli_main
+    sys.argv = ['starshipagentic', '{group}'] + sys.argv[1:]
+    cli_main()
+'''
     with open(init_file, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"Updated group __init__.py: {init_file}")
