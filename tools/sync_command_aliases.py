@@ -28,6 +28,7 @@ def create_command_module(group_name, group_data):
     template = f'''"""Commands for {group_data.get('description', 'the ' + group_name + ' group')}."""
 
 import click
+import sys
 from rich.console import Console
 from starshipagentic.utils.base_command import BaseCommand
 from starshipagentic.utils.interactive import prompt_for_missing_param
@@ -83,6 +84,20 @@ def {func_name}({", ".join(param_names) if param_names else ""}):
 def {func_name}_command():
     """Wrapper for direct invocation of {func_name} command."""
     BaseCommand.parse_args_for_command({func_name})()
+'''
+    
+    # Add function to run this group as a standalone command
+    template += f'''
+def main():
+    """Run this command group as a standalone command."""
+    from starshipagentic.cli import main as cli_main
+    
+    # Prepend the group name to the arguments if not already there
+    if len(sys.argv) > 0:
+        sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
+    
+    # Run the main CLI function
+    cli_main()
 '''
     
     # Write the file
@@ -432,6 +447,14 @@ def fix_command_imports():
                 content = content[:import_section_end] + new_import + content[import_section_end:]
                 has_changes = True
         
+        # Add sys import if needed
+        if "import sys" not in content:
+            import_section_end = content.find("\n\n", content.find("import"))
+            if import_section_end > 0:
+                new_import = "\nimport sys"
+                content = content[:import_section_end] + new_import + content[import_section_end:]
+                has_changes = True
+        
         # Add rich.console import if needed
         if "console.print" in content and "from rich.console import Console" not in content:
             import_section_end = content.find("\n\n", content.find("import"))
@@ -446,6 +469,28 @@ def fix_command_imports():
                     if group_def_pos > 0:
                         # Insert before the first function definition
                         content = content[:group_def_pos] + "\nconsole = Console()\n\n" + content[group_def_pos:]
+        
+        # Add standalone runner function if missing
+        if "def main():" not in content:
+            # Extract group name from filename
+            group_name = file_path.stem.replace("_cmds", "")
+            
+            # Add main function at the end of the file
+            main_func = f'''
+
+def main():
+    """Run this command group as a standalone command."""
+    from starshipagentic.cli import main as cli_main
+    
+    # Prepend the group name to the arguments if not already there
+    if len(sys.argv) > 0:
+        sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
+    
+    # Run the main CLI function
+    cli_main()
+'''
+            content += main_func
+            has_changes = True
                 
         # Write changes back to file
         if has_changes:
@@ -491,11 +536,21 @@ def sync_aliases():
     
     # Build a map of expected aliases from commands-list.yml
     expected_aliases = {}
+    
+    # Add group shortcuts (e.g., 'probe')
+    for group_name in commands.keys():
+        expected_aliases[group_name] = f"starshipagentic.__main__:main"
+    
+    # Add command shortcuts and aliases
     for group_name, group_data in commands.items():
         for cmd_name, cmd_data in group_data.get("commands", {}).items():
             cmd_func_name = cmd_name.replace("-", "_")
             target = f"starshipagentic.commands.{group_name}_cmds:{cmd_func_name}_command"
             
+            # Add direct command shortcut (e.g., 'map-planet')
+            expected_aliases[cmd_name] = f"starshipagentic.__main__:main"
+            
+            # Add command aliases
             for alias in cmd_data.get("aliases", []):
                 expected_aliases[alias] = target
     
