@@ -102,6 +102,17 @@ def main():
     
     # Run the main CLI function
     cli_main()
+
+def run_group():
+    """Entry point for running this group directly."""
+    import sys
+    from starshipagentic.cli import main as cli_main
+    
+    # Prepend 'starshipagentic {group_name}' to the arguments
+    sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
+    
+    # Run the main CLI function with the modified arguments
+    cli_main()
 '''
     
     # Write the file
@@ -474,13 +485,15 @@ def fix_command_imports():
                         # Insert before the first function definition
                         content = content[:group_def_pos] + "\nconsole = Console()\n\n" + content[group_def_pos:]
         
-        # Add standalone runner function if missing
-        if "def main():" not in content:
-            # Extract group name from filename
-            group_name = file_path.stem.replace("_cmds", "")
-            
-            # Add main function at the end of the file
-            main_func = f'''
+        # Add standalone runner functions if missing
+        group_name = file_path.stem.replace("_cmds", "")
+        has_main = "def main():" in content
+        has_run_group = "def run_group():" in content
+        
+        if not has_main or not has_run_group:
+            # Add missing functions at the end of the file
+            if not has_main:
+                main_func = f'''
 
 def main():
     """Run this command group as a standalone command."""
@@ -488,13 +501,34 @@ def main():
     
     # Prepend the group name to the arguments if not already there
     if len(sys.argv) > 0:
-        sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
+        # If no arguments provided, show help for this group
+        if len(sys.argv) == 1:
+            sys.argv = ['starshipagentic', '{group_name}', '--help']
+        else:
+            sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
     
     # Run the main CLI function
     cli_main()
 '''
-            content += main_func
-            has_changes = True
+                content += main_func
+                has_changes = True
+            
+            if not has_run_group:
+                run_group_func = f'''
+
+def run_group():
+    """Entry point for running this group directly."""
+    import sys
+    from starshipagentic.cli import main as cli_main
+    
+    # Prepend 'starshipagentic {group_name}' to the arguments
+    sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
+    
+    # Run the main CLI function with the modified arguments
+    cli_main()
+'''
+                content += run_group_func
+                has_changes = True
                 
         # Write changes back to file
         if has_changes:
@@ -543,7 +577,7 @@ def sync_aliases():
     
     # Add group shortcuts (e.g., 'probe')
     for group_name in commands.keys():
-        expected_aliases[group_name] = f"starshipagentic.__main__:main"
+        expected_aliases[group_name] = f"starshipagentic.commands.{group_name}_cmds:run_group"
     
     # Add command shortcuts and aliases
     for group_name, group_data in commands.items():
