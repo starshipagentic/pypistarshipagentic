@@ -101,7 +101,7 @@ def scaffold_command_package(group, command):
 
 def update_group_init(group):
     """
-    In the group folder (COMMANDS_DIR/group), update __init__.py to list all command packages.
+    In the group folder (COMMANDS_DIR/group), update __init__.py to list all command packages and create a click group object.
     """
     group_dir = COMMANDS_DIR / group
     init_file = group_dir / "__init__.py"
@@ -112,9 +112,13 @@ def update_group_init(group):
             if item_path.is_dir() and (item_path / "cli.py").exists():
                 packages.append(item)
         packages.sort()
-    content = f'"""Auto-generated __init__.py for the {group} group."""\n\n__all__ = [\n'
+    content = f'"""Auto-generated __init__.py for the {group} group."""\n\n'
+    content += "import click\n"
+    content += f'{group}_group = click.Group(name="{group}")\n\n'
+    content += "__all__ = [\n"
     for pkg in packages:
         content += f'    "{pkg}",\n'
+    content += f'    "{group}_group"\n'
     content += ']\n\n'
     for pkg in packages:
         content += f"from . import {pkg}\n"
