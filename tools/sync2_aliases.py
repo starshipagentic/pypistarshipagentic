@@ -82,21 +82,21 @@ def scaffold_command_package(group, command):
     init_file = package_dir / "__init__.py"
     if not init_file.exists():
         with open(init_file, "w", encoding="utf-8") as f:
-            f.write(INIT_TEMPLATE.format(command=command))
+            f.write(INIT_TEMPLATE.format(command=sanitized_command))
         print(f"Created: {init_file}")
 
     # cli.py: Scaffold if file does not exist.
     cli_file = package_dir / "cli.py"
     if not cli_file.exists():
         with open(cli_file, "w", encoding="utf-8") as f:
-            f.write(CLI_TEMPLATE.format(command=command))
+            f.write(CLI_TEMPLATE.format(command=sanitized_command))
         print(f"Created: {cli_file}")
 
     # services.py: Scaffold if file does not exist.
     services_file = package_dir / "services.py"
     if not services_file.exists():
         with open(services_file, "w", encoding="utf-8") as f:
-            f.write(SERVICES_TEMPLATE.format(command=command))
+            f.write(SERVICES_TEMPLATE.format(command=sanitized_command))
         print(f"Created: {services_file}")
 
 def update_group_init(group):
