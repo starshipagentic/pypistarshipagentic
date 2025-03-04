@@ -69,10 +69,11 @@ def load_commands_list():
 def scaffold_command_package(group, command):
     """
     Ensure that the command package exists under:
-        COMMANDS_DIR / group / command
+        COMMANDS_DIR / group / sanitized_command
     Create __init__.py, cli.py, and services.py using templates if they do not exist.
     """
-    package_dir = COMMANDS_DIR / group / command
+    sanitized_command = command.replace("-", "_")
+    package_dir = COMMANDS_DIR / group / sanitized_command
     if not package_dir.exists():
         os.makedirs(package_dir)
         print(f"Created package directory: {package_dir}")
@@ -160,11 +161,12 @@ def generate_expected_aliases(commands_data):
     for group, data in commands_data.items():
         cmds = data.get("commands", {})
         for cmd in cmds.keys():
+            sanitized_cmd = cmd.replace("-", "_")
             alias = cmd.replace("_", "-")
-            expected[alias] = f"starshipagentic.commands.{group}.{cmd}.cli:{cmd}_command"
+            expected[alias] = f"starshipagentic.commands.{group}.{sanitized_cmd}.cli:{sanitized_cmd}_command"
             # Also consider any additional aliases defined in commands-list.yml
             for extra_alias in cmds.get(cmd, {}).get("aliases", []):
-                expected[extra_alias] = f"starshipagentic.commands.{group}.{cmd}.cli:{cmd}_command"
+                expected[extra_alias] = f"starshipagentic.commands.{group}.{sanitized_cmd}.cli:{sanitized_cmd}_command"
     # Main alias
     expected["starshipagentic"] = "starshipagentic.cli:main"
     return expected
