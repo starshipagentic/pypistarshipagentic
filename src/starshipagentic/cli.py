@@ -1,3 +1,77 @@
+# [AUTO-GENERATED COMMAND IMPORTS START]
+from starshipagentic.commands.vessel import run_group  # alias: vessel
+from starshipagentic.commands.mission.mission_brief.cli import mission_brief_command  # alias: mission
+from starshipagentic.commands.architecture import run_group  # alias: architecture
+from starshipagentic.commands.navigation.plot_navigation.cli import plot_navigation_command  # alias: navigation
+from starshipagentic.commands.transmission.receive_transmission.cli import receive_transmission_command  # alias: transmission
+from starshipagentic.commands.probe import run_group  # alias: probe
+from starshipagentic.commands.exploration import run_group  # alias: exploration
+from starshipagentic.commands.weapons import run_group  # alias: weapons
+from starshipagentic.commands.engineering import run_group  # alias: engineering
+from starshipagentic.commands.cosmic import run_group  # alias: cosmic
+from starshipagentic.commands.beam import run_group  # alias: beam
+from starshipagentic.commands.mcars import run_group  # alias: mcars
+from starshipagentic.commands.droid.droid_splain.cli import droid_splain_command  # alias: droid
+from starshipagentic.commands.vessel.tour_ship.cli import tour_ship_command  # alias: tour-ship
+from starshipagentic.commands.vessel.tour_ship.cli import tour_ship_command  # alias: tour
+from starshipagentic.commands.vessel.commission_ship.cli import commission_ship_command  # alias: commission-ship
+from starshipagentic.commands.vessel.commission_ship.cli import commission_ship_command  # alias: commission
+from starshipagentic.commands.vessel.visualize_ship.cli import visualize_ship_command  # alias: visualize-ship
+from starshipagentic.commands.mission.mission_brief.cli import mission_brief_command  # alias: mission-brief
+from starshipagentic.commands.mission.expand_mission.cli import expand_mission_command  # alias: expand-mission
+from starshipagentic.commands.mission.expand_mission.cli import expand_mission_command  # alias: expand
+from starshipagentic.commands.architecture.review_schematics.cli import review_schematics_command  # alias: review-schematics
+from starshipagentic.commands.architecture.review_schematics.cli import review_schematics_command  # alias: schematics
+from starshipagentic.commands.architecture.calibrate_technology.cli import calibrate_technology_command  # alias: calibrate-technology
+from starshipagentic.commands.architecture.calibrate_technology.cli import calibrate_technology_command  # alias: calibrate
+from starshipagentic.commands.navigation.plot_navigation.cli import plot_navigation_command  # alias: plot-navigation
+from starshipagentic.commands.navigation.set_waypoints.cli import set_waypoints_command  # alias: set-waypoints
+from starshipagentic.commands.navigation.set_waypoints.cli import set_waypoints_command  # alias: waypoints
+from starshipagentic.commands.transmission.authorize_codes.cli import authorize_codes_command  # alias: authorize-codes
+from starshipagentic.commands.transmission.authorize_codes.cli import authorize_codes_command  # alias: authorize
+from starshipagentic.commands.transmission.scan_sector.cli import scan_sector_command  # alias: scan-sector
+from starshipagentic.commands.transmission.scan_sector.cli import scan_sector_command  # alias: scan
+from starshipagentic.commands.transmission.receive_transmission.cli import receive_transmission_command  # alias: receive-transmission
+from starshipagentic.commands.probe.map_planet.cli import map_planet_command  # alias: map-planet
+from starshipagentic.commands.probe.map_planet.cli import map_planet_command  # alias: map
+from starshipagentic.commands.probe.build_landing_zone.cli import build_landing_zone_command  # alias: build-landing-zone
+from starshipagentic.commands.probe.build_landing_zone.cli import build_landing_zone_command  # alias: buildlz
+from starshipagentic.commands.probe.fabricate_infrastructure.cli import fabricate_infrastructure_command  # alias: fabricate-infrastructure
+from starshipagentic.commands.probe.fabricate_infrastructure.cli import fabricate_infrastructure_command  # alias: fabricate
+from starshipagentic.commands.exploration.warp_speed.cli import warp_speed_command  # alias: warp-speed
+from starshipagentic.commands.exploration.warp_speed.cli import warp_speed_command  # alias: warp
+from starshipagentic.commands.exploration.trycoder.cli import trycoder_command  # alias: trycoder
+from starshipagentic.commands.exploration.engage.cli import engage_command  # alias: engage
+from starshipagentic.commands.weapons.fire_photons.cli import fire_photons_command  # alias: fire-photons
+from starshipagentic.commands.weapons.fire_photons.cli import fire_photons_command  # alias: photons
+from starshipagentic.commands.weapons.aim_lasers.cli import aim_lasers_command  # alias: aim-lasers
+from starshipagentic.commands.weapons.aim_lasers.cli import aim_lasers_command  # alias: lasers
+from starshipagentic.commands.weapons.shields_up.cli import shields_up_command  # alias: shields-up
+from starshipagentic.commands.weapons.shields_up.cli import shields_up_command  # alias: shields
+from starshipagentic.commands.engineering.create_checkpoint.cli import create_checkpoint_command  # alias: create-checkpoint
+from starshipagentic.commands.engineering.create_checkpoint.cli import create_checkpoint_command  # alias: checkpoint
+from starshipagentic.commands.engineering.restore_checkpoint.cli import restore_checkpoint_command  # alias: restore-checkpoint
+from starshipagentic.commands.engineering.restore_checkpoint.cli import restore_checkpoint_command  # alias: restore
+from starshipagentic.commands.engineering.inspect_vessel.cli import inspect_vessel_command  # alias: inspect-vessel
+from starshipagentic.commands.engineering.inspect_vessel.cli import inspect_vessel_command  # alias: inspect
+from starshipagentic.commands.engineering.complexity_report.cli import complexity_report_command  # alias: complexity-report
+from starshipagentic.commands.engineering.complexity_report.cli import complexity_report_command  # alias: complexity
+from starshipagentic.commands.cosmic.supernova.cli import supernova_command  # alias: supernova
+from starshipagentic.commands.beam.teleport.cli import teleport_command  # alias: teleport
+from starshipagentic.commands.mcars.search.cli import search_command  # alias: search
+from starshipagentic.commands.mcars.transport.cli import transport_command  # alias: transport
+from starshipagentic.commands.droid.droid_splain.cli import droid_splain_command  # alias: droid-splain
+from starshipagentic.commands.droid.man_splain.cli import man_splain_command  # alias: man-splain
+from starshipagentic.commands.droid.man_splain.cli import man_splain_command  # alias: splain
+# [AUTO-GENERATED COMMAND IMPORTS END]
+# Starship Agentic License Header
+#
+# Copyright (c) 2025 Travis Somerville and David Samson
+#
+# This file is part of Starship Agentic.
+#
+# It is licensed under the GNU Affero General Public License (AGPL) v3 or later.
+# For full details, see the LICENSE.md file in the project root.
 """Main CLI entry point for Starship Agentic."""
 
 import click
@@ -17,52 +91,55 @@ from starshipagentic.utils.command_registry import command_registry
 
 # Import command groups
 from starshipagentic.commands import (
-    vessel_cmds,
-    mission_cmds,
     architecture_cmds,
-    navigation_cmds,
-    transmission_cmds,
-    exploration_cmds,
-    weapons_cmds,
-    engineering_cmds,
+    beam_cmds,
     cosmic_cmds,
-    git_cmds,
-    mcars_cmds,
     droid_cmds,
+    engineering_cmds,
+    exploration_cmds,
+    mcars_cmds,
+    mission_cmds,
+    navigation_cmds,
+    probe_cmds,
+    transmission_cmds,
+    vessel_cmds,
+    weapons_cmds,
 )
 
 console = Console()
 
 # Command group themes/colors for consistent styling
 GROUP_THEMES = {
-    "vessel": "blue",
-    "mission": "green",
     "architecture": "magenta",
-    "navigation": "cyan",
-    "transmission": "yellow",
-    "exploration": "bright_blue",
-    "weapons": "red",
-    "engineering": "bright_green",
+    "beam": "blue",
     "cosmic": "bright_magenta",
-    "git": "bright_cyan",
-    "mcars": "bright_yellow",
     "droid": "bright_white",
+    "engineering": "bright_green",
+    "exploration": "bright_blue",
+    "mcars": "bright_yellow",
+    "mission": "green",
+    "navigation": "cyan",
+    "probe": "blue",
+    "transmission": "yellow",
+    "vessel": "blue",
+    "weapons": "red",
 }
 
 # Command group icons
 GROUP_ICONS = {
-    "vessel": "🚢",
-    "mission": "📋",
     "architecture": "🏗️",
-    "navigation": "🧭",
-    "transmission": "📡",
-    "exploration": "🔭",
-    "weapons": "🛡️",
-    "engineering": "🔧",
+    "beam": "🚀",
     "cosmic": "✨",
-    "git": "📦",
-    "mcars": "🔍",
     "droid": "🤖",
+    "engineering": "🔧",
+    "exploration": "🔭",
+    "mcars": "🔍",
+    "mission": "📋",
+    "navigation": "🧭",
+    "probe": "🚀",
+    "transmission": "📡",
+    "vessel": "🚢",
+    "weapons": "🛡️",
 }
 
 def display_welcome():
@@ -431,11 +508,12 @@ mission_group = enhance_group_help(mission_cmds.mission_group, "mission")
 architecture_group = enhance_group_help(architecture_cmds.architecture_group, "architecture")
 navigation_group = enhance_group_help(navigation_cmds.navigation_group, "navigation")
 transmission_group = enhance_group_help(transmission_cmds.transmission_group, "transmission")
+probe_group = enhance_group_help(probe_cmds.probe_group, "probe")
 exploration_group = enhance_group_help(exploration_cmds.exploration_group, "exploration")
 weapons_group = enhance_group_help(weapons_cmds.weapons_group, "weapons")
 engineering_group = enhance_group_help(engineering_cmds.engineering_group, "engineering")
 cosmic_group = enhance_group_help(cosmic_cmds.cosmic_group, "cosmic")
-git_group = enhance_group_help(git_cmds.git_group, "git")
+beam_group = enhance_group_help(beam_cmds.beam_group, "beam")
 mcars_group = enhance_group_help(mcars_cmds.mcars_group, "mcars")
 droid_group = enhance_group_help(droid_cmds.droid_group, "droid")
 
@@ -445,11 +523,12 @@ main.add_command(mission_group, "mission")
 main.add_command(architecture_group, "architecture")
 main.add_command(navigation_group, "navigation")
 main.add_command(transmission_group, "transmission")
+main.add_command(probe_group, "probe")
 main.add_command(exploration_group, "exploration")
 main.add_command(weapons_group, "weapons")
 main.add_command(engineering_group, "engineering")
 main.add_command(cosmic_group, "cosmic")
-main.add_command(git_group, "git")
+main.add_command(beam_group, "beam")
 main.add_command(mcars_group, "mcars")
 main.add_command(droid_group, "droid")
 

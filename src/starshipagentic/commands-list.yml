@@ -1,159 +1,197 @@
-# Starship Agentic Commands List
-# This file documents all available commands and their groupings
-
 vessel:
-  description: "Initialize and select project templates"
+  description: Initialize and select project templates
   commands:
     tour-ship:
-      description: "Browse available ship templates/frameworks"
+      description: Browse available ship templates/frameworks
       options:
-        - "--category: Filter templates by category"
-      aliases: ["tour"]
+      - '--category: Filter templates by category'
+      aliases:
+      - tour
     commission-ship:
-      description: "Clone template and run initialization"
+      description: Clone template and run initialization
       options:
-        - "--template: Project template to use"
-        - "--name: Project name"
-      aliases: ["commission"]
+      - '--template: Project template to use'
+      - '--name: Project name'
+      aliases:
+      - commission
     visualize-ship:
-      description: "Launch a Pygame visualization of the specified ship"
+      description: Launch a Pygame visualization of the specified ship
       options:
-        - "--ship: Ship to visualize"
+      - '--ship: Ship to visualize'
       aliases: []
-
 mission:
-  description: "Define and expand project requirements"
+  description: Define and expand project requirements
   commands:
     mission-brief:
-      description: "Define project mission and requirements"
-      aliases: ["mission"]
+      description: Define project mission and requirements
+      aliases:
+      - mission
     expand-mission:
-      description: "Expand existing requirements"
-      aliases: ["expand"]
-
+      description: Expand existing requirements
+      aliases:
+      - expand
 architecture:
-  description: "Review and configure system architecture"
+  description: Review and configure system architecture
   commands:
     review-schematics:
-      description: "Review system architecture diagrams (MD documents for state diagram and DDD)"
+      description: Review system architecture diagrams (MD documents for state diagram
+        and DDD)
       options:
-        - "--type: Type of diagram to review"
-      aliases: ["schematics"]
+      - '--type: Type of diagram to review'
+      aliases:
+      - schematics
     calibrate-technology:
-      description: "Configure technology stack"
+      description: Configure technology stack
       options:
-        - "--stack: Technology stack to configure"
-      aliases: ["calibrate"]
-
+      - '--stack: Technology stack to configure'
+      aliases:
+      - calibrate
 navigation:
-  description: "Plan feature implementation"
+  description: Plan feature implementation
   commands:
     plot-navigation:
-      description: "Generate and review BDD gherkin feature files"
+      description: Generate and review BDD gherkin feature files
       options:
-        - "--format: Output format for features"
-      aliases: ["navigation"]
+      - '--format: Output format for features'
+      aliases:
+      - navigation
     set-waypoints:
-      description: "Create order for working on features (project plan checklist)"
+      description: Create order for working on features (project plan checklist)
       options:
-        - "--priority: Prioritization method"
-      aliases: ["waypoints"]
-
+      - '--priority: Prioritization method'
+      aliases:
+      - waypoints
 transmission:
-  description: "Manage external data and API connections"
+  description: Manage external data and API connections
   commands:
     authorize-codes:
-      description: "Configure API credentials needed for features"
+      description: Configure API credentials needed for features
       options:
-        - "--service: Service to configure"
-      aliases: ["authorize"]
+      - '--service: Service to configure'
+      aliases:
+      - authorize
     scan-sector:
-      description: "Search for topic to find URLs for scraping"
-      aliases: ["scan"]
+      description: Search for topic to find URLs for scraping
+      aliases:
+      - scan
     receive-transmission:
-      description: "Scrape or directly input information from a known URL"
-      aliases: ["transmission"]
-
+      description: Scrape or directly input information from a known URL
+      aliases:
+      - transmission
+probe:
+  description: Generate initial code tracks and connect the top down BDD step coverage
+  commands:
+    map-planet:
+      description: 'Lightweight: create initial folder, and file names scaffolding,
+        not the BDD steps yet'
+      options:
+      - '--feature: Feature to map planet for'
+      aliases:
+      - map
+    build-landing-zone:
+      description: Create initial code tracks within the files that map-planet created
+      options:
+      - '--feature: Feature to build landing zone for'
+      aliases:
+      - buildlz
+    fabricate-infrastructure:
+      description: Generate BDD steps to connect the code laid down in the landing
+        zone
+      options:
+      - '--feature: Feature to fabricate code for'
+      aliases:
+      - fabricate
 exploration:
-  description: "Execute and test your implementation"
+  description: Execute and test your implementation
   commands:
     warp-speed:
-      description: "Top-down BDD behave driven loop (get behave errors and feed to AI to fix)"
-      aliases: ["warp"]
+      description: Top-down BDD behave driven loop (get behave errors and feed to
+        AI to fix)
+      aliases:
+      - warp
     trycoder:
-      description: "Bottom-up unit test driven loop (get errors and feed to AI to fix)"
+      description: Bottom-up unit test driven loop (get errors and feed to AI to fix)
       options:
-        - "--verbose: Show detailed test output"
-      aliases: ["trycoder"]
+      - '--verbose: Show detailed test output'
+      aliases:
+      - trycoder
     engage:
-      description: "Run warp cycle and trycoder to repeat full set of waypoints N times"
+      description: Run warp cycle and trycoder to repeat full set of waypoints N times
       options:
-        - "--cycles: Number of full test cycles"
-      aliases: ["engage"]
-
+      - '--cycles: Number of full test cycles'
+      aliases:
+      - engage
 weapons:
-  description: "Remove problematic code and tests"
+  description: Remove problematic code and tests
   commands:
     fire-photons:
-      description: "Remove specified steps that are causing trouble"
-      aliases: ["photons"]
+      description: Remove specified steps that are causing trouble
+      aliases:
+      - photons
     aim-lasers:
-      description: "Remove specified code that is causing trouble"
-      aliases: ["lasers"]
+      description: Remove specified code that is causing trouble
+      aliases:
+      - lasers
     shields-up:
-      description: "Protect code from changes (placeholder)"
+      description: Protect code from changes (placeholder)
       options:
-        - "--level: Shield strength (0-100)"
-      aliases: ["shields"]
-
+      - '--level: Shield strength (0-100)'
+      aliases:
+      - shields
 engineering:
-  description: "Manage project state and analyze code quality"
+  description: Manage project state and analyze code quality
   commands:
     create-checkpoint:
-      description: "Create a copy of entire folder and/or git tags"
-      aliases: ["checkpoint"]
+      description: Create a copy of entire folder and/or git tags
+      aliases:
+      - checkpoint
     restore-checkpoint:
-      description: "Roll code back to checkpoint (git or folder copy)"
-      aliases: ["restore"]
+      description: Roll code back to checkpoint (git or folder copy)
+      aliases:
+      - restore
     inspect-vessel:
-      description: "Run framework-specific checks to report on integrity"
-      aliases: ["inspect"]
+      description: Run framework-specific checks to report on integrity
+      aliases:
+      - inspect
     complexity-report:
-      description: "Run radon mi and radon cc to report on code complexity issues"
-      aliases: ["complexity"]
-
+      description: Run radon mi and radon cc to report on code complexity issues
+      aliases:
+      - complexity
 cosmic:
-  description: "Special operations"
+  description: Special operations
   commands:
     supernova:
-      description: "Remove all git stuff (searches through all sub-folders)"
+      description: Remove all git stuff (searches through all sub-folders)
       options:
-        - "--force: Force removal without confirmation"
-      aliases: ["supernova"]
-
-git:
-  description: "Git-related operations"
+      - '--force: Force removal without confirmation'
+      aliases:
+      - supernova
+beam:
+  description: Git-related operations
   commands:
     teleport:
-      description: "Take pieces of code and make a new git repo almost automatically"
-      aliases: ["teleport"]
-
+      description: Take pieces of code and make a new git repo almost automatically
+      aliases:
+      - teleport
 mcars:
-  description: "Code repository and search system"
+  description: Code repository and search system
   commands:
     search:
-      description: "Search for code in the MCARS database"
-      aliases: ["search"]
+      description: Search for code in the MCARS database
+      aliases:
+      - search
     transport:
-      description: "Store pointers/copies of code with AI-generated summaries in tinydb"
-      aliases: ["transport"]
-
+      description: Store pointers/copies of code with AI-generated summaries in tinydb
+      aliases:
+      - transport
 droid:
-  description: "Explanation and assistance commands"
+  description: Explanation and assistance commands
   commands:
     droid-splain:
-      description: "Get explanation from droid assistant"
-      aliases: ["droid"]
+      description: Get explanation from droid assistant
+      aliases:
+      - droid
     man-splain:
-      description: "Get manual page for a topic"
-      aliases: ["splain"]
+      description: Get manual page for a topic
+      aliases:
+      - splain
