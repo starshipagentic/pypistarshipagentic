@@ -341,12 +341,8 @@ def sync_cli_file():
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
-    console = Console()
-    table = Table(title="Synchronization Report", show_lines=True)
-    table.add_column("Message", style="cyan")
     for msg in log_messages:
-        table.add_row(msg)
-    console.print(table)
+        print(msg)
     return True
 
 def fix_command_imports():
