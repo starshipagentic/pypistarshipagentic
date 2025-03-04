@@ -109,6 +109,7 @@ def sync_cli_file():
     
     # Get all command groups
     group_names = list(commands.keys())
+    print(f"  Debug: Found groups in commands-list.yml: {', '.join(group_names)}")
     
     # Check if each group has a module file
     for group_name in group_names:
@@ -125,14 +126,25 @@ def sync_cli_file():
         # Parse current imports
         import_lines = [line.strip() for line in current_imports.split(',')]
         import_lines = [line for line in import_lines if line]
+        print(f"  Debug: Current imports in cli.py: {', '.join(import_lines)}")
         
-        # Add missing imports
-        added_imports = []
-        for group_name in group_names:
-            import_line = f"{group_name}_cmds"
-            if import_line not in current_imports:
-                import_lines.append(import_line)
-                added_imports.append(group_name)
+        # Create a set of expected imports
+        expected_imports = {f"{group_name}_cmds" for group_name in group_names}
+        current_import_set = set(import_lines)
+        
+        # Find imports to add and remove
+        imports_to_add = expected_imports - current_import_set
+        imports_to_remove = current_import_set - expected_imports
+        
+        # Update the import lines
+        for import_to_remove in imports_to_remove:
+            if import_to_remove in import_lines:
+                import_lines.remove(import_to_remove)
+                print(f"  Removing import: {import_to_remove}")
+        
+        for import_to_add in imports_to_add:
+            import_lines.append(import_to_add)
+            print(f"  Adding import: {import_to_add}")
         
         # Sort imports
         import_lines.sort()
@@ -144,8 +156,10 @@ def sync_cli_file():
         new_import_section = f"from starshipagentic.commands import (\n    {new_imports}\n)"
         cli_content = re.sub(import_pattern, new_import_section, cli_content, flags=re.DOTALL)
         
-        if added_imports:
-            print(f"✅ Added imports for: {', '.join(added_imports)}")
+        if imports_to_add:
+            print(f"✅ Added imports for: {', '.join(group_name for group_name in group_names if f'{group_name}_cmds' in imports_to_add)}")
+        if imports_to_remove:
+            print(f"✅ Removed imports for: {', '.join(import_name.replace('_cmds', '') for import_name in imports_to_remove)}")
     
     # Update GROUP_THEMES dictionary
     themes_pattern = r"GROUP_THEMES = \{(.*?)\}"
@@ -153,29 +167,48 @@ def sync_cli_file():
     
     if themes_match:
         current_themes = themes_match.group(1)
-        # Add missing themes
+        
+        # Parse current themes
+        theme_entries = re.findall(r'"([^"]+)":\s*"([^"]+)"', current_themes)
+        current_theme_dict = {group: color for group, color in theme_entries}
+        
+        # Add missing themes and remove obsolete ones
         added_themes = []
+        removed_themes = []
+        
+        # Check for themes to remove
+        for group_name in list(current_theme_dict.keys()):
+            if group_name not in group_names:
+                removed_themes.append(group_name)
+        
+        # Add missing themes
         for group_name in group_names:
-            if f'"{group_name}"' not in current_themes:
+            if group_name not in current_theme_dict:
                 # Choose a color based on position in the list
                 colors = ["blue", "green", "magenta", "cyan", "yellow", "bright_blue", 
                           "red", "bright_green", "bright_magenta", "bright_cyan", "bright_yellow"]
                 color = colors[len(added_themes) % len(colors)]
-                
-                # Add to the end of the dictionary
-                if current_themes.strip().endswith(","):
-                    current_themes += f'\n    "{group_name}": "{color}",'
-                else:
-                    current_themes += f',\n    "{group_name}": "{color}",'
-                
+                current_theme_dict[group_name] = color
                 added_themes.append(group_name)
         
+        # Remove obsolete themes
+        for group_name in removed_themes:
+            if group_name in current_theme_dict:
+                del current_theme_dict[group_name]
+        
+        # Format the new themes dictionary
+        new_themes = ""
+        for group_name in sorted(current_theme_dict.keys()):
+            new_themes += f'\n    "{group_name}": "{current_theme_dict[group_name]}",'
+        
         # Replace themes dictionary
-        new_themes_section = f"GROUP_THEMES = {{{current_themes}}}"
+        new_themes_section = f"GROUP_THEMES = {{{new_themes}\n}}"
         cli_content = re.sub(themes_pattern, new_themes_section, cli_content, flags=re.DOTALL)
         
         if added_themes:
             print(f"✅ Added themes for: {', '.join(added_themes)}")
+        if removed_themes:
+            print(f"✅ Removed themes for: {', '.join(removed_themes)}")
     
     # Update GROUP_ICONS dictionary
     icons_pattern = r"GROUP_ICONS = \{(.*?)\}"
@@ -183,28 +216,47 @@ def sync_cli_file():
     
     if icons_match:
         current_icons = icons_match.group(1)
-        # Add missing icons
+        
+        # Parse current icons
+        icon_entries = re.findall(r'"([^"]+)":\s*"([^"]+)"', current_icons)
+        current_icon_dict = {group: icon for group, icon in icon_entries}
+        
+        # Add missing icons and remove obsolete ones
         added_icons = []
+        removed_icons = []
+        
+        # Check for icons to remove
+        for group_name in list(current_icon_dict.keys()):
+            if group_name not in group_names:
+                removed_icons.append(group_name)
+        
+        # Add missing icons
         for group_name in group_names:
-            if f'"{group_name}"' not in current_icons:
+            if group_name not in current_icon_dict:
                 # Choose an icon
                 icons = ["🚀", "📦", "🔧", "📊", "🔍", "📡", "🛠️", "📝", "🔬", "🧪", "🧭"]
                 icon = icons[len(added_icons) % len(icons)]
-                
-                # Add to the end of the dictionary
-                if current_icons.strip().endswith(","):
-                    current_icons += f'\n    "{group_name}": "{icon}",'
-                else:
-                    current_icons += f',\n    "{group_name}": "{icon}",'
-                
+                current_icon_dict[group_name] = icon
                 added_icons.append(group_name)
         
+        # Remove obsolete icons
+        for group_name in removed_icons:
+            if group_name in current_icon_dict:
+                del current_icon_dict[group_name]
+        
+        # Format the new icons dictionary
+        new_icons = ""
+        for group_name in sorted(current_icon_dict.keys()):
+            new_icons += f'\n    "{group_name}": "{current_icon_dict[group_name]}",'
+        
         # Replace icons dictionary
-        new_icons_section = f"GROUP_ICONS = {{{current_icons}}}"
+        new_icons_section = f"GROUP_ICONS = {{{new_icons}\n}}"
         cli_content = re.sub(icons_pattern, new_icons_section, cli_content, flags=re.DOTALL)
         
         if added_icons:
             print(f"✅ Added icons for: {', '.join(added_icons)}")
+        if removed_icons:
+            print(f"✅ Removed icons for: {', '.join(removed_icons)}")
     
     # Update enhance_group_help section
     enhance_pattern = r"# Enhance command groups with better help display\s*(.*?)# Add command groups"
@@ -212,23 +264,55 @@ def sync_cli_file():
     
     if enhance_match:
         current_enhance = enhance_match.group(1)
-        # Add missing enhance lines
+        
+        # Parse current enhance lines
+        enhance_lines = []
+        for line in current_enhance.strip().split('\n'):
+            line = line.strip()
+            if line:
+                enhance_lines.append(line)
+        
+        # Extract group names from enhance lines
+        current_enhance_groups = []
+        for line in enhance_lines:
+            match = re.search(r'(\w+)_group = enhance_group_help\((\w+)_cmds\.', line)
+            if match:
+                current_enhance_groups.append(match.group(1))
+        
+        # Add missing enhance lines and remove obsolete ones
         added_enhance = []
+        removed_enhance = []
+        new_enhance_lines = []
+        
+        # Check for lines to remove
+        for group_name in current_enhance_groups:
+            if group_name not in group_names:
+                removed_enhance.append(group_name)
+        
+        # Add all required enhance lines (keeping existing ones that are still needed)
         for group_name in group_names:
             enhance_line = f"{group_name}_group = enhance_group_help({group_name}_cmds.{group_name}_group, \"{group_name}\")"
-            if enhance_line not in current_enhance:
-                if current_enhance.strip().endswith("\n"):
-                    current_enhance += enhance_line + "\n"
-                else:
-                    current_enhance += "\n" + enhance_line + "\n"
+            if group_name not in current_enhance_groups:
+                new_enhance_lines.append(enhance_line)
                 added_enhance.append(group_name)
+            else:
+                # Find and keep the existing line for this group
+                for line in enhance_lines:
+                    if f"{group_name}_group = enhance_group_help" in line:
+                        new_enhance_lines.append(line)
+                        break
+        
+        # Format the new enhance section
+        new_enhance = "\n" + "\n".join(new_enhance_lines) + "\n"
         
         # Replace enhance section
-        new_enhance_section = f"# Enhance command groups with better help display\n{current_enhance}\n# Add command groups"
+        new_enhance_section = f"# Enhance command groups with better help display{new_enhance}\n# Add command groups"
         cli_content = re.sub(enhance_pattern, new_enhance_section, cli_content, flags=re.DOTALL)
         
         if added_enhance:
             print(f"✅ Added enhance_group_help for: {', '.join(added_enhance)}")
+        if removed_enhance:
+            print(f"✅ Removed enhance_group_help for: {', '.join(removed_enhance)}")
     
     # Update add_command section
     add_pattern = r"# Add command groups\s*(.*?)if __name__ == \"__main__\":"
@@ -236,23 +320,55 @@ def sync_cli_file():
     
     if add_match:
         current_add = add_match.group(1)
-        # Add missing add lines
+        
+        # Parse current add lines
+        add_lines = []
+        for line in current_add.strip().split('\n'):
+            line = line.strip()
+            if line:
+                add_lines.append(line)
+        
+        # Extract group names from add lines
+        current_add_groups = []
+        for line in add_lines:
+            match = re.search(r'main\.add_command\((\w+)_group,\s*\"(\w+)\"\)', line)
+            if match:
+                current_add_groups.append(match.group(2))
+        
+        # Add missing add lines and remove obsolete ones
         added_commands = []
+        removed_commands = []
+        new_add_lines = []
+        
+        # Check for lines to remove
+        for group_name in current_add_groups:
+            if group_name not in group_names:
+                removed_commands.append(group_name)
+        
+        # Add all required add lines (keeping existing ones that are still needed)
         for group_name in group_names:
             add_line = f"main.add_command({group_name}_group, \"{group_name}\")"
-            if add_line not in current_add:
-                if current_add.strip().endswith("\n"):
-                    current_add += add_line + "\n"
-                else:
-                    current_add += "\n" + add_line + "\n"
+            if group_name not in current_add_groups:
+                new_add_lines.append(add_line)
                 added_commands.append(group_name)
+            else:
+                # Find and keep the existing line for this group
+                for line in add_lines:
+                    if f"main.add_command({group_name}_group" in line:
+                        new_add_lines.append(line)
+                        break
+        
+        # Format the new add section
+        new_add = "\n" + "\n".join(new_add_lines) + "\n"
         
         # Replace add section
-        new_add_section = f"# Add command groups\n{current_add}\nif __name__ == \"__main__\":"
+        new_add_section = f"# Add command groups{new_add}\nif __name__ == \"__main__\":"
         cli_content = re.sub(add_pattern, new_add_section, cli_content, flags=re.DOTALL)
         
         if added_commands:
             print(f"✅ Added command registration for: {', '.join(added_commands)}")
+        if removed_commands:
+            print(f"✅ Removed command registration for: {', '.join(removed_commands)}")
     
     # Write updated cli.py
     with open(cli_path, 'w') as f:
