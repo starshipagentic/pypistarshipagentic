@@ -35,7 +35,7 @@ def validate_cli():
         missing_commands = []
         for group_name in all_groups:
             for cmd_info in command_registry.get_all_commands(group_name):
-                cmd_name = cmd_info['name']
+                cmd_name = cmd_info if isinstance(cmd_info, str) else cmd_info['name']
                 full_cmd = f"{group_name} {cmd_name}"
                 
                 # More robust check - look for the command in various formats
@@ -73,7 +73,7 @@ def validate_cli():
         missing_aliases = []
         for group_name in all_groups:
             for cmd_info in command_registry.get_all_commands(group_name):
-                cmd_name = cmd_info['name']
+                cmd_name = cmd_info if isinstance(cmd_info, str) else cmd_info['name']
                 aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
                 for alias in aliases:
                     # Aliases might be displayed in various formats or combined with others
@@ -158,7 +158,7 @@ def validate_cli():
         missing_commands = []
         for group_name in all_groups:
             for cmd_info in command_registry.get_all_commands(group_name):
-                cmd_name = cmd_info['name']
+                cmd_name = cmd_info if isinstance(cmd_info, str) else cmd_info['name']
                 full_cmd = f"{group_name} {cmd_name}"
                 
                 # More robust check - look for the command in various formats
