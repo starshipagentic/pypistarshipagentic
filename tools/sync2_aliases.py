@@ -135,7 +135,7 @@ def run_group():
 '''
     with open(init_file, "w", encoding="utf-8") as f:
         f.write(content)
-    print(f"Updated group __init__.py: {init_file}")
+    print(f"✅ Group '{group}' updated.")
 
 def update_commands_init():
     """
@@ -156,7 +156,7 @@ def update_commands_init():
         content += f"from . import {group}\n"
     with open(init_file, "w", encoding="utf-8") as f:
         f.write(content)
-    print(f"Updated top-level commands __init__.py: {init_file}")
+    print("✅ Commands __init__ updated.")
 
 def generate_expected_aliases(commands_data):
     """
@@ -207,13 +207,9 @@ def update_pyproject_scripts(expected_aliases):
     with open(PYPROJECT_PATH, "wb") as f:
         tomli_w.dump(pyproject, f)
     if added_aliases or updated_aliases:
-        print("Updated pyproject.toml scripts:")
-        for a in added_aliases:
-            print("  Added:", a)
-        for u in updated_aliases:
-            print("  Updated:", u)
+        print("✅ pyproject.toml scripts updated.")
     else:
-        print("No changes needed in pyproject.toml scripts.")
+        print("ℹ️  pyproject.toml scripts ok.")
 
 def update_cli_main(expected_aliases):
     """
@@ -248,7 +244,7 @@ def update_cli_main(expected_aliases):
         content = "\n".join(lines)
     with open(CLI_PATH, "w", encoding="utf-8") as f:
         f.write(content)
-    print("Updated main CLI file:", CLI_PATH)
+    print("✅ CLI updated.")
 
 def sync_cli_file():
     """
@@ -263,7 +259,7 @@ def sync_cli_file():
     log("  ├─ Synchronizing CLI file...")
     commands_data = load_commands_list()
     group_names = list(commands_data.keys())
-    log(f"  Debug: Found groups: {', '.join(group_names)}")
+    log(f"🔍 Groups: {', '.join(group_names)}")
     for group in group_names:
         # Check if group folder exists; if not, create it.
         group_dir = COMMANDS_DIR / group
