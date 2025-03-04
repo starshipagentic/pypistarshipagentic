@@ -91,19 +91,19 @@ from starshipagentic.utils.command_registry import command_registry
 
 # Import command groups
 from starshipagentic.commands import (
-    architecture_cmds,
-    beam_cmds,
-    cosmic_cmds,
-    droid_cmds,
-    engineering_cmds,
-    exploration_cmds,
-    mcars_cmds,
-    mission_cmds,
-    navigation_cmds,
-    probe_cmds,
-    transmission_cmds,
-    vessel_cmds,
-    weapons_cmds,
+    architecture,
+    beam,
+    cosmic,
+    droid,
+    engineering,
+    exploration,
+    mcars,
+    mission,
+    navigation,
+    probe,
+    transmission,
+    vessel,
+    weapons,
 )
 
 console = Console()
@@ -503,19 +503,19 @@ def main(ctx, all_commands, commands_list):
         interactive_mode()
 
 # Enhance command groups with better help display
-vessel_group = enhance_group_help(vessel_cmds.vessel_group, "vessel")
-mission_group = enhance_group_help(mission_cmds.mission_group, "mission")
-architecture_group = enhance_group_help(architecture_cmds.architecture_group, "architecture")
-navigation_group = enhance_group_help(navigation_cmds.navigation_group, "navigation")
-transmission_group = enhance_group_help(transmission_cmds.transmission_group, "transmission")
-probe_group = enhance_group_help(probe_cmds.probe_group, "probe")
-exploration_group = enhance_group_help(exploration_cmds.exploration_group, "exploration")
-weapons_group = enhance_group_help(weapons_cmds.weapons_group, "weapons")
-engineering_group = enhance_group_help(engineering_cmds.engineering_group, "engineering")
-cosmic_group = enhance_group_help(cosmic_cmds.cosmic_group, "cosmic")
-beam_group = enhance_group_help(beam_cmds.beam_group, "beam")
-mcars_group = enhance_group_help(mcars_cmds.mcars_group, "mcars")
-droid_group = enhance_group_help(droid_cmds.droid_group, "droid")
+vessel_group = enhance_group_help(vessel.vessel_group, "vessel")
+mission_group = enhance_group_help(mission.mission_group, "mission")
+architecture_group = enhance_group_help(architecture.architecture_group, "architecture")
+navigation_group = enhance_group_help(navigation.navigation_group, "navigation")
+transmission_group = enhance_group_help(transmission.transmission_group, "transmission")
+probe_group = enhance_group_help(probe.probe_group, "probe")
+exploration_group = enhance_group_help(exploration.exploration_group, "exploration")
+weapons_group = enhance_group_help(weapons.weapons_group, "weapons")
+engineering_group = enhance_group_help(engineering.engineering_group, "engineering")
+cosmic_group = enhance_group_help(cosmic.cosmic_group, "cosmic")
+beam_group = enhance_group_help(beam.beam_group, "beam")
+mcars_group = enhance_group_help(mcars.mcars_group, "mcars")
+droid_group = enhance_group_help(droid.droid_group, "droid")
 
 # Add command groups
 main.add_command(vessel_group, "vessel")
