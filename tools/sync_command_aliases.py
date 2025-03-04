@@ -548,7 +548,7 @@ def sync_aliases():
             target = f"starshipagentic.commands.{group_name}_cmds:{cmd_func_name}_command"
             
             # Add direct command shortcut (e.g., 'map-planet')
-            expected_aliases[cmd_name] = f"starshipagentic.__main__:main"
+            expected_aliases[cmd_name] = target  # Map directly to the specific command function
             
             # Add command aliases
             for alias in cmd_data.get("aliases", []):

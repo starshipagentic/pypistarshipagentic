@@ -12,6 +12,9 @@ def preprocess_command_args():
     1. 'starshipagentic probe map-planet' (fully qualified, no change needed)
     2. 'probe map-planet' (group shortcut)
     3. 'map-planet' (direct command)
+    
+    Note: For direct commands (case 3), the actual execution is handled by the entry point
+    in pyproject.toml, which maps directly to the command function.
     """
     # Get command registry
     command_registry = CommandRegistry()
@@ -32,17 +35,12 @@ def preprocess_command_args():
         sys.argv = ['starshipagentic', script_name] + sys.argv[1:]
         return
     
-    # Case 2: Script is a command name (e.g., 'map-planet')
-    if script_name in all_commands:
-        # Get the group for this command
-        group = all_commands[script_name]
-        # Adjust arguments to include app name and group
-        sys.argv = ['starshipagentic', group, script_name] + sys.argv[1:]
-        return
-    
-    # Case 3: Normal invocation, just ensure program name is correct
+    # Case 2: Normal invocation with group, ensure program name is correct
     if len(sys.argv) > 1 and sys.argv[1] in group_names:
         sys.argv[0] = 'starshipagentic'
+        
+    # Note: We don't need to handle Case 3 (direct command) here anymore
+    # as it's handled by the entry point in pyproject.toml
 
 if __name__ == "__main__":
     # Preprocess command arguments to handle shortened forms
