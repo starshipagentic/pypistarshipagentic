@@ -34,10 +34,32 @@ def validate_cli():
         # Check that all commands appear in the output
         missing_commands = []
         for group_name in all_groups:
-            for cmd_name in command_registry.get_all_commands(group_name):
+            for cmd_info in command_registry.get_all_commands(group_name):
+                cmd_name = cmd_info['name']
                 full_cmd = f"{group_name} {cmd_name}"
-                # Use a more lenient check - just look for the command name anywhere in the output
-                if cmd_name not in output and full_cmd not in output:
+                
+                # More robust check - look for the command in various formats
+                cmd_found = False
+                
+                # Check for exact command name
+                if cmd_name in output:
+                    cmd_found = True
+                
+                # Check for full command (group + command)
+                if full_cmd in output:
+                    cmd_found = True
+                
+                # Check for command with spaces instead of hyphens (for display purposes)
+                cmd_display = cmd_name.replace('-', ' ')
+                if cmd_display in output:
+                    cmd_found = True
+                
+                # Check for full command with spaces instead of hyphens
+                full_cmd_display = f"{group_name} {cmd_display}"
+                if full_cmd_display in output:
+                    cmd_found = True
+                
+                if not cmd_found:
                     missing_commands.append(full_cmd)
         
         if missing_commands:
@@ -50,10 +72,12 @@ def validate_cli():
         # Check that all aliases appear in the output
         missing_aliases = []
         for group_name in all_groups:
-            for cmd_name in command_registry.get_all_commands(group_name):
+            for cmd_info in command_registry.get_all_commands(group_name):
+                cmd_name = cmd_info['name']
                 aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
                 for alias in aliases:
-                    if alias not in output:
+                    # Aliases might be displayed in various formats or combined with others
+                    if alias not in output and f", {alias}" not in output and f"{alias}," not in output:
                         missing_aliases.append(f"{alias} (for {group_name} {cmd_name})")
         
         if missing_aliases:
@@ -81,11 +105,15 @@ def validate_cli():
             
             # Check that all commands in this group appear in the output
             missing_commands = []
-            for cmd_name in command_registry.get_all_commands(group_name):
-                # Some commands might be displayed with different formatting or spacing
-                # So we check for the command name itself rather than the exact format
-                if cmd_name not in output:
-                    missing_commands.append(f"{group_name} {cmd_name}")
+            for cmd_info in command_registry.get_all_commands(group_name):
+                cmd_name = cmd_info['name']
+                # Use a more robust check - look for the command name in various formats
+                # The command might appear as "group_name cmd_name" or just "cmd_name"
+                if not (cmd_name in output or f"{group_name} {cmd_name}" in output):
+                    # Try with hyphens replaced by spaces (for display purposes)
+                    cmd_display = cmd_name.replace('-', ' ')
+                    if not (cmd_display in output or f"{group_name} {cmd_display}" in output):
+                        missing_commands.append(f"{group_name} {cmd_name}")
             
             if missing_commands:
                 group_help_issues = True
@@ -95,10 +123,12 @@ def validate_cli():
             
             # Check that all aliases for this group appear in the output
             missing_aliases = []
-            for cmd_name in command_registry.get_all_commands(group_name):
+            for cmd_info in command_registry.get_all_commands(group_name):
+                cmd_name = cmd_info['name']
                 aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
                 for alias in aliases:
-                    if alias not in output:
+                    # Aliases might be displayed in various formats or combined with others
+                    if alias not in output and f", {alias}" not in output and f"{alias}," not in output:
                         missing_aliases.append(f"{alias} (for {group_name} {cmd_name})")
             
             if missing_aliases:
@@ -127,10 +157,32 @@ def validate_cli():
         # Check that all commands appear in the output
         missing_commands = []
         for group_name in all_groups:
-            for cmd_name in command_registry.get_all_commands(group_name):
+            for cmd_info in command_registry.get_all_commands(group_name):
+                cmd_name = cmd_info['name']
                 full_cmd = f"{group_name} {cmd_name}"
-                # More flexible check - look for both group and command names in the output
-                if not (group_name in output and cmd_name in output):
+                
+                # More robust check - look for the command in various formats
+                cmd_found = False
+                
+                # Check for exact command name
+                if cmd_name in output:
+                    cmd_found = True
+                
+                # Check for full command (group + command)
+                if full_cmd in output:
+                    cmd_found = True
+                
+                # Check for command with spaces instead of hyphens (for display purposes)
+                cmd_display = cmd_name.replace('-', ' ')
+                if cmd_display in output:
+                    cmd_found = True
+                
+                # Check for full command with spaces instead of hyphens
+                full_cmd_display = f"{group_name} {cmd_display}"
+                if full_cmd_display in output:
+                    cmd_found = True
+                
+                if not cmd_found:
                     missing_commands.append(full_cmd)
         
         if missing_commands:
