@@ -94,7 +94,11 @@ def main():
     
     # Prepend the group name to the arguments if not already there
     if len(sys.argv) > 0:
-        sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
+        # If no arguments provided, show help for this group
+        if len(sys.argv) == 1:
+            sys.argv = ['starshipagentic', '{group_name}', '--help']
+        else:
+            sys.argv = ['starshipagentic', '{group_name}'] + sys.argv[1:]
     
     # Run the main CLI function
     cli_main()

@@ -31,8 +31,14 @@ def preprocess_command_args():
     
     # Case 1: Script is a group name (e.g., 'probe map-planet')
     if script_name in group_names:
-        # Adjust arguments to include the app name
-        sys.argv = ['starshipagentic', script_name] + sys.argv[1:]
+        # Check if we're being run directly as a module entry point
+        if len(sys.argv) > 1:
+            # We have arguments, so this is likely a group command like "weapons aim-lasers"
+            # Adjust arguments to include the app name
+            sys.argv = ['starshipagentic', script_name] + sys.argv[1:]
+        else:
+            # No arguments, so this is just "weapons" - show help for this group
+            sys.argv = ['starshipagentic', script_name, '--help']
         return
     
     # Case 2: Normal invocation with group, ensure program name is correct
