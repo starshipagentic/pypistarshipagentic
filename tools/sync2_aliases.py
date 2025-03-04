@@ -270,6 +270,33 @@ def sync_cli_file():
         update_group_init(group)
     update_commands_init()
     expected_aliases = generate_expected_aliases(commands_data)
+    import sys
+    import os
+    conflicts = []
+    alias_sources = {}
+    for group in commands_data:
+        alias = group
+        alias_sources.setdefault(alias, []).append(f"group {group}")
+        for cmd, data in commands_data[group].get("commands", {}).items():
+            cmd_alias = cmd.replace("_", "-")
+            alias_sources.setdefault(cmd_alias, []).append(f"command {group}:{cmd}")
+            for extra in data.get("aliases", []):
+                alias_sources.setdefault(extra, []).append(f"command {group}:{cmd} extra")
+    for alias, sources in alias_sources.items():
+        if len(sources) > 1:
+            conflicts.append(f"Alias '{alias}' is used in multiple contexts: " + ", ".join(sources))
+    no_go_path = BASE_DIR / "no-go-alias.txt"
+    if os.path.exists(no_go_path):
+        with open(no_go_path, "r", encoding="utf-8") as nf:
+            no_go = {line.strip() for line in nf if line.strip()}
+        for alias in alias_sources:
+            if alias in no_go:
+                conflicts.append(f"Alias '{alias}' is reserved and cannot be used (found in no-go-alias.txt).")
+    if conflicts:
+        print("ERROR: Alias conflicts detected:")
+        for conflict in conflicts:
+            print("  " + conflict)
+        sys.exit(1)
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
     return True
