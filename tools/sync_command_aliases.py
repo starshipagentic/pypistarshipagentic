@@ -94,9 +94,10 @@ def {func_name}_command():
 
 def sync_cli_file():
     """Update cli.py to include all command groups from commands-list.yml."""
-    print("🔄 Synchronizing CLI file...")
+    print("  ├─ Synchronizing CLI file...")
     
     # Load commands-list.yml
+    print("  └─ Checking command aliases...")
     commands_path = Path(__file__).parent.parent / "src" / "starshipagentic" / "commands-list.yml"
     with open(commands_path, 'r') as f:
         commands = yaml.safe_load(f)
@@ -258,15 +259,15 @@ def sync_cli_file():
         f.write(cli_content)
     
     if added_imports or added_themes or added_icons or added_enhance or added_commands:
-        print("✅ Updated cli.py with new command groups")
+        print("    ✅ Updated cli.py with new command groups")
     else:
-        print("✅ No changes needed in cli.py")
+        print("    ✅ No changes needed in cli.py")
     
     return True
 
 def fix_command_imports():
     """Fix import statements in all command modules."""
-    print("🔄 Fixing import statements in command modules...")
+    print("  ├─ Fixing import statements in command modules...")
     
     # Get all command module files
     commands_dir = Path(__file__).parent.parent / "src" / "starshipagentic" / "commands"
@@ -324,9 +325,9 @@ def fix_command_imports():
             fixed_files.append(file_path.name)
     
     if fixed_files:
-        print(f"✅ Fixed imports in {len(fixed_files)} files: {', '.join(fixed_files)}")
+        print(f"    ✅ Fixed imports in {len(fixed_files)} files: {', '.join(fixed_files)}")
     else:
-        print("✅ No import fixes needed")
+        print("    ✅ No import fixes needed")
     
     return True
 
@@ -413,37 +414,37 @@ def sync_aliases():
         pyproject["project"]["scripts"] = scripts
         with open(pyproject_path, "wb") as f:
             tomli_w.dump(pyproject, f)
-        print(f"✅ Updated pyproject.toml with {len(added_aliases)} new and {len(updated_aliases)} modified aliases")
+        print(f"    ✅ Updated pyproject.toml with {len(added_aliases)} new and {len(updated_aliases)} modified aliases")
         changes_made = True
     else:
-        print("✅ No changes needed in pyproject.toml")
+        print("    ✅ No changes needed in pyproject.toml")
     
     # Update commands-list.yml if we added aliases to it
     if updated_aliases:
         with open(commands_path, 'w') as f:
             yaml.dump(commands, f, sort_keys=False, default_flow_style=False)
-        print(f"✅ Updated commands-list.yml with {len(updated_aliases)} aliases")
+        print(f"    ✅ Updated commands-list.yml with {len(updated_aliases)} aliases")
         changes_made = True
     
     # Report changes
     if added_aliases:
-        print("\nAdded aliases:")
+        print("\n  Added aliases:")
         for alias in added_aliases:
             print(f"  + {alias}")
     
     if updated_aliases:
-        print("\nUpdated aliases:")
+        print("\n  Updated aliases:")
         for alias in updated_aliases:
             print(f"  ~ {alias}")
     
     if removed_aliases:
-        print("\nPotential aliases to remove (not automatically removed):")
+        print("\n  Potential aliases to remove (not automatically removed):")
         for alias in removed_aliases:
             print(f"  - {alias}")
     
     # Install the package in development mode if changes were made
     if changes_made:
-        print("\n🔄 Installing package in development mode...")
+        print("\n  🔄 Installing package in development mode...")
         import subprocess
         try:
             result = subprocess.run(
@@ -453,7 +454,7 @@ def sync_aliases():
                 text=True,
                 check=True
             )
-            print("✅ Package installed successfully")
+            print("    ✅ Package installed successfully")
             if result.stdout.strip():
                 print(result.stdout)
         except subprocess.CalledProcessError as e:
@@ -465,8 +466,9 @@ def sync_aliases():
 
 def fix_specific_command_file(file_path):
     """Fix a specific command file by path."""
+    print(f"🔄 Checking imports in {os.path.basename(file_path)}...")
     if not os.path.exists(file_path):
-        print(f"❌ File not found: {file_path}")
+        print(f"  ❌ File not found: {file_path}")
         return False
     
     with open(file_path, 'r') as f:
@@ -493,9 +495,9 @@ def fix_specific_command_file(file_path):
     if has_changes:
         with open(file_path, 'w') as f:
             f.write(content)
-        print(f"✅ Fixed imports in {os.path.basename(file_path)}")
+        print(f"  ✅ Fixed imports in {os.path.basename(file_path)}")
     else:
-        print(f"✅ No import fixes needed in {os.path.basename(file_path)}")
+        print(f"  ✅ No import fixes needed in {os.path.basename(file_path)}")
     
     return True
 
