@@ -151,7 +151,9 @@ def validate_cli():
                 aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
                 for alias in aliases:
                     # Aliases might be displayed in various formats or combined with others
-                    if alias not in output and f", {alias}" not in output and f"{alias}," not in output:
+                    if not (output_contains(alias, output) or
+                            output_contains(f", {alias}", output) or
+                            output_contains(f"{alias},", output)):
                         missing_aliases.append(f"{alias} (for {group_name} {cmd_name})")
             
             if missing_aliases:
