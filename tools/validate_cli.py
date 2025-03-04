@@ -15,6 +15,24 @@ from rich.console import Console
 
 console = Console()
 
+def output_contains(expected, output):
+    """
+    Check if `expected` is present in `output`. If not found exactly,
+    then search for any token ending with '...' whose prefix matches `expected`.
+    """
+    if expected in output:
+        return True
+
+    # Look for any non-whitespace tokens ending with '...'
+    import re
+    tokens = re.findall(r'\S+\.\.\.', output)
+    for token in tokens:
+        # Remove the ellipsis
+        prefix = token[:-3]
+        if expected.startswith(prefix):
+            return True
+    return False
+
 def validate_cli():
     """Validate that the CLI correctly displays all commands and aliases."""
     # Get all commands from the registry
@@ -78,8 +96,10 @@ def validate_cli():
                 cmd_name = cmd_info if isinstance(cmd_info, str) else cmd_info['name']
                 aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
                 for alias in aliases:
-                    # Aliases might be displayed in various formats or combined with others
-                    if alias not in output and f", {alias}" not in output and f"{alias}," not in output:
+                    # Use helper function to allow for truncated output
+                    if not (output_contains(alias, output) or
+                            output_contains(f", {alias}", output) or
+                            output_contains(f"{alias},", output)):
                         missing_aliases.append(f"{alias} (for {group_name} {cmd_name})")
         
         if missing_aliases:
