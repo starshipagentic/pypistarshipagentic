@@ -1,0 +1,11 @@
+help
+ls
+cd
+man
+exit
+sudo
+rm
+cp
+mv
+mkdir
+rmdir
