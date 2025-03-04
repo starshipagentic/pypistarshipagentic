@@ -271,19 +271,44 @@ def sync_cli_file():
     update_commands_init()
     expected_aliases = generate_expected_aliases(commands_data)
     import sys
-    conflicts = []
+    # Build a detailed mapping of alias -> list of source tuples.
+    # Each tuple: (source_type, group, command)
+    # - source_type is "group" for group aliases
+    #   and "command" for command aliases.
+    # For command aliases, group & command specify the origin.
     alias_sources = {}
-    for group in commands_data:
-        alias = group
-        alias_sources.setdefault(alias, []).append(f"group {group}")
-        for cmd, data in commands_data[group].get("commands", {}).items():
-            cmd_alias = cmd.replace("_", "-")
-            alias_sources.setdefault(cmd_alias, []).append(f"command {group}:{cmd}")
-            for extra in data.get("aliases", []):
-                alias_sources.setdefault(extra, []).append(f"command {group}:{cmd} extra")
+
+    def add_alias(alias, source_type, group, cmd=None):
+        # Build the source tuple.
+        source = (source_type, group, cmd)
+        alias_sources.setdefault(alias, []).append(source)
+
+    for group, data in commands_data.items():
+        # Group alias.
+        add_alias(group, "group", group)
+        # Now the commands within that group.
+        for cmd, cmd_data in data.get("commands", {}).items():
+            default_alias = cmd.replace("_", "-")
+            add_alias(default_alias, "command", group, cmd)
+            # Process extra aliases.
+            for extra in cmd_data.get("aliases", []):
+                add_alias(extra, "command", group, cmd)
+
+    # Now check for conflicts. For a given alias, if the sources list contains entries
+    # that don’t all refer to the same command, then that alias is ambiguous.
+    conflicts = []
     for alias, sources in alias_sources.items():
         if len(sources) > 1:
-            conflicts.append(f"Alias '{alias}' is used in multiple contexts: " + ", ".join(sources))
+            unique = set(sources)
+            if len(unique) == 1 and all(s[0] == "command" for s in sources):
+                continue
+            details = []
+            for s in sources:
+                if s[0] == "group":
+                    details.append(f"group {s[1]}")
+                elif s[0] == "command":
+                    details.append(f"command {s[1]}:{s[2]}")
+            conflicts.append(f"Alias '{alias}' is used in multiple contexts: " + ", ".join(details))
     no_go_path = BASE_DIR / "no-go-alias.txt"
     if os.path.exists(no_go_path):
         with open(no_go_path, "r", encoding="utf-8") as nf:
