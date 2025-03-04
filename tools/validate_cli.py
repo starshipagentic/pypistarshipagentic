@@ -5,6 +5,7 @@ import sys
 import subprocess
 from pathlib import Path
 import re
+import os
 
 # Add the project root to the Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -27,6 +28,7 @@ def validate_cli():
             ["starshipagentic", "--all-commands"], 
             capture_output=True, 
             text=True,
+            env=dict(os.environ, COLUMNS="500"),
             check=True
         )
         output = result.stdout
@@ -99,6 +101,7 @@ def validate_cli():
                 ["starshipagentic", group_name, "--help"], 
                 capture_output=True, 
                 text=True,
+                env=dict(os.environ, COLUMNS="500"),
                 check=True
             )
             output = result.stdout
@@ -150,6 +153,7 @@ def validate_cli():
             ["starshipagentic", "--commands-list"], 
             capture_output=True, 
             text=True,
+            env=dict(os.environ, COLUMNS="500"),
             check=True
         )
         output = result.stdout
@@ -208,6 +212,7 @@ def validate_cli():
                         [alias, "--help"], 
                         capture_output=True, 
                         text=True,
+                        env=dict(os.environ, COLUMNS="500"),
                         check=True
                     )
                     # Check if the help output mentions the full command name
