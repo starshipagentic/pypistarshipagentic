@@ -271,7 +271,6 @@ def sync_cli_file():
     update_commands_init()
     expected_aliases = generate_expected_aliases(commands_data)
     import sys
-    import os
     conflicts = []
     alias_sources = {}
     for group in commands_data:
