@@ -256,16 +256,20 @@ def sync_cli_file():
     if the file for that group doesn't exist, scaffold a command module.
     Then update the import section in cli.py.
     """
-    print("  ├─ Synchronizing CLI file...")
+    log_messages = []
+    def log(msg):
+        log_messages.append(msg)
+        print(msg)
+    log("  ├─ Synchronizing CLI file...")
     commands_data = load_commands_list()
     group_names = list(commands_data.keys())
-    print(f"  Debug: Found groups: {', '.join(group_names)}")
+    log(f"  Debug: Found groups: {', '.join(group_names)}")
     for group in group_names:
         # Check if group folder exists; if not, create it.
         group_dir = COMMANDS_DIR / group
         if not group_dir.exists():
             os.makedirs(group_dir)
-            print(f"Created group directory: {group_dir}")
+            log(f"Created group directory: {group_dir}")
         # For each command in the group, scaffold its package if missing.
         for cmd in commands_data[group].get("commands", {}):
             scaffold_command_package(group, cmd)
@@ -337,6 +341,12 @@ def sync_cli_file():
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
+    console = Console()
+    table = Table(title="Synchronization Report", show_lines=True)
+    table.add_column("Message", style="cyan")
+    for msg in log_messages:
+        table.add_row(msg)
+    console.print(table)
     return True
 
 def fix_command_imports():
