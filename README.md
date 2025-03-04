@@ -102,6 +102,16 @@ Manage external data and API connections
 | `transmission scan-sector` | `scan` | Search for topic to find URLs for scraping |
 | `transmission receive-transmission` | `transmission` | Scrape or directly input information from a known URL |
 
+## Probe Commands
+
+Generate initial code tracks and connect the top down BDD step coverage
+
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `probe map-planet` | `map` | Lightweight: create initial folder, and file names scaffolding, not the BDD steps yet |
+| `probe build-landing-zone` | `buildlz` | Create initial code tracks within the files that map-planet created |
+| `probe fabricate-infrastructure` | `fabricate` | Generate BDD steps to connect the code laid down in the landing zone |
+
 ## Exploration Commands
 
 Execute and test your implementation
@@ -141,13 +151,13 @@ Special operations
 |---------|-------|-------------|
 | `cosmic supernova` | `supernova` | Remove all git stuff (searches through all sub-folders) |
 
-## Git Commands
+## Beam Commands
 
 Git-related operations
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `git teleport` | `teleport` | Take pieces of code and make a new git repo almost automatically |
+| `beam teleport` | `teleport` | Take pieces of code and make a new git repo almost automatically |
 
 ## Mcars Commands
 
