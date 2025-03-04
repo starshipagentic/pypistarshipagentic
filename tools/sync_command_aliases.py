@@ -374,7 +374,20 @@ def sync_cli_file():
     with open(cli_path, 'w') as f:
         f.write(cli_content)
     
-    if added_imports or added_themes or added_icons or added_enhance or added_commands:
+    # Check if any changes were made
+    changes_made = False
+    if 'imports_to_add' in locals() and imports_to_add:
+        changes_made = True
+    if 'added_themes' in locals() and added_themes:
+        changes_made = True
+    if 'added_icons' in locals() and added_icons:
+        changes_made = True
+    if 'added_enhance' in locals() and added_enhance:
+        changes_made = True
+    if 'added_commands' in locals() and added_commands:
+        changes_made = True
+    
+    if changes_made:
         print("    ✅ Updated cli.py with new command groups")
     else:
         print("    ✅ No changes needed in cli.py")
