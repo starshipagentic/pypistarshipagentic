@@ -106,7 +106,7 @@ def validate_cli():
             # Check that all commands in this group appear in the output
             missing_commands = []
             for cmd_info in command_registry.get_all_commands(group_name):
-                cmd_name = cmd_info['name']
+                cmd_name = cmd_info if isinstance(cmd_info, str) else cmd_info['name']
                 # Use a more robust check - look for the command name in various formats
                 # The command might appear as "group_name cmd_name" or just "cmd_name"
                 if not (cmd_name in output or f"{group_name} {cmd_name}" in output):
