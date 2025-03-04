@@ -26,6 +26,8 @@ import yaml
 import tomli
 import tomli_w
 import subprocess
+from rich.console import Console
+from rich.table import Table
 
 # Define key paths
 BASE_DIR = Path(__file__).parent.parent
@@ -317,11 +319,10 @@ def sync_cli_file():
             if alias in no_go:
                 conflicts.append(f"Alias '{alias}' is reserved and cannot be used (found in no-go-alias.txt).")
     if conflicts:
-        print("ERROR: Alias conflicts detected!")
-        print("The following alias conflicts must be resolved before continuing:")
-        print("+----------------------+----------------------------------------------------------+")
-        print("| Alias                | Conflict Details                                         |")
-        print("+----------------------+----------------------------------------------------------+")
+        console = Console()
+        table = Table(title="Alias Conflicts Detected", show_lines=True)
+        table.add_column("Alias", style="bold red")
+        table.add_column("Conflict Details", style="magenta")
         for conflict in conflicts:
             try:
                 alias_val = conflict.split("'")[1]
@@ -331,8 +332,8 @@ def sync_cli_file():
                 details = conflict.split(": ", 1)[1]
             except IndexError:
                 details = conflict
-            print("| {:20s} | {:56s} |".format(alias_val, details))
-        print("+----------------------+----------------------------------------------------------+")
+            table.add_row(alias_val, details)
+        console.print(table)
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
