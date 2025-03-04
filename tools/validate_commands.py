@@ -17,39 +17,19 @@ def get_implemented_commands():
     """Get all implemented commands from the codebase."""
     implemented_commands = {}
     
-    # Import all command modules
-    from src.starshipagentic.commands import (
-        vessel_cmds,
-        mission_cmds,
-        architecture_cmds,
-        navigation_cmds,
-        transmission_cmds,
-        probe_cmds,
-        exploration_cmds,
-        weapons_cmds,
-        engineering_cmds,
-        cosmic_cmds,
-        git_cmds,
-        mcars_cmds,
-        droid_cmds,
-    )
+    import starshipagentic.commands as commands_pkg
+    dynamic_modules = {}
+    for module_name in commands_pkg.__all__:
+        dynamic_modules[module_name] = getattr(commands_pkg, module_name)
     
-    # List of all command modules
-    command_modules = [
-        ("vessel", vessel_cmds),
-        ("mission", mission_cmds),
-        ("architecture", architecture_cmds),
-        ("navigation", navigation_cmds),
-        ("transmission", transmission_cmds),
-        ("probe", probe_cmds),
-        ("exploration", exploration_cmds),
-        ("weapons", weapons_cmds),
-        ("engineering", engineering_cmds),
-        ("cosmic", cosmic_cmds),
-        ("git", git_cmds),
-        ("mcars", mcars_cmds),
-        ("droid", droid_cmds),
-    ]
+    # Build a list of (group, module) tuples by converting module names ending with '_cmds'
+    command_modules = []
+    for module_name, module in dynamic_modules.items():
+        if module_name.endswith('_cmds'):
+            group = module_name[:-5]
+        else:
+            group = module_name
+        command_modules.append((group, module))
     
     # Extract commands from each module
     for group_name, module in command_modules:
