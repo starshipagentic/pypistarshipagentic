@@ -1,10 +1,12 @@
 # Starship Agentic
 
-A command-line toolkit for AI-assisted software development using a Star Trek-inspired interface.
+**License Notice:** All source code in this repository is protected under the GNU Affero General Public License (AGPL) v3 or later. For full details, please refer to the LICENSE.md file. To help maintain legal clarity, consider adding the header from LICENSE_HEADER.txt to your source code files.
+
+A command-line toolkit for AI-assisted software development using a sci-fi -inspired interface.
 
 ## Why Starship Agentic?
 
-Starship Agentic transforms the software development process into an engaging, Star Trek-inspired journey. It combines:
+Starship Agentic transforms the software development process into an engaging, sci-fi inspired journey. It combines:
 
 - **AI-powered development** - Leverage LLMs to generate, test, and fix code automatically
 - **Guided workflow** - Follow a structured process from project initialization to deployment
