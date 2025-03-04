@@ -28,7 +28,11 @@ def create_command_module(group_name, group_data):
     template = f'''"""Commands for {group_data.get('description', 'the ' + group_name + ' group')}."""
 
 import click
-from src.starshipagentic.utils.base_command import BaseCommand
+from rich.console import Console
+from starshipagentic.utils.base_command import BaseCommand
+from starshipagentic.utils.interactive import prompt_for_missing_param
+
+console = Console()
 
 # Create the command group
 {group_name}_group = click.Group(
@@ -260,12 +264,81 @@ def sync_cli_file():
     
     return True
 
+def fix_command_imports():
+    """Fix import statements in all command modules."""
+    print("🔄 Fixing import statements in command modules...")
+    
+    # Get all command module files
+    commands_dir = Path(__file__).parent.parent / "src" / "starshipagentic" / "commands"
+    command_files = list(commands_dir.glob("*_cmds.py"))
+    
+    fixed_files = []
+    for file_path in command_files:
+        with open(file_path, 'r') as f:
+            content = f.read()
+        
+        # Check for incorrect imports
+        has_changes = False
+        
+        # Fix src.starshipagentic imports
+        if "from src.starshipagentic" in content:
+            content = content.replace("from src.starshipagentic", "from starshipagentic")
+            has_changes = True
+        
+        # Add missing BaseCommand import if needed
+        if "BaseCommand" in content and "from starshipagentic.utils.base_command import BaseCommand" not in content:
+            # Find the import section
+            import_section_end = content.find("\n\n", content.find("import"))
+            if import_section_end > 0:
+                new_import = "\nfrom starshipagentic.utils.base_command import BaseCommand"
+                content = content[:import_section_end] + new_import + content[import_section_end:]
+                has_changes = True
+        
+        # Add missing interactive import if needed
+        if "prompt_for_missing_param" in content and "from starshipagentic.utils.interactive import prompt_for_missing_param" not in content:
+            import_section_end = content.find("\n\n", content.find("import"))
+            if import_section_end > 0:
+                new_import = "\nfrom starshipagentic.utils.interactive import prompt_for_missing_param"
+                content = content[:import_section_end] + new_import + content[import_section_end:]
+                has_changes = True
+        
+        # Add rich.console import if needed
+        if "console.print" in content and "from rich.console import Console" not in content:
+            import_section_end = content.find("\n\n", content.find("import"))
+            if import_section_end > 0:
+                new_import = "\nfrom rich.console import Console"
+                content = content[:import_section_end] + new_import + content[import_section_end:]
+                has_changes = True
+                
+                # Also add console initialization if missing
+                if "console = Console()" not in content:
+                    group_def_pos = content.find("def ") 
+                    if group_def_pos > 0:
+                        # Insert before the first function definition
+                        content = content[:group_def_pos] + "\nconsole = Console()\n\n" + content[group_def_pos:]
+                
+        # Write changes back to file
+        if has_changes:
+            with open(file_path, 'w') as f:
+                f.write(content)
+            fixed_files.append(file_path.name)
+    
+    if fixed_files:
+        print(f"✅ Fixed imports in {len(fixed_files)} files: {', '.join(fixed_files)}")
+    else:
+        print("✅ No import fixes needed")
+    
+    return True
+
 def sync_aliases():
     """Synchronize aliases between commands-list.yml and pyproject.toml."""
     print("🔄 Synchronizing command aliases...")
     
     # First, sync the CLI file to ensure all command groups are registered
     sync_cli_file()
+    
+    # Fix imports in command modules
+    fix_command_imports()
     
     # Load commands-list.yml
     commands_path = Path(__file__).parent.parent / "src" / "starshipagentic" / "commands-list.yml"
@@ -390,6 +463,52 @@ def sync_aliases():
     
     return True
 
+def fix_specific_command_file(file_path):
+    """Fix a specific command file by path."""
+    if not os.path.exists(file_path):
+        print(f"❌ File not found: {file_path}")
+        return False
+    
+    with open(file_path, 'r') as f:
+        content = f.read()
+    
+    # Check for incorrect imports
+    has_changes = False
+    
+    # Fix src.starshipagentic imports
+    if "from src.starshipagentic" in content:
+        content = content.replace("from src.starshipagentic", "from starshipagentic")
+        has_changes = True
+    
+    # Add missing BaseCommand import if needed
+    if "BaseCommand" in content and "from starshipagentic.utils.base_command import BaseCommand" not in content:
+        # Find the import section
+        import_section_end = content.find("\n\n", content.find("import"))
+        if import_section_end > 0:
+            new_import = "\nfrom starshipagentic.utils.base_command import BaseCommand"
+            content = content[:import_section_end] + new_import + content[import_section_end:]
+            has_changes = True
+    
+    # Write changes back to file
+    if has_changes:
+        with open(file_path, 'w') as f:
+            f.write(content)
+        print(f"✅ Fixed imports in {os.path.basename(file_path)}")
+    else:
+        print(f"✅ No import fixes needed in {os.path.basename(file_path)}")
+    
+    return True
+
 if __name__ == "__main__":
-    success = sync_aliases()
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Synchronize command aliases and fix imports")
+    parser.add_argument("--fix-file", help="Fix imports in a specific command file")
+    args = parser.parse_args()
+    
+    if args.fix_file:
+        success = fix_specific_command_file(args.fix_file)
+    else:
+        success = sync_aliases()
+    
     sys.exit(0 if success else 1)

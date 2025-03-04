@@ -1,7 +1,11 @@
 """Commands for generating initial code tracks and connecting BDD step coverage."""
 
 import click
-from src.starshipagentic.utils.base_command import BaseCommand
+from rich.console import Console
+from starshipagentic.utils.base_command import BaseCommand
+from starshipagentic.utils.interactive import prompt_for_missing_param
+
+console = Console()
 
 # Create the command group
 send_probe_group = click.Group(

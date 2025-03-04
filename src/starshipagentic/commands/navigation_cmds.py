@@ -3,6 +3,7 @@
 import click
 import sys
 from rich.console import Console
+from starshipagentic.utils.base_command import BaseCommand
 
 console = Console()
 
@@ -36,8 +37,8 @@ def set_waypoints(priority):
 # Command entry points for direct invocation
 def plot_navigation_command():
     """Entry point for the 'navigation' command."""
-    return plot_navigation(sys.argv[1:])
+    BaseCommand.parse_args_for_command(plot_navigation)()
 
 def set_waypoints_command():
     """Entry point for the 'waypoints' command."""
-    return set_waypoints(sys.argv[1:])
+    BaseCommand.parse_args_for_command(set_waypoints)()
