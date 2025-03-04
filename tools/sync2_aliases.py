@@ -317,9 +317,22 @@ def sync_cli_file():
             if alias in no_go:
                 conflicts.append(f"Alias '{alias}' is reserved and cannot be used (found in no-go-alias.txt).")
     if conflicts:
-        print("ERROR: Alias conflicts detected:")
+        print("ERROR: Alias conflicts detected!")
+        print("The following alias conflicts must be resolved before continuing:")
+        print("+----------------------+----------------------------------------------------------+")
+        print("| Alias                | Conflict Details                                         |")
+        print("+----------------------+----------------------------------------------------------+")
         for conflict in conflicts:
-            print("  " + conflict)
+            try:
+                alias_val = conflict.split("'")[1]
+            except IndexError:
+                alias_val = "N/A"
+            try:
+                details = conflict.split(": ", 1)[1]
+            except IndexError:
+                details = conflict
+            print("| {:20s} | {:56s} |".format(alias_val, details))
+        print("+----------------------+----------------------------------------------------------+")
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
