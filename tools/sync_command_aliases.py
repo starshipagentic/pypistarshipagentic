@@ -692,18 +692,18 @@ def fix_specific_command_file(file_path):
     if not os.path.exists(file_path):
         print(f"  ❌ File not found: {file_path}")
         return False
-    
+
     with open(file_path, 'r') as f:
         content = f.read()
-    
+
     # Check for incorrect imports
     has_changes = False
-    
+
     # Fix src.starshipagentic imports
     if "from src.starshipagentic" in content:
         content = content.replace("from src.starshipagentic", "from starshipagentic")
         has_changes = True
-    
+
     # Add missing BaseCommand import if needed
     if "BaseCommand" in content and "from starshipagentic.utils.base_command import BaseCommand" not in content:
         # Find the import section
@@ -712,7 +712,7 @@ def fix_specific_command_file(file_path):
             new_import = "\nfrom starshipagentic.utils.base_command import BaseCommand"
             content = content[:import_section_end] + new_import + content[import_section_end:]
             has_changes = True
-    
+
     # Write changes back to file
     if has_changes:
         with open(file_path, 'w') as f:
@@ -720,19 +720,45 @@ def fix_specific_command_file(file_path):
         print(f"  ✅ Fixed imports in {os.path.basename(file_path)}")
     else:
         print(f"  ✅ No import fixes needed in {os.path.basename(file_path)}")
-    
+
     return True
+
+def update_commands_init():
+    """Update src/starshipagentic/commands/__init__.py to automatically import all *_cmds.py modules."""
+    from pathlib import Path
+    commands_dir = Path(__file__).parent.parent / "src" / "starshipagentic" / "commands"
+    init_file = commands_dir / "__init__.py"
+    modules = []
+    for file in commands_dir.glob("*_cmds.py"):
+        module_name = file.stem
+        modules.append(module_name)
+    modules.sort()
+    lines = []
+    lines.append('"""Auto-generated __init__.py for command modules."""')
+    lines.append("")
+    lines.append("__all__ = [")
+    for module in modules:
+        lines.append(f'    "{module}",')
+    lines.append("]")
+    lines.append("")
+    for module in modules:
+        lines.append(f"from . import {module}")
+    new_content = "\n".join(lines) + "\n"
+    with open(init_file, "w") as f:
+        f.write(new_content)
+    print(f"✅ Updated {init_file} with modules: {', '.join(modules)}")
 
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Synchronize command aliases and fix imports")
     parser.add_argument("--fix-file", help="Fix imports in a specific command file")
     args = parser.parse_args()
-    
+
     if args.fix_file:
         success = fix_specific_command_file(args.fix_file)
     else:
+        update_commands_init()
         success = sync_aliases()
-    
+
     sys.exit(0 if success else 1)
