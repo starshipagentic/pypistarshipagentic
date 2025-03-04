@@ -284,6 +284,7 @@ def sync_aliases():
     added_aliases = []
     removed_aliases = []
     updated_aliases = []
+    changes_made = False
     
     # Build a map of expected aliases from commands-list.yml
     expected_aliases = {}
@@ -340,6 +341,7 @@ def sync_aliases():
         with open(pyproject_path, "wb") as f:
             tomli_w.dump(pyproject, f)
         print(f"✅ Updated pyproject.toml with {len(added_aliases)} new and {len(updated_aliases)} modified aliases")
+        changes_made = True
     else:
         print("✅ No changes needed in pyproject.toml")
     
@@ -348,6 +350,7 @@ def sync_aliases():
         with open(commands_path, 'w') as f:
             yaml.dump(commands, f, sort_keys=False, default_flow_style=False)
         print(f"✅ Updated commands-list.yml with {len(updated_aliases)} aliases")
+        changes_made = True
     
     # Report changes
     if added_aliases:
@@ -364,6 +367,26 @@ def sync_aliases():
         print("\nPotential aliases to remove (not automatically removed):")
         for alias in removed_aliases:
             print(f"  - {alias}")
+    
+    # Install the package in development mode if changes were made
+    if changes_made:
+        print("\n🔄 Installing package in development mode...")
+        import subprocess
+        try:
+            result = subprocess.run(
+                ["pip", "install", "-e", "."], 
+                cwd=Path(__file__).parent.parent,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            print("✅ Package installed successfully")
+            if result.stdout.strip():
+                print(result.stdout)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Error installing package: {e}")
+            print(e.stdout)
+            print(e.stderr)
     
     return True
 
