@@ -24,6 +24,7 @@ def get_implemented_commands():
         architecture_cmds,
         navigation_cmds,
         transmission_cmds,
+        send_probe_cmds,
         exploration_cmds,
         weapons_cmds,
         engineering_cmds,
