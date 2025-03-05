@@ -228,7 +228,8 @@ def update_cli_main(expected_aliases):
         except ValueError:
             print(f"❌ Invalid target format for alias '{alias}': {target}")
             continue
-        generated.append(f"from {module} import {func} as {alias}")
+        safe_alias = alias.replace("-", "_")
+        generated.append(f"from {module} import {func} as {safe_alias}")
     generated.append(end_marker)
     gen_block = "\n".join(generated)
     with open(CLI_PATH, "r", encoding="utf-8") as f:
