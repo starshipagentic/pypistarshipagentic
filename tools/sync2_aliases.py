@@ -208,23 +208,34 @@ def update_pyproject_scripts(expected_aliases):
         tomli_w.dump(pyproject, f)
     print("✅ pyproject.toml scripts regenerated.")
 
-def update_cli_main(expected_aliases):
+def update_cli_main():
     """
-    Update the main CLI file (CLI_PATH) with auto-generated import lines within markers.
+    Update the main CLI file (CLI_PATH) with auto-generated import lines based on the __all__ list
+    from commands/__init__.py.
     """
-    with open(CLI_PATH, "r", encoding="utf-8") as f:
-        content = f.read()
+    import re
+    # Read the auto-generated __init__.py in the commands folder.
+    init_path = COMMANDS_DIR / "__init__.py"
+    with open(init_path, "r", encoding="utf-8") as f:
+        init_content = f.read()
+    match = re.search(r"__all__\s*=\s*\[(.*?)\]", init_content, re.DOTALL)
+    groups = []
+    if match:
+        groups_list = match.group(1)
+        groups = re.findall(r'"([^"]+)"', groups_list)
+    else:
+        print("Could not find __all__ in commands/__init__.py")
+        return
     start_marker = "# [AUTO-GENERATED COMMAND IMPORTS START]"
     end_marker = "# [AUTO-GENERATED COMMAND IMPORTS END]"
     generated = [start_marker]
-    # Exclude main alias
-    for alias, target in expected_aliases.items():
-        if alias == "starshipagentic":
-            continue
-        module, func = target.split(":")
-        generated.append(f"from {module} import {func}  # alias: {alias}")
+    for group in groups:
+        if group:
+            generated.append(f"from starshipagentic.commands import {group}")
     generated.append(end_marker)
     gen_block = "\n".join(generated)
+    with open(CLI_PATH, "r", encoding="utf-8") as f:
+        content = f.read()
     if start_marker in content and end_marker in content:
         content = re.sub(
             rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
@@ -241,7 +252,7 @@ def update_cli_main(expected_aliases):
         content = "\n".join(lines)
     with open(CLI_PATH, "w", encoding="utf-8") as f:
         f.write(content)
-    print("✅ CLI updated.")
+    print("✅ CLI updated with groups from commands/__init__.py.")
 
 def sync_cli_file():
     """
