@@ -1,48 +1,140 @@
-# [AUTO-GENERATED GROUP HELP REGISTER START]
-import importlib
-GROUP_NAMES = ['fleet_commander', 'number_two', 'engineering_officer', 'navigation_officer', 'communications_officer', 'insterstellar_officer', 'captains_orders', 'tactical_officer', 'maintenance_officer', 'red_buttons', 'gitmaster', 'mcars', 'droids']
-for group in GROUP_NAMES:
-    mod = importlib.import_module(f'starshipagentic.commands.{group}')
-    group_obj = getattr(mod, f'{group}_group', None)
-    if group_obj is None:
-        continue
-    enhanced = enhance_group_help(group_obj, group)
-    main.add_command(enhanced, group)
-# [AUTO-GENERATED GROUP HELP REGISTER END]
-# [AUTO-GENERATED GROUP THEMES AND ICONS START]
-GROUP_THEMES = {
-    "fleet_commander": "white",
-    "number_two": "white",
-    "engineering_officer": "white",
-    "navigation_officer": "white",
-    "communications_officer": "white",
-    "insterstellar_officer": "white",
-    "captains_orders": "white",
-    "tactical_officer": "white",
-    "maintenance_officer": "white",
-    "red_buttons": "white",
-    "gitmaster": "white",
-    "mcars": "white",
-    "droids": "white",
-}
+#!/usr/bin/env python3
+"""
+Starship Agentic CLI - Static Content
+This file contains the static parts of the CLI that don't change during generation.
+"""
 
-GROUP_ICONS = {
-    "fleet_commander": "⚙️",
-    "number_two": "⚙️",
-    "engineering_officer": "⚙️",
-    "navigation_officer": "⚙️",
-    "communications_officer": "⚙️",
-    "insterstellar_officer": "⚙️",
-    "captains_orders": "⚙️",
-    "tactical_officer": "⚙️",
-    "maintenance_officer": "⚙️",
-    "red_buttons": "⚙️",
-    "gitmaster": "⚙️",
-    "mcars": "⚙️",
-    "droids": "⚙️",
-}
+import click
+from rich.console import Console
+from rich.panel import Panel
 
-# [AUTO-GENERATED GROUP THEMES AND ICONS END]
+console = Console()
+
+def enhance_group_help(group, name):
+    """Enhance a command group with better help text and rich formatting."""
+    from rich.table import Table
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.text import Text
+    from starshipagentic.utils.command_registry import CommandRegistry
+    
+    def display_rich_help(ctx):
+        """Display rich formatted help for the command group."""
+        console = Console()
+        
+        # Get group info from registry
+        registry = CommandRegistry()
+        group_info = registry.get_group_info(name)
+        
+        # Create a title panel
+        replacement = name.replace('_', ' ')
+        description = group_info.get('description', f'Commands for {replacement}')
+        
+        # Create a fancy panel for the title
+        panel = Panel(
+            f"[bold cyan]{description}[/bold cyan]",
+            title=f"[bold yellow]{name.upper()}[/bold yellow]",
+            border_style="blue",
+            expand=False
+        )
+        console.print(panel)
+        
+        # Create a table for commands
+        table = Table(show_header=True, header_style="bold magenta", border_style="cyan")
+        table.add_column("Command", style="green bold")
+        table.add_column("Aliases", style="yellow")
+        table.add_column("Description", style="cyan")
+        
+        # Add rows for each command
+        commands = registry.get_all_commands(name)
+        console.print(f"[bold blue]DEBUG:[/bold blue] Group name: {name}")
+        console.print(f"[bold blue]DEBUG:[/bold blue] Commands found: {commands}")
+        
+        if not commands:
+            console.print("[italic red]No commands found for this group.[/italic red]")
+            console.print("[bold yellow]Available groups in registry:[/bold yellow]")
+            all_groups = registry.get_all_groups()
+            console.print(f"{all_groups}")
+        else:
+            for cmd_name, cmd_info in commands.items():
+                aliases = registry.get_aliases_for_command(name, cmd_name)
+                console.print(f"[bold blue]DEBUG:[/bold blue] Aliases for {cmd_name}: {aliases}")
+                alias_str = ", ".join(aliases) if aliases else ""
+                description = cmd_info.get("description", "")
+                table.add_row(cmd_name, alias_str, description)
+            
+            console.print(table)
+        
+        console.print("\n[bold green]Usage:[/bold green] [italic]<command> [OPTIONS] [ARGS][/italic]")
+        console.print("[bold green]Help:[/bold green] [italic]<command> --help[/italic] for detailed information about a specific command.\n")
+    
+    # Override the help formatting for the group
+    group.format_help = lambda ctx, formatter: None
+    
+    # Create a custom callback for the help option
+    def custom_help_callback(ctx, param, value):
+        if value:
+            display_rich_help(ctx)
+            ctx.exit()
+    
+    # Override the help option to use our custom callback
+    for param in group.params:
+        if param.name == 'help':
+            param.callback = custom_help_callback
+            break
+    
+    # Store the original callback
+    original_callback = group.callback
+    
+    # Create a new callback that shows help when no subcommand is invoked
+    def new_callback(ctx, *args, **kwargs):
+        # If no subcommand is invoked, show the rich help
+        if ctx.invoked_subcommand is None:
+            display_rich_help(ctx)
+            return ctx.exit()
+        
+        # Otherwise, call the original callback if it exists
+        if original_callback:
+            return original_callback(ctx, *args, **kwargs)
+    
+    # Replace the group's callback
+    group.callback = new_callback
+    
+    # Set a basic help text for when --help isn't used
+    group.help = f"[{name.upper()}] Commands for {name.replace('_', ' ')}"
+    
+    return group
+
+@click.group(invoke_without_command=True)
+@click.option("--all-commands", is_flag=True, help="Display all available commands")
+@click.option("--commands-list", is_flag=True, help="Display commands from commands-list.yml")
+@click.pass_context
+def main(ctx, all_commands, commands_list):
+    """Starship Agentic CLI - Your AI-powered command center."""
+    if ctx.invoked_subcommand is None:
+        console.print(Panel("Welcome to Starship Agentic", title="🚀"))
+        if all_commands:
+            console.print("All commands would be displayed here")
+        elif commands_list:
+            console.print("Commands from commands-list.yml would be displayed here")
+        else:
+            console.print("Use --help for more information")
+
+# Import and register dynamic groups immediately when this module is imported
+from starshipagentic.cli_generated import register_dynamic_groups
+register_dynamic_groups()
+
+if __name__ == "__main__":
+    main()
+
+
+#!/usr/bin/env python3
+"""
+AUTO-GENERATED FILE – DO NOT EDIT MANUALLY.
+This file is generated by the sync2_aliases.py tool.
+It contains all dynamic imports, group themes/icons, and group help registration code.
+"""
+
 # [AUTO-GENERATED COMMAND IMPORTS START]
 from starshipagentic.commands.fleet_commander import run_group as fleet_commander
 from starshipagentic.commands.number_two import run_group as number_two
@@ -113,392 +205,53 @@ from starshipagentic.commands.droids.droid_splain.cli import droid_splain_comman
 from starshipagentic.commands.droids.man_splain.cli import man_splain_command as man_splain
 from starshipagentic.commands.droids.man_splain.cli import man_splain_command as splain
 # [AUTO-GENERATED COMMAND IMPORTS END]
-# Starship Agentic License Header
-#
-# Copyright (c) 2025 Travis Somerville and David Samson
-#
-# This file is part of Starship Agentic.
-#
-# It is licensed under the GNU Affero General Public License (AGPL) v3 or later.
-# For full details, see the LICENSE.md file in the project root.
-"""Main CLI entry point for Starship Agentic."""
 
-import click
-import sys
-import yaml
-import os
-from pathlib import Path
-from rich.console import Console
-from rich.panel import Panel
-from rich.text import Text
-from rich.table import Table
-from rich.markdown import Markdown
-from functools import update_wrapper
 
-# Import command registry
-from starshipagentic.utils.command_registry import command_registry
+# [AUTO-GENERATED GROUP THEMES AND ICONS START]
+GROUP_THEMES = {
+    "fleet_commander": "white",
+    "number_two": "white",
+    "engineering_officer": "white",
+    "navigation_officer": "white",
+    "communications_officer": "white",
+    "insterstellar_officer": "white",
+    "captains_orders": "white",
+    "tactical_officer": "white",
+    "maintenance_officer": "white",
+    "red_buttons": "white",
+    "gitmaster": "white",
+    "mcars": "white",
+    "droids": "white",
+}
 
-console = Console()
+GROUP_ICONS = {
+    "fleet_commander": "⚙️",
+    "number_two": "⚙️",
+    "engineering_officer": "⚙️",
+    "navigation_officer": "⚙️",
+    "communications_officer": "⚙️",
+    "insterstellar_officer": "⚙️",
+    "captains_orders": "⚙️",
+    "tactical_officer": "⚙️",
+    "maintenance_officer": "⚙️",
+    "red_buttons": "⚙️",
+    "gitmaster": "⚙️",
+    "mcars": "⚙️",
+    "droids": "⚙️",
+}
 
-def display_welcome():
-    """Display welcome message with ASCII art."""
-    welcome_text = """
-    ███████╗████████╗ █████╗ ██████╗ ███████╗██╗  ██╗██╗██████╗ 
-    ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║  ██║██║██╔══██╗
-    ███████╗   ██║   ███████║██████╔╝███████╗███████║██║██████╔╝
-    ╚════██║   ██║   ██╔══██║██╔══██╗╚════██║██╔══██║██║██╔═══╝ 
-    ███████║   ██║   ██║  ██║██║  ██║███████║██║  ██║██║██║     
-    ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝     
-    
-     █████╗  ██████╗ ███████╗███╗   ██╗████████╗██╗ ██████╗
-    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝██║██╔════╝
-    ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ██║██║     
-    ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ██║██║     
-    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ██║╚██████╗
-    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝ ╚═════╝
-    """
-    
-    console.print(Panel(Text(welcome_text, style="bold blue")))
-    console.print("Welcome to Starship Agentic - AI-assisted software development with a Star Trek-inspired interface.")
+# [AUTO-GENERATED GROUP THEMES AND ICONS END]
 
-def enhance_group_help(group, name):
-    """Enhance a command group's help display."""
-    original_format_help = group.format_help
-    
-    def enhanced_format_help(ctx, formatter):
-        # Use rich to display a better help
-        theme_color = GROUP_THEMES.get(name, "white")
-        icon = GROUP_ICONS.get(name, "🚀")
-        
-        # Get group info from registry
-        group_info = command_registry.get_group_info(name)
-        
-        # Group header with icon and styled name
-        header = f"{icon} {name.upper()} COMMANDS"
-        console.print(Panel(header, style=f"bold {theme_color}"))
-        
-        # Group description - use registry description if available, otherwise use Click group help
-        description = group_info.get('description') or group.help or "No description"
-        console.print(Markdown(f"**Description:** {description}"))
-        console.print("")
-        
-        # Commands table
-        table = Table(show_header=True, header_style=f"bold {theme_color}")
-        table.add_column("Command", style=f"{theme_color}")
-        table.add_column("Aliases", style="yellow")
-        table.add_column("Description", style="white")
-        table.add_column("Options", style="dim")
-        
-        # Add commands to table
-        for cmd_name in sorted(group.commands):
-            cmd = group.commands[cmd_name]
-            
-            # Get command info from registry
-            cmd_info = command_registry.get_command_info(name, cmd_name)
-            
-            # Get options from Click command
-            options = []
-            for param in cmd.params:
-                if isinstance(param, click.Option):
-                    opt_str = f"--{param.name}"
-                    if param.required:
-                        opt_str += " (required)"
-                    options.append(opt_str)
-            
-            # Get aliases from registry (which now uses pyproject.toml)
-            aliases = command_registry.get_aliases_for_command(name, cmd_name)
-            aliases_str = ", ".join(aliases) if aliases else "None"
-            
-            # Get description from registry or Click command
-            description = cmd_info.get('description') or cmd.help or "No description"
-            
-            options_str = ", ".join(options) if options else "None"
-            table.add_row(
-                f"{name} {cmd_name}",
-                aliases_str,
-                description,
-                options_str
-            )
-        
-        console.print(table)
-        console.print("")
-        console.print(f"For more details on a specific command, type: [bold]starshipagentic {name} COMMAND --help[/bold]")
-        
-        # Skip the default Click help formatting
-        return
-    
-    # Replace the format_help method
-    group.format_help = enhanced_format_help
-    update_wrapper(group.format_help, original_format_help)
-    
-    return group
 
-def display_available_commands():
-    """Display all available commands in a user-friendly format."""
-    
-    console.print(Panel("Available Command Categories", style="bold white"))
-    
-    # Create a table for command categories
-    table = Table(show_header=True, header_style="bold")
-    table.add_column("Category", style="cyan")
-    table.add_column("Icon", style="yellow")
-    table.add_column("Description", style="green")
-    table.add_column("Example Command", style="bright_blue")
-    
-    # Add each command group with description and example from registry
-    for group_name in command_registry.get_all_groups():
-        group_info = command_registry.get_group_info(group_name)
-        icon = GROUP_ICONS.get(group_name, "🚀")
-        description = group_info.get('description', 'No description')
-        example = command_registry.get_example_command(group_name)
-        
-        table.add_row(group_name, icon, description, example)
-    
-    console.print(table)
-    
-    console.print("\nTo see commands in a category: [bold]starshipagentic CATEGORY --help[/bold]")
-    console.print("For details on a specific command: [bold]starshipagentic CATEGORY COMMAND --help[/bold]")
-
-def display_all_commands():
-    """Display all available commands in a detailed format."""
-    
-    console.print(Panel("All Available Commands", style="bold white"))
-    
-    # Create a table for all commands
-    table = Table(show_header=True, header_style="bold")
-    table.add_column("Command", style="cyan")
-    table.add_column("Description", style="green")
-    
-    # Add commands from each group using the registry
-    for group_name in command_registry.get_all_groups():
-        group_info = command_registry.get_group_info(group_name)
-        theme_color = GROUP_THEMES.get(group_name, "white")
-        icon = GROUP_ICONS.get(group_name, "🚀")
-        
-        # Add a header row for the group
-        table.add_row(
-            f"[bold {theme_color}]{icon} {group_name.upper()}[/bold {theme_color}]", 
-            f"[italic]{group_info.get('description', 'No description')}[/italic]"
-        )
-        
-        # Add each command in the group
-        # Get commands directly from the Click command groups to ensure all are included
-        group_obj = main.get_command(None, group_name)
-        if group_obj:
-            for cmd_name in sorted(group_obj.commands.keys()):
-                cmd_data = command_registry.get_command_info(group_name, cmd_name)
-                aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
-                aliases_str = ", ".join(aliases) if aliases else ""
-                
-                command_text = f"  {group_name} {cmd_name}"
-                description = cmd_data.get('description', 'No description') if cmd_data else group_obj.commands[cmd_name].help or "No description"
-                
-                if aliases_str:
-                    description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
-                    
-                table.add_row(command_text, description)
-        else:
-            # Fallback to registry if Click group not found
-            commands = group_info.get('commands', {})
-            for cmd_name in sorted(commands.keys()):
-                cmd_data = commands[cmd_name]
-                aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
-                aliases_str = ", ".join(aliases) if aliases else ""
-                
-                command_text = f"  {group_name} {cmd_name}"
-                description = cmd_data.get('description', 'No description')
-                
-                if aliases_str:
-                    description = f"[yellow][Aliases: {aliases_str}][/yellow] {description}"
-                    
-                table.add_row(command_text, description)
-    
-    console.print(table)
-
-def load_config():
-    """Load configuration from YAML file."""
-    config_paths = [
-        Path.home() / ".starshipagentic.yaml",
-        Path.home() / ".starshipagentic.yml",
-        Path.home() / ".config" / "starshipagentic.yaml",
-        Path.home() / ".config" / "starshipagentic.yml",
-        Path("starshipagentic.yaml"),
-        Path("starshipagentic.yml"),
-        # Look for config in the package directory
-        Path(__file__).parent / "starshipagentic.yml",
-    ]
-    
-    for config_path in config_paths:
-        if config_path.exists():
-            try:
-                with open(config_path, 'r') as f:
-                    return yaml.safe_load(f)
-            except Exception as e:
-                console.print(f"[bold red]Error loading config from {config_path}: {e}[/bold red]")
-                return {}
-    
-    return {}
-
-def run_command_sequence(commands):
-    """Run a sequence of commands from config."""
-    if not commands:
-        return
-    
-    console.print(Panel("Running Command Sequence", style="bold green"))
-    
-    for cmd_info in commands:
-        try:
-            if isinstance(cmd_info, str):
-                # Simple command without args
-                cmd_parts = cmd_info.split()
-                console.print(f"[bold cyan]> starshipagentic {cmd_info}[/bold cyan]")
-                # Execute command
-                sys.argv = ["starshipagentic"] + cmd_parts
-                main(standalone_mode=False)
-            elif isinstance(cmd_info, dict):
-                # Command with args as dict
-                group_name = list(cmd_info.keys())[0]
-                group_value = cmd_info[group_name]
-                
-                if isinstance(group_value, dict) and len(group_value) == 1:
-                    # This is a nested command structure: group -> command -> options
-                    cmd_name = list(group_value.keys())[0]
-                    options = group_value[cmd_name]
-                    
-                    cmd_args = []
-                    for k, v in options.items():
-                        if v is True:
-                            cmd_args.append(f"--{k}")
-                        elif v is not None:
-                            cmd_args.append(f"--{k}={v}")
-                    
-                    console.print(f"[bold cyan]> starshipagentic {group_name} {cmd_name} {' '.join(cmd_args)}[/bold cyan]")
-                    # Execute command
-                    sys.argv = ["starshipagentic", group_name, cmd_name] + cmd_args
-                    main(standalone_mode=False)
-                else:
-                    # This is a simple command with options
-                    cmd_args = []
-                    for k, v in group_value.items():
-                        if v is True:
-                            cmd_args.append(f"--{k}")
-                        elif v is not None:
-                            cmd_args.append(f"--{k}={v}")
-                    
-                    console.print(f"[bold cyan]> starshipagentic {group_name} {' '.join(cmd_args)}[/bold cyan]")
-                    # Execute command
-                    sys.argv = ["starshipagentic", group_name] + cmd_args
-                    main(standalone_mode=False)
-        except Exception as e:
-            console.print(f"[bold red]Command failed: {e}[/bold red]")
-            console.print("[yellow]Continuing with next command...[/yellow]")
-
-def interactive_mode():
-    """Start interactive guided process."""
-    display_welcome()
-    
-    # Load config
-    config = load_config()
-    
-    # Check if we have a command sequence in config
-    if config and 'commands' in config:
-        run_command_sequence(config['commands'])
-        return
-    
-    console.print(Panel("Interactive Mode", style="bold green"))
-    console.print("This is your command center for AI-assisted software development.")
-    
-    # Show command categories first
-    display_available_commands()
-    
-    # Option to show all commands
-    console.print("\nTo see all available commands: [bold]starshipagentic --all-commands[/bold]")
-    console.print("To see commands from YAML file: [bold]starshipagentic --commands-list[/bold]")
-    console.print("To get started, try: [bold]starshipagentic vessel tour-ship[/bold]")
-
-class StarshipAgenticCLI(click.Group):
-    """Custom Click Group that shows commands differently."""
-    
-    def format_help(self, ctx, formatter):
-        display_welcome()
-        console.print("Type [bold]starshipagentic[/bold] to start interactive mode.\n")
-        display_available_commands()
-        
-        # Skip the default Click help formatting
-        return
-
-def load_commands_list():
-    """Load commands list from YAML file."""
-    # Use the command registry to get the commands
-    return command_registry._commands
-
-@click.group(cls=StarshipAgenticCLI, invoke_without_command=True)
-@click.version_option()
-@click.option('--all-commands', is_flag=True, help='Show all available commands')
-@click.option('--commands-list', is_flag=True, help='Show all commands from implementation')
-@click.pass_context
-def main(ctx, all_commands, commands_list):
-    """Starship Agentic - AI-assisted software development with a Star Trek-inspired interface."""
-    if commands_list:
-        display_welcome()
-        console.print(Panel("Complete Commands List", style="bold green"))
-        
-        # Get all command groups from the main CLI
-        for group_name in sorted(main.commands.keys()):
-            group_obj = main.commands[group_name]
-            group_data = command_registry.get_group_info(group_name)
-            
-            theme_color = GROUP_THEMES.get(group_name, "white")
-            icon = GROUP_ICONS.get(group_name, "🚀")
-            console.print(f"\n[bold {theme_color}]{icon} {group_name.upper()}[/bold {theme_color}]: {group_data.get('description', '') or group_obj.help or 'No description'}")
-            
-            # Create a table for commands in this group
-            table = Table(show_header=True, header_style=f"bold {theme_color}")
-            table.add_column("Command", style=f"{theme_color}")
-            table.add_column("Aliases", style="yellow")
-            table.add_column("Description", style="white")
-            table.add_column("Options", style="dim")
-            
-            # Get commands directly from the Click command group
-            for cmd_name in sorted(group_obj.commands.keys()):
-                cmd_obj = group_obj.commands[cmd_name]
-                cmd_data = command_registry.get_command_info(group_name, cmd_name)
-                
-                # Get aliases from registry
-                aliases = command_registry.get_aliases_for_command(group_name, cmd_name)
-                aliases_str = ", ".join(aliases) if aliases else "None"
-                
-                # Get description from registry or Click command
-                description = (cmd_data.get('description') if cmd_data else None) or cmd_obj.help or "No description"
-                
-                # Get options from Click command
-                options = []
-                for param in cmd_obj.params:
-                    if isinstance(param, click.Option):
-                        opt_str = f"--{param.name}"
-                        if param.required:
-                            opt_str += " (required)"
-                        options.append(opt_str)
-                
-                options_str = "\n".join(options) or "None"
-                
-                table.add_row(
-                    f"{group_name} {cmd_name}",
-                    aliases_str,
-                    description,
-                    options_str
-                )
-            
-            console.print(table)
-        return
-        
-    if all_commands:
-        display_welcome()
-        display_all_commands()
-        return
-        
-    if ctx.invoked_subcommand is None:
-        interactive_mode()
-
-if __name__ == "__main__":
-    main()
+def register_dynamic_groups():
+    """Register all dynamic command groups with the main CLI."""
+    from starshipagentic.cli import main, enhance_group_help
+    import importlib
+    GROUP_NAMES = ['fleet_commander', 'number_two', 'engineering_officer', 'navigation_officer', 'communications_officer', 'insterstellar_officer', 'captains_orders', 'tactical_officer', 'maintenance_officer', 'red_buttons', 'gitmaster', 'mcars', 'droids']
+    for group in GROUP_NAMES:
+        mod = importlib.import_module(f'starshipagentic.commands.{group}')
+        group_obj = getattr(mod, f'{group}_group', None)
+        if group_obj is None:
+            continue
+        enhanced = enhance_group_help(group_obj, group)
+        main.add_command(enhanced, group)
