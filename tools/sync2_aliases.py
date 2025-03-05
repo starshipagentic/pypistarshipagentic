@@ -242,12 +242,7 @@ def update_cli_main(expected_aliases):
             flags=re.DOTALL,
         )
     else:
-        lines = content.splitlines()
-        insert_at = 0
-        if lines and lines[0].startswith("#!"):
-            insert_at = 1
-        lines.insert(insert_at, gen_block)
-        content = "\n".join(lines)
+        content += "\n\n" + gen_block + "\n"
     with open(CLI_PATH, "w", encoding="utf-8") as f:
         f.write(content)
     print("✅ CLI updated with command aliases.")
