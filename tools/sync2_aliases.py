@@ -348,6 +348,9 @@ This file contains the static parts of the CLI that don't change during generati
 
 import click
 from rich.console import Console
+console = Console()
+console.print("[bold red]DEBUG: fleet_commander/cli.py loaded[/bold red]")
+from rich.console import Console
 from rich.panel import Panel
 
 console = Console()
