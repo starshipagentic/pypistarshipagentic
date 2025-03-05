@@ -208,30 +208,27 @@ def update_pyproject_scripts(expected_aliases):
         tomli_w.dump(pyproject, f)
     print("✅ pyproject.toml scripts regenerated.")
 
-def update_cli_main():
+def update_cli_main(expected_aliases):
     """
-    Update the main CLI file (CLI_PATH) with auto-generated import lines based on the __all__ list
-    from commands/__init__.py.
+    Update the main CLI file (CLI_PATH) with auto-generated import lines for all command aliases.
+    For each alias (except the main alias "starshipagentic"), an import line is generated
+    with the syntax:
+      from <module> import <function> as <alias>
+    where the mapping is defined in expected_aliases.
     """
     import re
-    # Read the auto-generated __init__.py in the commands folder.
-    init_path = COMMANDS_DIR / "__init__.py"
-    with open(init_path, "r", encoding="utf-8") as f:
-        init_content = f.read()
-    match = re.search(r"__all__\s*=\s*\[(.*?)\]", init_content, re.DOTALL)
-    groups = []
-    if match:
-        groups_list = match.group(1)
-        groups = re.findall(r'"([^"]+)"', groups_list)
-    else:
-        print("Could not find __all__ in commands/__init__.py")
-        return
     start_marker = "# [AUTO-GENERATED COMMAND IMPORTS START]"
     end_marker = "# [AUTO-GENERATED COMMAND IMPORTS END]"
     generated = [start_marker]
-    for group in groups:
-        if group:
-            generated.append(f"from starshipagentic.commands import {group}")
+    for alias, target in expected_aliases.items():
+        if alias == "starshipagentic":
+            continue
+        try:
+            module, func = target.split(":")
+        except ValueError:
+            print(f"❌ Invalid target format for alias '{alias}': {target}")
+            continue
+        generated.append(f"from {module} import {func} as {alias}")
     generated.append(end_marker)
     gen_block = "\n".join(generated)
     with open(CLI_PATH, "r", encoding="utf-8") as f:
@@ -252,7 +249,7 @@ def update_cli_main():
         content = "\n".join(lines)
     with open(CLI_PATH, "w", encoding="utf-8") as f:
         f.write(content)
-    print("✅ CLI updated with groups from commands/__init__.py.")
+    print("✅ CLI updated with command aliases.")
 
 def sync_cli_file():
     """
