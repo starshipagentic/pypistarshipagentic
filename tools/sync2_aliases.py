@@ -393,8 +393,13 @@ if __name__ == "__main__":
         main_block = ""
         static_without_main = static_content
     
-    # Combine the static content (without __main__), then generated content, then reattach the __main__ block.
-    combined = f"{static_without_main}\n\n{generated_content}\n\n{main_block}"
+    # Insert a dynamic registration call at module level so that commands (e.g. communications_officer) are registered before CLI is invoked.
+    registration_call = (
+        "from starshipagentic.cli_generated import register_dynamic_groups\n"
+        "register_dynamic_groups()\n"
+    )
+    # Reattach the __main__ block unchanged.
+    combined = f"{static_without_main}\n\n{generated_content}\n\n{registration_call}\n\n{main_block}"
     
     # Write the combined file
     with open(CLI_PATH, "w", encoding="utf-8") as f:
