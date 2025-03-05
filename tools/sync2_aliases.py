@@ -285,6 +285,42 @@ def update_cli_themes_icons(group_names):
         f.write(content)
     print("✅ CLI updated with group themes and icons.")
 
+def update_cli_group_help(group_names):
+    import re
+    start_marker = "# [AUTO-GENERATED GROUP HELP REGISTER START]"
+    end_marker = "# [AUTO-GENERATED GROUP HELP REGISTER END]"
+    generated = [start_marker]
+    generated.append("import importlib")
+    generated.append(f"GROUP_NAMES = {group_names!r}")
+    generated.append("for group in GROUP_NAMES:")
+    generated.append("    mod = importlib.import_module(f'starshipagentic.commands.{group}')")
+    generated.append("    group_obj = getattr(mod, f'{group}_group', None)")
+    generated.append("    if group_obj is None:")
+    generated.append("        continue")
+    generated.append("    enhanced = enhance_group_help(group_obj, group)")
+    generated.append("    main.add_command(enhanced, group)")
+    generated.append(end_marker)
+    gen_block = "\n".join(generated)
+    with open(CLI_PATH, "r", encoding="utf-8") as f:
+        content = f.read()
+    if re.search(re.escape(start_marker), content) and re.search(re.escape(end_marker), content):
+        content = re.sub(
+            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
+            gen_block,
+            content,
+            flags=re.DOTALL,
+        )
+    else:
+        lines = content.splitlines()
+        insert_at = 0
+        if lines and lines[0].startswith("#!"):
+            insert_at = 1
+        lines.insert(insert_at, gen_block)
+        content = "\n".join(lines)
+    with open(CLI_PATH, "w", encoding="utf-8") as f:
+        f.write(content)
+    print("✅ CLI updated with enhanced group help registration.")
+
 def sync_cli_file():
     """
     Synchronize cli.py by ensuring that for each group in commands-list.yml,
@@ -377,6 +413,7 @@ def sync_cli_file():
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
     update_cli_themes_icons(group_names)
+    update_cli_group_help(group_names)
     for msg in log_messages:
         print(msg)
     return True
