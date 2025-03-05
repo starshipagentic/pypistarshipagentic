@@ -97,14 +97,17 @@ def enhance_group_help(group, name):
     def new_callback(ctx, *args, **kwargs):
         console.print(f"[bold red]DEBUG: new_callback called for group '{name}', invoked_subcommand={ctx.invoked_subcommand}[/bold red]")
         console.print(f"[bold red]DEBUG: ctx.args: {ctx.args}[/bold red]")
-        # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
+            console.print("[bold red]DEBUG: No subcommand provided; calling display_rich_help[/bold red]")
             display_rich_help(ctx)
+            console.print("[bold red]DEBUG: Exiting new_callback after help display[/bold red]")
             return ctx.exit()
-        
-        # Otherwise, call the original callback if it exists
+        else:
+            console.print(f"[bold red]DEBUG: Subcommand provided: {ctx.invoked_subcommand}[/bold red]")
         if original_callback:
+            console.print("[bold red]DEBUG: original_callback exists; calling it...[/bold red]")
             return original_callback(ctx, *args, **kwargs)
+        console.print("[bold red]DEBUG: No original callback; nothing to call.[/bold red]")
     
     # Replace the group's callback
     group.callback = new_callback
