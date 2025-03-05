@@ -5,6 +5,11 @@ This file contains code that does not change dynamically.
 """
 
 import click
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+
+console = Console()
 
 def enhance_group_help(group_obj, group_name):
     """
