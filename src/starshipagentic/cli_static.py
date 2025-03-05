@@ -47,11 +47,18 @@ def enhance_group_help(group, name):
         
         # Add rows for each command
         commands = registry.get_all_commands(name)
+        console.print(f"[bold blue]DEBUG:[/bold blue] Group name: {name}")
+        console.print(f"[bold blue]DEBUG:[/bold blue] Commands found: {commands}")
+        
         if not commands:
             console.print("[italic red]No commands found for this group.[/italic red]")
+            console.print("[bold yellow]Available groups in registry:[/bold yellow]")
+            all_groups = registry.get_all_groups()
+            console.print(f"{all_groups}")
         else:
             for cmd_name, cmd_info in commands.items():
                 aliases = registry.get_aliases_for_command(name, cmd_name)
+                console.print(f"[bold blue]DEBUG:[/bold blue] Aliases for {cmd_name}: {aliases}")
                 alias_str = ", ".join(aliases) if aliases else ""
                 description = cmd_info.get("description", "")
                 table.add_row(cmd_name, alias_str, description)
