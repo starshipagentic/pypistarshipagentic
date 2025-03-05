@@ -372,9 +372,6 @@ def main(ctx, all_commands, commands_list):
             console.print("Use --help for more information")
 
 if __name__ == "__main__":
-    # Import dynamic content
-    from starshipagentic.cli_generated import register_dynamic_groups
-    register_dynamic_groups()
     main()
 """)
     

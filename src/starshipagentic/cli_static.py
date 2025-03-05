@@ -121,9 +121,6 @@ def main(ctx, all_commands, commands_list):
         else:
             console.print("Use --help for more information")
 
-# Import and register dynamic groups immediately when this module is imported
-from starshipagentic.cli_generated import register_dynamic_groups
-register_dynamic_groups()
 
 if __name__ == "__main__":
     main()
