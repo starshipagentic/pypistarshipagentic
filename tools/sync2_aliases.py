@@ -252,6 +252,39 @@ def update_cli_main(expected_aliases):
         f.write(content)
     print("✅ CLI updated with command aliases.")
 
+def update_cli_themes_icons(group_names):
+    import re
+    start_marker = "# [AUTO-GENERATED GROUP THEMES AND ICONS START]"
+    end_marker = "# [AUTO-GENERATED GROUP THEMES AND ICONS END]"
+    themes = "GROUP_THEMES = {\n"
+    for group in group_names:
+        themes += f'    "{group}": "white",\n'
+    themes += "}\n"
+    icons = "GROUP_ICONS = {\n"
+    for group in group_names:
+        icons += f'    "{group}": "⚙️",\n'
+    icons += "}\n"
+    gen_block = f"{start_marker}\n{themes}\n{icons}\n{end_marker}"
+    with open(CLI_PATH, "r", encoding="utf-8") as f:
+        content = f.read()
+    if re.search(re.escape(start_marker), content) and re.search(re.escape(end_marker), content):
+        content = re.sub(
+            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
+            gen_block,
+            content,
+            flags=re.DOTALL,
+        )
+    else:
+        lines = content.splitlines()
+        insert_at = 0
+        if lines and lines[0].startswith("#!"):
+            insert_at = 1
+        lines.insert(insert_at, gen_block)
+        content = "\n".join(lines)
+    with open(CLI_PATH, "w", encoding="utf-8") as f:
+        f.write(content)
+    print("✅ CLI updated with group themes and icons.")
+
 def sync_cli_file():
     """
     Synchronize cli.py by ensuring that for each group in commands-list.yml,
@@ -343,6 +376,7 @@ def sync_cli_file():
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
     update_cli_main(expected_aliases)
+    update_cli_themes_icons(group_names)
     for msg in log_messages:
         print(msg)
     return True
