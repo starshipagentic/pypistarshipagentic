@@ -75,6 +75,7 @@ def enhance_group_help(group, name):
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
         if value:
+            console.print(f"[bold red]DEBUG: custom_help_callback triggered for group '{name}'[/bold red]")
             display_rich_help(ctx)
             ctx.exit()
     
@@ -90,6 +91,7 @@ def enhance_group_help(group, name):
     # Create a new callback that shows help when no subcommand is invoked
     def new_callback(ctx, *args, **kwargs):
         console.print(f"[bold red]DEBUG: new_callback called for group '{name}', invoked_subcommand={ctx.invoked_subcommand}[/bold red]")
+        console.print(f"[bold red]DEBUG: ctx.args: {ctx.args}[/bold red]")
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
             display_rich_help(ctx)
@@ -114,6 +116,7 @@ def enhance_group_help(group, name):
 @click.pass_context
 def main(ctx, all_commands, commands_list):
     """Starship Agentic CLI - Your AI-powered command center."""
+    console.print(f"[bold red]DEBUG: main() invoked, invoked_subcommand={ctx.invoked_subcommand}, args={ctx.args}[/bold red]")
     if ctx.invoked_subcommand is None:
         console.print(Panel("Welcome to Starship Agentic", title="🚀"))
         if all_commands:
