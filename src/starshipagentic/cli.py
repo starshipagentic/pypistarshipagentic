@@ -10,11 +10,6 @@ from rich.panel import Panel
 
 console = Console()
 
-class DebugGroup(click.Group):
-    def invoke(self, ctx):
-        console.print(f"[bold red]DEBUG: DebugGroup.invoke() called with ctx.invoked_subcommand={ctx.invoked_subcommand}, args={ctx.args}[/bold red]")
-        return super().invoke(ctx)
-
 def enhance_group_help(group, name):
     """Enhance a command group with better help text and rich formatting."""
     from rich.table import Table
@@ -25,8 +20,7 @@ def enhance_group_help(group, name):
     
     def display_rich_help(ctx):
         """Display rich formatted help for the command group."""
-        local_console = Console()
-        local_console.print(f"[bold red]DEBUG: display_rich_help called for group {name}[/bold red]")
+        console = Console()
         
         # Get group info from registry
         registry = CommandRegistry()
@@ -80,7 +74,6 @@ def enhance_group_help(group, name):
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
         if value:
-            console.print(f"[bold red]DEBUG: custom_help_callback triggered for group '{name}'[/bold red]")
             display_rich_help(ctx)
             ctx.exit()
     
@@ -94,20 +87,17 @@ def enhance_group_help(group, name):
     original_callback = group.callback
     
     # Create a new callback that shows help when no subcommand is invoked
-    def new_callback(ctx, *args, **kwargs):
-        console.print(f"[bold red]DEBUG: new_callback called for group '{name}', invoked_subcommand={ctx.invoked_subcommand}[/bold red]")
-        console.print(f"[bold red]DEBUG: ctx.args: {ctx.args}[/bold red]")
+    def new_callback(*args, **kwargs):
+        import click
+        ctx = click.get_current_context()
+        # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
-            console.print("[bold red]DEBUG: No subcommand provided; calling display_rich_help[/bold red]")
             display_rich_help(ctx)
-            console.print("[bold red]DEBUG: Exiting new_callback after help display[/bold red]")
             return ctx.exit()
-        else:
-            console.print(f"[bold red]DEBUG: Subcommand provided: {ctx.invoked_subcommand}[/bold red]")
+        
+        # Otherwise, call the original callback if it exists
         if original_callback:
-            console.print("[bold red]DEBUG: original_callback exists; calling it...[/bold red]")
             return original_callback(ctx, *args, **kwargs)
-        console.print("[bold red]DEBUG: No original callback; nothing to call.[/bold red]")
     
     # Replace the group's callback
     group.callback = new_callback
@@ -118,13 +108,12 @@ def enhance_group_help(group, name):
     
     return group
 
-@click.group(cls=DebugGroup, invoke_without_command=True)
+@click.group(invoke_without_command=True)
 @click.option("--all-commands", is_flag=True, help="Display all available commands")
 @click.option("--commands-list", is_flag=True, help="Display commands from commands-list.yml")
 @click.pass_context
 def main(ctx, all_commands, commands_list):
     """Starship Agentic CLI - Your AI-powered command center."""
-    console.print(f"[bold red]DEBUG: main() invoked, invoked_subcommand={ctx.invoked_subcommand}, args={ctx.args}[/bold red]")
     if ctx.invoked_subcommand is None:
         console.print(Panel("Welcome to Starship Agentic", title="🚀"))
         if all_commands:
@@ -133,6 +122,14 @@ def main(ctx, all_commands, commands_list):
             console.print("Commands from commands-list.yml would be displayed here")
         else:
             console.print("Use --help for more information")
+    else:
+        console.print(f"[bold red]DEBUG: Delegating control to subcommand: {ctx.invoked_subcommand}[/bold red]")
+        sub_cmd = ctx.command.get_command(ctx, ctx.invoked_subcommand)
+        if sub_cmd:
+            return ctx.invoke(sub_cmd)
+        else:
+            console.print(f"[bold red]DEBUG: Subcommand {ctx.invoked_subcommand} not found.[/bold red]")
+            ctx.exit()
 
 #!/usr/bin/env python3
 """
@@ -254,25 +251,18 @@ def register_dynamic_groups():
     from starshipagentic.cli import main, enhance_group_help
     import importlib
     GROUP_NAMES = ['fleet_commander', 'number_two', 'engineering_officer', 'navigation_officer', 'communications_officer', 'insterstellar_officer', 'captains_orders', 'tactical_officer', 'maintenance_officer', 'red_buttons', 'gitmaster', 'mcars', 'droids']
-    console.print("[bold red]DEBUG: register_dynamic_groups() called[/bold red]")
     for group in GROUP_NAMES:
-        console.print(f"[bold red]DEBUG: Processing group: {group}[/bold red]")
         mod = importlib.import_module(f'starshipagentic.commands.{group}')
-        console.print(f"[bold red]DEBUG: Imported module for {group}: {mod}[/bold red]")
         group_obj = getattr(mod, f'{group}_group', None)
-        console.print(f"[bold red]DEBUG: Retrieved {group}_group: {group_obj}[/bold red]")
         if group_obj is None:
             continue
         enhanced = enhance_group_help(group_obj, group)
-        console.print(f"[bold red]DEBUG: Enhanced group for {group}: {enhanced}[/bold red]")
         main.add_command(enhanced, group)
-        console.print(f"[bold red]DEBUG: {group} added to main. Available commands now: {list(main.commands.keys())}[/bold red]")
-    console.print(f"[bold red]DEBUG: Final main.commands: {list(main.commands.keys())}[/bold red]")
 
 
 from starshipagentic.cli_generated import register_dynamic_groups
 register_dynamic_groups()
-console.print("[bold red]DEBUG: main.commands after dynamic registration: " + str(list(main.commands.keys())) + "[/bold red]")
+
 
 if __name__ == "__main__":
     main()

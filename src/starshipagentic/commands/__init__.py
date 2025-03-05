@@ -1,33 +1,31 @@
 """Auto-generated __init__.py for command groups."""
 
 __all__ = [
-    "__pycache__",
-    "architecture",
-    "beam",
-    "cosmic",
-    "droid",
-    "engineering",
-    "exploration",
+    "captains_orders",
+    "communications_officer",
+    "droids",
+    "engineering_officer",
+    "fleet_commander",
+    "gitmaster",
+    "insterstellar_officer",
+    "maintenance_officer",
     "mcars",
-    "mission",
-    "navigation",
-    "probe",
-    "transmission",
-    "vessel",
-    "weapons",
+    "navigation_officer",
+    "number_two",
+    "red_buttons",
+    "tactical_officer",
 ]
 
-from . import __pycache__
-from . import architecture
-from . import beam
-from . import cosmic
-from . import droid
-from . import engineering
-from . import exploration
+from . import captains_orders
+from . import communications_officer
+from . import droids
+from . import engineering_officer
+from . import fleet_commander
+from . import gitmaster
+from . import insterstellar_officer
+from . import maintenance_officer
 from . import mcars
-from . import mission
-from . import navigation
-from . import probe
-from . import transmission
-from . import vessel
-from . import weapons
+from . import navigation_officer
+from . import number_two
+from . import red_buttons
+from . import tactical_officer

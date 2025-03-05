@@ -1,4 +1,4 @@
-vessel:
+fleet_commander:
   description: Initialize and select project templates
   commands:
     tour-ship:
@@ -19,7 +19,7 @@ vessel:
       options:
       - '--ship: Ship to visualize'
       aliases: []
-mission:
+number_two:
   description: Define and expand project requirements
   commands:
     mission-brief:
@@ -30,7 +30,7 @@ mission:
       description: Expand existing requirements
       aliases:
       - expand
-architecture:
+engineering_officer:
   description: Review and configure system architecture
   commands:
     review-schematics:
@@ -46,7 +46,7 @@ architecture:
       - '--stack: Technology stack to configure'
       aliases:
       - calibrate
-navigation:
+navigation_officer:
   description: Plan feature implementation
   commands:
     plot-navigation:
@@ -61,7 +61,7 @@ navigation:
       - '--priority: Prioritization method'
       aliases:
       - waypoints
-transmission:
+communications_officer:
   description: Manage external data and API connections
   commands:
     authorize-codes:
@@ -78,7 +78,7 @@ transmission:
       description: Scrape or directly input information from a known URL
       aliases:
       - transmission
-probe:
+insterstellar_officer:
   description: Generate initial code tracks and connect the top down BDD step coverage
   commands:
     map-planet:
@@ -101,7 +101,7 @@ probe:
       - '--feature: Feature to fabricate code for'
       aliases:
       - fabricate
-exploration:
+captains_orders:
   description: Execute and test your implementation
   commands:
     warp-speed:
@@ -121,7 +121,7 @@ exploration:
       - '--cycles: Number of full test cycles'
       aliases:
       - engage
-weapons:
+tactical_officer:
   description: Remove problematic code and tests
   commands:
     fire-photons:
@@ -138,7 +138,7 @@ weapons:
       - '--level: Shield strength (0-100)'
       aliases:
       - shields
-engineering:
+maintenance_officer:
   description: Manage project state and analyze code quality
   commands:
     create-checkpoint:
@@ -157,7 +157,7 @@ engineering:
       description: Run radon mi and radon cc to report on code complexity issues
       aliases:
       - complexity
-cosmic:
+red_buttons:
   description: Special operations
   commands:
     supernova:
@@ -166,7 +166,7 @@ cosmic:
       - '--force: Force removal without confirmation'
       aliases:
       - supernova
-beam:
+gitmaster:
   description: Git-related operations
   commands:
     teleport:
@@ -184,7 +184,7 @@ mcars:
       description: Store pointers/copies of code with AI-generated summaries in tinydb
       aliases:
       - transport
-droid:
+droids:
   description: Explanation and assistance commands
   commands:
     droid-splain:
