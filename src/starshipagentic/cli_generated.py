@@ -15,14 +15,14 @@ It contains all dynamic imports, group themes/icons, and group help registration
 # [AUTO-GENERATED GROUP THEMES AND ICONS END]
 
 
-# [AUTO-GENERATED GROUP HELP REGISTER START]
-import importlib
-GROUP_NAMES = {group_names_block}
-for group in GROUP_NAMES:
-    mod = importlib.import_module(f'starshipagentic.commands.{group}')
-    group_obj = getattr(mod, f'{group}_group', None)
-    if group_obj is None:
-        continue
-    enhanced = enhance_group_help(group_obj, group)
-    main.add_command(enhanced, group)
+def register_dynamic_groups():
+    import importlib
+    GROUP_NAMES = {group_names_block}
+    for group in GROUP_NAMES:
+        mod = importlib.import_module(f'starshipagentic.commands.{group}')
+        group_obj = getattr(mod, f'{group}_group', None)
+        if group_obj is None:
+            continue
+        enhanced = enhance_group_help(group_obj, group)
+        main.add_command(enhanced, group)
 # [AUTO-GENERATED GROUP HELP REGISTER END]
