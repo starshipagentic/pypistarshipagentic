@@ -154,10 +154,10 @@ def update_commands_init(valid_groups):
     groups.sort()
     stale = sorted(set(groups) - set(valid_groups))
     if stale:
-        from rich import print
-        print("[bold red]BIG NOTE: The following command group directories are stale (not in commands-list.yml). Please cleanup manually:[/bold red]")
+        from rich import print as rich_print
+        rich_print("[bold red]BIG NOTE: The following command group directories are stale (not in commands-list.yml). Please cleanup manually:[/bold red]")
         for s in stale:
-            print(f" - {s}")
+            rich_print(f" - {s}")
     content = '"""Auto-generated __init__.py for command groups."""\n\n__all__ = [\n'
     for group in groups:
         content += f'    "{group}",\n'
