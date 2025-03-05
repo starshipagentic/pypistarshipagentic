@@ -437,6 +437,8 @@ def sync_aliases():
     print("🔄 Starting synchronization based on commands-list.yml...")
     sync_cli_file()
     fix_command_imports()
+    import subprocess
+    subprocess.run(["pip", "install", "-e", "."], check=True)
     print("Sync complete.")
     return True
 
