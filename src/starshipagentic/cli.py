@@ -10,6 +10,11 @@ from rich.panel import Panel
 
 console = Console()
 
+class DebugGroup(click.Group):
+    def invoke(self, ctx):
+        console.print(f"[bold red]DEBUG: DebugGroup.invoke() called with ctx.invoked_subcommand={ctx.invoked_subcommand}, args={ctx.args}[/bold red]")
+        return super().invoke(ctx)
+
 def enhance_group_help(group, name):
     """Enhance a command group with better help text and rich formatting."""
     from rich.table import Table
@@ -110,7 +115,7 @@ def enhance_group_help(group, name):
     
     return group
 
-@click.group(invoke_without_command=True)
+@click.group(cls=DebugGroup, invoke_without_command=True)
 @click.option("--all-commands", is_flag=True, help="Display all available commands")
 @click.option("--commands-list", is_flag=True, help="Display commands from commands-list.yml")
 @click.pass_context
