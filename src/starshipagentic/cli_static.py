@@ -99,6 +99,7 @@ def enhance_group_help(group, name):
     
     # Replace the group's callback
     group.callback = new_callback
+    group.invoke_without_command = True
     
     # Set a basic help text for when --help isn't used
     group.help = f"[{name.upper()}] Commands for {name.replace('_', ' ')}"
