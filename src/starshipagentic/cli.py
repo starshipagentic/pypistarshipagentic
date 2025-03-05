@@ -74,9 +74,6 @@ def enhance_group_help(group, name):
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
         if value:
-            from rich.console import Console
-            console = Console()
-            console.print(f"[bold magenta]DEBUG: custom_help_callback triggered for group {name}[/bold magenta]")
             display_rich_help(ctx)
             ctx.exit()
     
@@ -91,23 +88,18 @@ def enhance_group_help(group, name):
     
     # Create a new callback that shows help when no subcommand is invoked
     def new_callback(ctx, *args, **kwargs):
-        from rich.console import Console
-        console = Console()
-        console.print(f"[bold magenta]DEBUG: new_callback invoked for group {name}[/bold magenta]")
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
-            console.print(f"[bold magenta]DEBUG: No subcommand found, displaying rich help for group {name}[/bold magenta]")
             display_rich_help(ctx)
-            console.print(f"[bold magenta]DEBUG: Exiting after displaying help for group {name}[/bold magenta]")
             return ctx.exit()
         
         # Otherwise, call the original callback if it exists
-        console.print(f"[bold magenta]DEBUG: Subcommand {ctx.invoked_subcommand} detected, running original callback for group {name}[/bold magenta]")
         if original_callback:
             return original_callback(ctx, *args, **kwargs)
     
     # Replace the group's callback
     group.callback = new_callback
+    group.invoke_without_command = True
     
     # Set a basic help text for when --help isn't used
     group.help = f"[{name.upper()}] Commands for {name.replace('_', ' ')}"
@@ -130,30 +122,8 @@ def main(ctx, all_commands, commands_list):
             console.print("Use --help for more information")
 
 # Import and register dynamic groups immediately when this module is imported
-print("\n\n=== DEBUG: LOADING CLI MODULE ===")
 from starshipagentic.cli_generated import register_dynamic_groups
-print("=== DEBUG: ABOUT TO REGISTER DYNAMIC GROUPS ===")
 register_dynamic_groups()
-print("=== DEBUG: FINISHED REGISTERING DYNAMIC GROUPS ===")
-
-# Debug the command registry
-from starshipagentic.utils.command_registry import CommandRegistry
-registry = CommandRegistry()
-print("\n=== DEBUG: COMMAND REGISTRY CONTENTS ===")
-print(f"All groups: {registry.get_all_groups()}")
-for group in registry.get_all_groups():
-    print(f"\nGroup: {group}")
-    print(f"Group info: {registry.get_group_info(group)}")
-    commands = registry.get_all_commands(group)
-    print(f"Commands: {commands}")
-    for cmd in commands:
-        print(f"  Command: {cmd}")
-        print(f"  Aliases: {registry.get_aliases_for_command(group, cmd)}")
-print("\n=== END DEBUG ===\n")
-
-if __name__ == "__main__":
-    main()
-
 
 #!/usr/bin/env python3
 """
@@ -282,3 +252,7 @@ def register_dynamic_groups():
             continue
         enhanced = enhance_group_help(group_obj, group)
         main.add_command(enhanced, group)
+
+
+if __name__ == "__main__":
+    main()
