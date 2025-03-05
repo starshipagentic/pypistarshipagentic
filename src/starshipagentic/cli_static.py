@@ -11,9 +11,54 @@ from rich.panel import Panel
 console = Console()
 
 def enhance_group_help(group, name):
-    """Enhance a command group with better help text."""
-    # Add custom styling and help text to the group
+    """Enhance a command group with better help text and rich formatting."""
+    from rich.table import Table
+    from rich.console import Console
+    from rich.text import Text
+    from starshipagentic.utils.command_registry import CommandRegistry
+    
+    # Create a custom callback for the help option
+    def custom_help_callback(ctx, param, value):
+        if not value or ctx.resilient_parsing:
+            return
+        
+        console = Console()
+        
+        # Get group info from registry
+        registry = CommandRegistry()
+        group_info = registry.get_group_info(name)
+        
+        # Create a title panel
+        title = f"[bold cyan]{name.upper()}[/bold cyan]: {group_info.get('description', f'Commands for {name.replace('_', ' ')}')}"
+        console.print(f"\n{title}\n")
+        
+        # Create a table for commands
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("Command", style="green")
+        table.add_column("Aliases", style="yellow")
+        table.add_column("Description", style="cyan")
+        
+        # Add rows for each command
+        commands = registry.get_all_commands(name)
+        for cmd_name, cmd_info in commands.items():
+            aliases = registry.get_aliases_for_command(name, cmd_name)
+            alias_str = ", ".join(aliases) if aliases else ""
+            description = cmd_info.get("description", "")
+            table.add_row(cmd_name, alias_str, description)
+        
+        console.print(table)
+        console.print("\nUse [bold]<command> --help[/bold] for detailed information about a specific command.\n")
+        ctx.exit()
+    
+    # Override the help option to use our custom callback
+    for param in group.params:
+        if param.name == 'help':
+            param.callback = custom_help_callback
+            break
+    
+    # Set a basic help text for when --help isn't used
     group.help = f"[{name.upper()}] Commands for {name.replace('_', ' ')}"
+    
     return group
 
 @click.group(invoke_without_command=True)
