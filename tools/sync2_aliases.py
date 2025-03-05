@@ -131,7 +131,7 @@ def run_group():
     """Entry point for running the {group} command group directly."""
     import sys
     from starshipagentic.cli import main as cli_main
-    sys.argv = ['starshipagentic', '{group}'] + sys.argv[1:]
+    sys.argv = ['starshipagentic', '{group}']
     cli_main()
 '''
     with open(init_file, "w", encoding="utf-8") as f:
