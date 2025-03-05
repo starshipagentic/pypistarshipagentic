@@ -17,11 +17,8 @@ def enhance_group_help(group, name):
     from rich.text import Text
     from starshipagentic.utils.command_registry import CommandRegistry
     
-    # Create a custom callback for the help option
-    def custom_help_callback(ctx, param, value):
-        if not value or ctx.resilient_parsing:
-            return
-        
+    def display_rich_help(ctx):
+        """Display rich formatted help for the command group."""
         console = Console()
         
         # Get group info from registry
@@ -49,6 +46,13 @@ def enhance_group_help(group, name):
         
         console.print(table)
         console.print("\nUse [bold]<command> --help[/bold] for detailed information about a specific command.\n")
+    
+    # Create a custom callback for the help option
+    def custom_help_callback(ctx, param, value):
+        if not value or ctx.resilient_parsing:
+            return
+        
+        display_rich_help(ctx)
         ctx.exit()
     
     # Override the help option to use our custom callback
@@ -56,6 +60,23 @@ def enhance_group_help(group, name):
         if param.name == 'help':
             param.callback = custom_help_callback
             break
+    
+    # Store the original callback
+    original_callback = group.callback
+    
+    # Create a new callback that shows help when no subcommand is invoked
+    def new_callback(ctx, *args, **kwargs):
+        # If no subcommand is invoked, show the rich help
+        if ctx.invoked_subcommand is None:
+            display_rich_help(ctx)
+            return ctx.exit()
+        
+        # Otherwise, call the original callback if it exists
+        if original_callback:
+            return original_callback(ctx, *args, **kwargs)
+    
+    # Replace the group's callback
+    group.callback = new_callback
     
     # Set a basic help text for when --help isn't used
     group.help = f"[{name.upper()}] Commands for {name.replace('_', ' ')}"
