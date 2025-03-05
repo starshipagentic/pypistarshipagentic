@@ -143,8 +143,11 @@ def update_commands_init(valid_groups):
     Also report stale groups that are present on disk but not in valid_groups.
     """
     init_file = COMMANDS_DIR / "__init__.py"
+    ignored = {"__pycache__"}
     groups = []
     for item in os.listdir(COMMANDS_DIR):
+        if item in ignored:
+            continue
         item_path = COMMANDS_DIR / item
         if item_path.is_dir():
             groups.append(item)
