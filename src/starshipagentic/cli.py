@@ -21,6 +21,7 @@ def enhance_group_help(group, name):
     def display_rich_help(ctx):
         """Display rich formatted help for the command group."""
         console = Console()
+        console.print(f"[bold red]DEBUG: display_rich_help called for group {name}[/bold red]")
         
         # Get group info from registry
         registry = CommandRegistry()
@@ -88,6 +89,9 @@ def enhance_group_help(group, name):
     
     # Create a new callback that shows help when no subcommand is invoked
     def new_callback(ctx, *args, **kwargs):
+        from rich.console import Console
+        console = Console()
+        console.print(f"[bold red]DEBUG: new_callback invoked for group {name} | ctx.invoked_subcommand={ctx.invoked_subcommand}[/bold red]")
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
             display_rich_help(ctx)
