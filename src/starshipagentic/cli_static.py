@@ -87,7 +87,9 @@ def enhance_group_help(group, name):
     original_callback = group.callback
     
     # Create a new callback that shows help when no subcommand is invoked
-    def new_callback(ctx, *args, **kwargs):
+    def new_callback(*args, **kwargs):
+        import click
+        ctx = click.get_current_context()
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
             display_rich_help(ctx)
