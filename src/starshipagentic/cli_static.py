@@ -12,6 +12,8 @@ console = Console()
 
 def enhance_group_help(group, name):
     """Enhance a command group with better help text."""
+    # Add custom styling and help text to the group
+    group.help = f"[{name.upper()}] Commands for {name.replace('_', ' ')}"
     return group
 
 @click.group(invoke_without_command=True)
@@ -29,8 +31,9 @@ def main(ctx, all_commands, commands_list):
         else:
             console.print("Use --help for more information")
 
+# Import and register dynamic groups immediately when this module is imported
+from starshipagentic.cli_generated import register_dynamic_groups
+register_dynamic_groups()
+
 if __name__ == "__main__":
-    # Import dynamic content
-    from starshipagentic.cli_generated import register_dynamic_groups
-    register_dynamic_groups()
     main()
