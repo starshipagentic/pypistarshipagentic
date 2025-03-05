@@ -16,6 +16,8 @@ It contains all dynamic imports, group themes/icons, and group help registration
 
 
 def register_dynamic_groups():
+    """Register all dynamic command groups with the main CLI."""
+    from starshipagentic.cli import main, enhance_group_help
     import importlib
     GROUP_NAMES = {group_names_block}
     for group in GROUP_NAMES:
@@ -25,4 +27,3 @@ def register_dynamic_groups():
             continue
         enhanced = enhance_group_help(group_obj, group)
         main.add_command(enhanced, group)
-# [AUTO-GENERATED GROUP HELP REGISTER END]

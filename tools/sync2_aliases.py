@@ -248,64 +248,131 @@ def update_cli_main(expected_aliases):
         f.write(content)
     print("✅ CLI updated with command aliases.")
 
-def update_cli_themes_icons(group_names):
-    import re
-    start_marker = "# [AUTO-GENERATED GROUP THEMES AND ICONS START]"
-    end_marker = "# [AUTO-GENERATED GROUP THEMES AND ICONS END]"
+def update_cli_generated(group_names, expected_aliases):
+    """
+    Update the cli_generated.py file with all dynamic content.
+    This includes:
+    - Command imports
+    - Group themes and icons
+    - Group help registration
+    
+    All generated code is placed inside functions to prevent execution before main is defined.
+    """
+    # Generate command imports block
+    command_imports = []
+    for alias, target in expected_aliases.items():
+        if alias == "starshipagentic":
+            continue
+        try:
+            module, func = target.split(":")
+        except ValueError:
+            print(f"❌ Invalid target format for alias '{alias}': {target}")
+            continue
+        safe_alias = alias.replace("-", "_")
+        command_imports.append(f"from {module} import {func} as {safe_alias}")
+    
+    command_imports_block = "\n".join(command_imports)
+    
+    # Generate group themes and icons block
     themes = "GROUP_THEMES = {\n"
     for group in group_names:
         themes += f'    "{group}": "white",\n'
     themes += "}\n"
+    
     icons = "GROUP_ICONS = {\n"
     for group in group_names:
         icons += f'    "{group}": "⚙️",\n'
     icons += "}\n"
-    gen_block = f"{start_marker}\n{themes}\n{icons}\n{end_marker}"
-    with open(CLI_PATH, "r", encoding="utf-8") as f:
-        content = f.read()
-    if re.search(re.escape(start_marker), content) and re.search(re.escape(end_marker), content):
-        content = re.sub(
-            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
-            gen_block,
-            content,
-            flags=re.DOTALL,
-        )
-    else:
-        content += "\n\n" + gen_block + "\n"
-    with open(CLI_PATH, "w", encoding="utf-8") as f:
+    
+    group_themes_icons_block = f"{themes}\n{icons}"
+    
+    # Format the group names as a Python list literal
+    group_names_block = repr(group_names)
+    
+    # Read the template
+    with open(CLI_GENERATED_PATH, "r", encoding="utf-8") as f:
+        template = f.read()
+    
+    # Fill in the template
+    content = template.format(
+        command_imports_block=command_imports_block,
+        group_themes_icons_block=group_themes_icons_block,
+        group_names_block=group_names_block
+    )
+    
+    # Write the generated file
+    with open(CLI_GENERATED_PATH, "w", encoding="utf-8") as f:
         f.write(content)
-    print("✅ CLI updated with group themes and icons.")
+    
+    # Now combine cli_static.py and cli_generated.py to create cli.py
+    combine_cli_files()
+    
+    print("✅ CLI generated file updated.")
 
-def update_cli_group_help(group_names):
-    import re
-    start_marker = "# [AUTO-GENERATED GROUP HELP REGISTER START]"
-    end_marker = "# [AUTO-GENERATED GROUP HELP REGISTER END]"
-    generated = [start_marker]
-    generated.append("import importlib")
-    generated.append(f"GROUP_NAMES = {group_names!r}")
-    generated.append("for group in GROUP_NAMES:")
-    generated.append("    mod = importlib.import_module(f'starshipagentic.commands.{group}')")
-    generated.append("    group_obj = getattr(mod, f'{group}_group', None)")
-    generated.append("    if group_obj is None:")
-    generated.append("        continue")
-    generated.append("    enhanced = enhance_group_help(group_obj, group)")
-    generated.append("    main.add_command(enhanced, group)")
-    generated.append(end_marker)
-    gen_block = "\n".join(generated)
-    with open(CLI_PATH, "r", encoding="utf-8") as f:
-        content = f.read()
-    if re.search(re.escape(start_marker), content) and re.search(re.escape(end_marker), content):
-        content = re.sub(
-            rf"{re.escape(start_marker)}.*?{re.escape(end_marker)}",
-            gen_block,
-            content,
-            flags=re.DOTALL,
-        )
-    else:
-        content += "\n\n" + gen_block + "\n"
+def combine_cli_files():
+    """
+    Combine cli_static.py and cli_generated.py to create the final cli.py file.
+    """
+    static_path = BASE_DIR / "src" / "starshipagentic" / "cli_static.py"
+    
+    # Check if static file exists
+    if not static_path.exists():
+        print("⚠️ cli_static.py not found. Creating a minimal version.")
+        with open(static_path, "w", encoding="utf-8") as f:
+            f.write("""#!/usr/bin/env python3
+\"\"\"
+Starship Agentic CLI - Static Content
+This file contains the static parts of the CLI that don't change during generation.
+\"\"\"
+
+import click
+from rich.console import Console
+from rich.panel import Panel
+
+console = Console()
+
+def enhance_group_help(group, name):
+    \"\"\"Enhance a command group with better help text.\"\"\"
+    return group
+
+@click.group(invoke_without_command=True)
+@click.option("--all-commands", is_flag=True, help="Display all available commands")
+@click.option("--commands-list", is_flag=True, help="Display commands from commands-list.yml")
+@click.pass_context
+def main(ctx, all_commands, commands_list):
+    \"\"\"Starship Agentic CLI - Your AI-powered command center.\"\"\"
+    if ctx.invoked_subcommand is None:
+        console.print(Panel("Welcome to Starship Agentic", title="🚀"))
+        if all_commands:
+            console.print("All commands would be displayed here")
+        elif commands_list:
+            console.print("Commands from commands-list.yml would be displayed here")
+        else:
+            console.print("Use --help for more information")
+
+if __name__ == "__main__":
+    # Import dynamic content
+    from starshipagentic.cli_generated import register_dynamic_groups
+    register_dynamic_groups()
+    main()
+""")
+    
+    # Read the static content
+    with open(static_path, "r", encoding="utf-8") as f:
+        static_content = f.read()
+    
+    # Read the generated content
+    with open(CLI_GENERATED_PATH, "r", encoding="utf-8") as f:
+        generated_content = f.read()
+    
+    # Combine the files
+    combined = static_content + "\n\n" + generated_content
+    
+    # Write the combined file
     with open(CLI_PATH, "w", encoding="utf-8") as f:
-        f.write(content)
-    print("✅ CLI updated with enhanced group help registration.")
+        f.write(combined)
+    
+    print("✅ Combined CLI file created.")
 
 def sync_cli_file():
     """
