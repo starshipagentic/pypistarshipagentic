@@ -14,6 +14,7 @@ def enhance_group_help(group, name):
     """Enhance a command group with better help text and rich formatting."""
     from rich.table import Table
     from rich.console import Console
+    from rich.panel import Panel
     from rich.text import Text
     from starshipagentic.utils.command_registry import CommandRegistry
     
@@ -27,33 +28,47 @@ def enhance_group_help(group, name):
         
         # Create a title panel
         replacement = name.replace('_', ' ')
-        title = f"[bold cyan]{name.upper()}[/bold cyan]: {group_info.get('description', f'Commands for {replacement}')}"
-        console.print(f"\n{title}\n")
+        description = group_info.get('description', f'Commands for {replacement}')
+        
+        # Create a fancy panel for the title
+        panel = Panel(
+            f"[bold cyan]{description}[/bold cyan]",
+            title=f"[bold yellow]{name.upper()}[/bold yellow]",
+            border_style="blue",
+            expand=False
+        )
+        console.print(panel)
         
         # Create a table for commands
-        table = Table(show_header=True, header_style="bold magenta")
-        table.add_column("Command", style="green")
+        table = Table(show_header=True, header_style="bold magenta", border_style="cyan")
+        table.add_column("Command", style="green bold")
         table.add_column("Aliases", style="yellow")
         table.add_column("Description", style="cyan")
         
         # Add rows for each command
         commands = registry.get_all_commands(name)
-        for cmd_name, cmd_info in commands.items():
-            aliases = registry.get_aliases_for_command(name, cmd_name)
-            alias_str = ", ".join(aliases) if aliases else ""
-            description = cmd_info.get("description", "")
-            table.add_row(cmd_name, alias_str, description)
+        if not commands:
+            console.print("[italic red]No commands found for this group.[/italic red]")
+        else:
+            for cmd_name, cmd_info in commands.items():
+                aliases = registry.get_aliases_for_command(name, cmd_name)
+                alias_str = ", ".join(aliases) if aliases else ""
+                description = cmd_info.get("description", "")
+                table.add_row(cmd_name, alias_str, description)
+            
+            console.print(table)
         
-        console.print(table)
-        console.print("\nUse [bold]<command> --help[/bold] for detailed information about a specific command.\n")
+        console.print("\n[bold green]Usage:[/bold green] [italic]<command> [OPTIONS] [ARGS][/italic]")
+        console.print("[bold green]Help:[/bold green] [italic]<command> --help[/italic] for detailed information about a specific command.\n")
+    
+    # Override the help formatting for the group
+    group.format_help = lambda ctx, formatter: None
     
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
-        if not value or ctx.resilient_parsing:
-            return
-        
-        display_rich_help(ctx)
-        ctx.exit()
+        if value:
+            display_rich_help(ctx)
+            ctx.exit()
     
     # Override the help option to use our custom callback
     for param in group.params:
