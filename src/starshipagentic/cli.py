@@ -20,6 +20,7 @@ def enhance_group_help(group, name):
     
     def display_rich_help(ctx):
         """Display rich formatted help for the command group."""
+        console.print(f"[bold red]DEBUG: display_rich_help called for group {name}[/bold red]")
         console = Console()
         
         # Get group info from registry
@@ -88,6 +89,7 @@ def enhance_group_help(group, name):
     
     # Create a new callback that shows help when no subcommand is invoked
     def new_callback(ctx, *args, **kwargs):
+        console.print(f"[bold red]DEBUG: new_callback called for group '{name}', invoked_subcommand={ctx.invoked_subcommand}[/bold red]")
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
             display_rich_help(ctx)
@@ -241,18 +243,25 @@ def register_dynamic_groups():
     from starshipagentic.cli import main, enhance_group_help
     import importlib
     GROUP_NAMES = ['fleet_commander', 'number_two', 'engineering_officer', 'navigation_officer', 'communications_officer', 'insterstellar_officer', 'captains_orders', 'tactical_officer', 'maintenance_officer', 'red_buttons', 'gitmaster', 'mcars', 'droids']
+    console.print("[bold red]DEBUG: register_dynamic_groups() called[/bold red]")
     for group in GROUP_NAMES:
+        console.print(f"[bold red]DEBUG: Processing group: {group}[/bold red]")
         mod = importlib.import_module(f'starshipagentic.commands.{group}')
+        console.print(f"[bold red]DEBUG: Imported module for {group}: {mod}[/bold red]")
         group_obj = getattr(mod, f'{group}_group', None)
+        console.print(f"[bold red]DEBUG: Retrieved {group}_group: {group_obj}[/bold red]")
         if group_obj is None:
             continue
         enhanced = enhance_group_help(group_obj, group)
+        console.print(f"[bold red]DEBUG: Enhanced group for {group}: {enhanced}[/bold red]")
         main.add_command(enhanced, group)
+        console.print(f"[bold red]DEBUG: {group} added to main. Available commands now: {list(main.commands.keys())}[/bold red]")
+    console.print(f"[bold red]DEBUG: Final main.commands: {list(main.commands.keys())}[/bold red]")
 
 
 from starshipagentic.cli_generated import register_dynamic_groups
 register_dynamic_groups()
-
+console.print("[bold red]DEBUG: main.commands after dynamic registration: " + str(list(main.commands.keys())) + "[/bold red]")
 
 if __name__ == "__main__":
     main()
