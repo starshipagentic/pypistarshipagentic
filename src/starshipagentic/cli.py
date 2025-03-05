@@ -74,6 +74,9 @@ def enhance_group_help(group, name):
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
         if value:
+            from rich.console import Console
+            console = Console()
+            console.print(f"[bold magenta]DEBUG: custom_help_callback triggered for group {name}[/bold magenta]")
             display_rich_help(ctx)
             ctx.exit()
     
@@ -88,12 +91,18 @@ def enhance_group_help(group, name):
     
     # Create a new callback that shows help when no subcommand is invoked
     def new_callback(ctx, *args, **kwargs):
+        from rich.console import Console
+        console = Console()
+        console.print(f"[bold magenta]DEBUG: new_callback invoked for group {name}[/bold magenta]")
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
+            console.print(f"[bold magenta]DEBUG: No subcommand found, displaying rich help for group {name}[/bold magenta]")
             display_rich_help(ctx)
+            console.print(f"[bold magenta]DEBUG: Exiting after displaying help for group {name}[/bold magenta]")
             return ctx.exit()
         
         # Otherwise, call the original callback if it exists
+        console.print(f"[bold magenta]DEBUG: Subcommand {ctx.invoked_subcommand} detected, running original callback for group {name}[/bold magenta]")
         if original_callback:
             return original_callback(ctx, *args, **kwargs)
     
