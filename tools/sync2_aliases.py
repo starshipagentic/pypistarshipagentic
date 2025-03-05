@@ -137,9 +137,10 @@ def run_group():
         f.write(content)
     print(f"✅ Group '{group}' updated.")
 
-def update_commands_init():
+def update_commands_init(valid_groups):
     """
     Update the top-level commands/__init__.py to list all groups.
+    Also report stale groups that are present on disk but not in valid_groups.
     """
     init_file = COMMANDS_DIR / "__init__.py"
     groups = []
@@ -148,6 +149,12 @@ def update_commands_init():
         if item_path.is_dir():
             groups.append(item)
     groups.sort()
+    stale = sorted(set(groups) - set(valid_groups))
+    if stale:
+        from rich import print
+        print("[bold red]BIG NOTE: The following command group directories are stale (not in commands-list.yml). Please cleanup manually:[/bold red]")
+        for s in stale:
+            print(f" - {s}")
     content = '"""Auto-generated __init__.py for command groups."""\n\n__all__ = [\n'
     for group in groups:
         content += f'    "{group}",\n'
@@ -270,7 +277,7 @@ def sync_cli_file():
         for cmd in commands_data[group].get("commands", {}):
             scaffold_command_package(group, cmd)
         update_group_init(group)
-    update_commands_init()
+    update_commands_init(list(commands_data.keys()))
     expected_aliases = generate_expected_aliases(commands_data)
     import sys
     # Build a detailed mapping of alias -> list of source tuples.
