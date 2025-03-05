@@ -29,7 +29,8 @@ def enhance_group_help(group, name):
         group_info = registry.get_group_info(name)
         
         # Create a title panel
-        title = f"[bold cyan]{name.upper()}[/bold cyan]: {group_info.get('description', f'Commands for {name.replace(\"_\", \" \")}')}"
+        replacement = name.replace('_', ' ')
+        title = f"[bold cyan]{name.upper()}[/bold cyan]: {group_info.get('description', f'Commands for {replacement}')}"
         console.print(f"\n{title}\n")
         
         # Create a table for commands
