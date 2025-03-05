@@ -21,7 +21,6 @@ def enhance_group_help(group, name):
     def display_rich_help(ctx):
         """Display rich formatted help for the command group."""
         console = Console()
-        console.print(f"[bold red]DEBUG: display_rich_help called for group {name}[/bold red]")
         
         # Get group info from registry
         registry = CommandRegistry()
@@ -89,9 +88,6 @@ def enhance_group_help(group, name):
     
     # Create a new callback that shows help when no subcommand is invoked
     def new_callback(ctx, *args, **kwargs):
-        from rich.console import Console
-        console = Console()
-        console.print(f"[bold red]DEBUG: new_callback invoked for group {name} | ctx.invoked_subcommand={ctx.invoked_subcommand}[/bold red]")
         # If no subcommand is invoked, show the rich help
         if ctx.invoked_subcommand is None:
             display_rich_help(ctx)
@@ -124,10 +120,6 @@ def main(ctx, all_commands, commands_list):
             console.print("Commands from commands-list.yml would be displayed here")
         else:
             console.print("Use --help for more information")
-
-# Import and register dynamic groups immediately when this module is imported
-from starshipagentic.cli_generated import register_dynamic_groups
-register_dynamic_groups()
 
 #!/usr/bin/env python3
 """
@@ -256,6 +248,10 @@ def register_dynamic_groups():
             continue
         enhanced = enhance_group_help(group_obj, group)
         main.add_command(enhanced, group)
+
+
+from starshipagentic.cli_generated import register_dynamic_groups
+register_dynamic_groups()
 
 
 if __name__ == "__main__":
