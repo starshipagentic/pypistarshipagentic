@@ -14,6 +14,28 @@ def enhance_group_help(group_obj, group_name):
     # Example stub: simply return the group object unchanged.
     return group_obj
 
+def display_welcome():
+    """Display welcome message with ASCII art."""
+    welcome_text = """
+    ███████╗████████╗ █████╗ ██████╗ ███████╗██╗  ██╗██╗██████╗ 
+    ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║  ██║██║██╔══██╗
+    ███████╗   ██║   ███████║██████╔╝███████╗███████║██║██████╔╝
+    ╚════██║   ██║   ██╔══██║██╔══██╗╚════██║██╔══██║██║██╔═══╝ 
+    ███████║   ██║   ██║  ██║██║  ██║███████║██║  ██║██║██║     
+    ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝     
+    
+     █████╗  ██████╗ ███████╗███╗   ██╗████████╗██╗ ██████╗
+    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝██║██╔════╝
+    ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ██║██║     
+    ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ██║██║     
+    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ██║╚██████╗
+    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝ ╚═════╝
+    """
+    
+    console.print(Panel(Text(welcome_text, style="bold blue")))
+    console.print("Welcome to Starship Agentic - AI-assisted software development with a Star Trek-inspired interface.")
+
+
 main = click.Group()
 
 # Import the auto-generated dynamic CLI code.
