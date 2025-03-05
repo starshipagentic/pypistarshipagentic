@@ -199,27 +199,14 @@ def generate_expected_aliases(commands_data):
 def update_pyproject_scripts(expected_aliases):
     """
     Update the [project.scripts] section in pyproject.toml.
+    Regenerates the scripts from expected_aliases computed from commands-list.yml.
     """
     with open(PYPROJECT_PATH, "rb") as f:
         pyproject = tomli.load(f)
-    scripts = pyproject.get("project", {}).get("scripts", {})
-    added_aliases = []
-    updated_aliases = []
-    for alias, target in expected_aliases.items():
-        if alias not in scripts:
-            scripts[alias] = target
-            added_aliases.append(f"{alias} -> {target}")
-        elif scripts[alias] != target:
-            old = scripts[alias]
-            scripts[alias] = target
-            updated_aliases.append(f"{alias}: {old} => {target}")
-    pyproject.setdefault("project", {})["scripts"] = scripts
+    pyproject.setdefault("project", {})["scripts"] = expected_aliases
     with open(PYPROJECT_PATH, "wb") as f:
         tomli_w.dump(pyproject, f)
-    if added_aliases or updated_aliases:
-        print("✅ pyproject.toml scripts updated.")
-    else:
-        print("ℹ️  pyproject.toml scripts ok.")
+    print("✅ pyproject.toml scripts regenerated.")
 
 def update_cli_main(expected_aliases):
     """
