@@ -344,7 +344,7 @@ def sync_cli_file():
         console.print(table)
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
-    update_cli_main(expected_aliases)
+    update_cli_main()
     for msg in log_messages:
         print(msg)
     return True
