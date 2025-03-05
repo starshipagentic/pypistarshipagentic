@@ -120,7 +120,14 @@ def main(ctx, all_commands, commands_list):
             console.print("Commands from commands-list.yml would be displayed here")
         else:
             console.print("Use --help for more information")
-
+    else:
+        console.print(f"[bold red]DEBUG: Delegating control to subcommand: {ctx.invoked_subcommand}[/bold red]")
+        sub_cmd = ctx.command.get_command(ctx, ctx.invoked_subcommand)
+        if sub_cmd:
+            return ctx.invoke(sub_cmd)
+        else:
+            console.print(f"[bold red]DEBUG: Subcommand {ctx.invoked_subcommand} not found.[/bold red]")
+            ctx.exit()
 
 if __name__ == "__main__":
     main()
