@@ -20,8 +20,8 @@ def enhance_group_help(group, name):
     
     def display_rich_help(ctx):
         """Display rich formatted help for the command group."""
-        console.print(f"[bold red]DEBUG: display_rich_help called for group {name}[/bold red]")
-        console = Console()
+        local_console = Console()
+        local_console.print(f"[bold red]DEBUG: display_rich_help called for group {name}[/bold red]")
         
         # Get group info from registry
         registry = CommandRegistry()
