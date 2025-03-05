@@ -35,6 +35,7 @@ COMMANDS_LIST_PATH = BASE_DIR / "src" / "starshipagentic" / "commands-list.yml"
 COMMANDS_DIR = BASE_DIR / "src" / "starshipagentic" / "commands"
 PYPROJECT_PATH = BASE_DIR / "pyproject.toml"
 CLI_PATH = BASE_DIR / "src" / "starshipagentic" / "cli.py"
+CLI_GENERATED_PATH = BASE_DIR / "src" / "starshipagentic" / "cli_generated.py"
 
 # Templates for new command package files
 INIT_TEMPLATE = '''"""Auto-generated __init__.py for the {command} command package."""
@@ -396,9 +397,7 @@ def sync_cli_file():
         console.print(table)
         sys.exit(1)
     update_pyproject_scripts(expected_aliases)
-    update_cli_main(expected_aliases)
-    update_cli_themes_icons(group_names)
-    update_cli_group_help(group_names)
+    update_cli_generated(group_names, expected_aliases)
     for msg in log_messages:
         print(msg)
     return True
