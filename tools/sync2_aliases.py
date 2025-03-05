@@ -386,14 +386,24 @@ if __name__ == "__main__":
     with open(CLI_GENERATED_PATH, "r", encoding="utf-8") as f:
         generated_content = f.read()
     
-    # Combine the files
-    combined = static_content + "\n\n" + generated_content
+    # Extract and remove the "__main__" block from the static content.
+    main_block_pattern = r"(if __name__\s*==\s*['\"]__main__['\"]:.*)"
+    match = re.search(main_block_pattern, static_content, flags=re.DOTALL)
+    if match:
+        main_block = match.group(1)
+        static_without_main = re.sub(main_block_pattern, "", static_content, flags=re.DOTALL).rstrip()
+    else:
+        main_block = ""
+        static_without_main = static_content
+    
+    # Combine the static content (without __main__), then generated content, then reattach the __main__ block.
+    combined = f"{static_without_main}\n\n{generated_content}\n\n{main_block}"
     
     # Write the combined file
     with open(CLI_PATH, "w", encoding="utf-8") as f:
         f.write(combined)
     
-    print("✅ Combined CLI file created.")
+    print("✅ Combined CLI file created with dynamic groups registered before __main__ is called.")
 
 def sync_cli_file():
     """
