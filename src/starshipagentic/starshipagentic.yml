@@ -2,10 +2,16 @@
 # This file controls the command sequence for interactive mode
 
 commands:
-  - "vessel tour-ship"
-  - vessel:
+  - "fleet_commander tour-ship"
+  - fleet_commander:
       commission-ship:
-        template: "django-galaxy"
-        name: "my-starship-project"
-  - "mission mission-brief"
-  - "architecture review-schematics --type=system"
+        template: "modern-django"
+        name: "modern-starship"
+  - "number_two mission-brief"
+  - "engineering_officer review-schematics --type=microservice"
+  - "navigation_officer plot-navigation --format=gherkin"
+  - "communications_officer scan-sector"
+  - "insterstellar_officer map-planet --feature=AI-powered"
+  - "captains_orders trycoder --verbose"
+  - "tactical_officer fire-photons"
+  - "maintenance_officer create-checkpoint"
