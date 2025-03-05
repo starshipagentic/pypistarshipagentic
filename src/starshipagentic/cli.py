@@ -121,8 +121,26 @@ def main(ctx, all_commands, commands_list):
             console.print("Use --help for more information")
 
 # Import and register dynamic groups immediately when this module is imported
+print("\n\n=== DEBUG: LOADING CLI MODULE ===")
 from starshipagentic.cli_generated import register_dynamic_groups
+print("=== DEBUG: ABOUT TO REGISTER DYNAMIC GROUPS ===")
 register_dynamic_groups()
+print("=== DEBUG: FINISHED REGISTERING DYNAMIC GROUPS ===")
+
+# Debug the command registry
+from starshipagentic.utils.command_registry import CommandRegistry
+registry = CommandRegistry()
+print("\n=== DEBUG: COMMAND REGISTRY CONTENTS ===")
+print(f"All groups: {registry.get_all_groups()}")
+for group in registry.get_all_groups():
+    print(f"\nGroup: {group}")
+    print(f"Group info: {registry.get_group_info(group)}")
+    commands = registry.get_all_commands(group)
+    print(f"Commands: {commands}")
+    for cmd in commands:
+        print(f"  Command: {cmd}")
+        print(f"  Aliases: {registry.get_aliases_for_command(group, cmd)}")
+print("\n=== END DEBUG ===\n")
 
 if __name__ == "__main__":
     main()
