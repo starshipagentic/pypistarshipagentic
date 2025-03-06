@@ -12,6 +12,7 @@ import os
 import sys
 import subprocess
 import threading
+from pathlib import Path
 from importlib import resources
 
 try:
@@ -19,92 +20,58 @@ try:
 except ImportError:
     raise ImportError("Pygame is required for visualization features")
 
+def read_ship_from_file(filename):
+    """Read ship ASCII art from a file in the assets directory."""
+    try:
+        assets_dir = Path(__file__).parent / "assets"
+        file_path = assets_dir / filename
+        
+        if file_path.exists():
+            with open(file_path, 'r') as f:
+                return [line.rstrip('\n') for line in f.readlines()]
+        else:
+            print(f"Warning: Ship file {filename} not found")
+            return ["Ship file not found"]
+    except Exception as e:
+        print(f"Error reading ship file: {e}")
+        return ["Error loading ship"]
+
 # Ship configurations with colors, shapes, and details
 SHIP_CONFIGS = {
+    "scout": {
+        "color": (255, 255, 150),
+        "details": "Scout Ship\nClass: Reconnaissance\nCrew: 15\nMax Speed: Warp 8\nWeapons: Light Phasers\nCaptain: First Officer",
+        "shape": read_ship_from_file("scout-ship.txt")
+    },
     "enterprise": {
         "color": (200, 200, 255),
         "details": "USS Enterprise NCC-1701-D\nClass: Galaxy\nCrew: 1,014\nMax Speed: Warp 9.8\nWeapons: Phasers, Photon Torpedoes\nCaptain: Jean-Luc Picard",
-        "shape": [
-            "          ___----___          ",
-            "    ___---           ---___   ",
-            " __--                     --__",
-            "/                           \\",
-            "|============================ |",
-            "\\___________________________/",
-            "   |  |                 |  |  ",
-            "   |  |                 |  |  ",
-            "    --                   --   "
-        ]
+        "shape": read_ship_from_file("enterprise.txt")
     },
     "voyager": {
         "color": (255, 200, 200),
         "details": "USS Voyager NCC-74656\nClass: Intrepid\nCrew: 141\nMax Speed: Warp 9.975\nWeapons: Phasers, Photon & Quantum Torpedoes\nCaptain: Kathryn Janeway",
-        "shape": [
-            "         /\\               ",
-            "        /  \\              ",
-            "       /    \\             ",
-            "      /      \\            ",
-            "     /========\\           ",
-            "    /==========\\          ",
-            "   /============\\         ",
-            "  /==============\\        ",
-            " /================\\       ",
-            "/==================\\      ",
-            "         ||              ",
-            "         ||              ",
-            "         ||              ",
-            "        /  \\             ",
-        ]
+        "shape": read_ship_from_file("voyager.txt")
     },
     "defiant": {
         "color": (200, 255, 200),
         "details": "USS Defiant NX-74205\nClass: Defiant\nCrew: 50\nMax Speed: Warp 9.5\nWeapons: Pulse Phasers, Quantum Torpedoes\nCaptain: Benjamin Sisko",
-        "shape": [
-            "       ___       ",
-            "     /     \\     ",
-            "    /       \\    ",
-            "   /         \\   ",
-            "  /===========\\  ",
-            " /=============\\ ",
-            "/===============\\",
-            "\\_______________/",
-        ]
+        "shape": read_ship_from_file("defiant.txt")
     },
     "django": {
         "color": (150, 255, 150),
         "details": "Django Cruiser\nType: Web Framework\nLanguage: Python\nSpecialty: Full-stack development\nFeatures: ORM, Admin Interface, Authentication\nFounder: Adrian Holovaty & Simon Willison",
-        "shape": [
-            "    ____              ",
-            "   /    \\             ",
-            "  /      \\____________",
-            " /                    \\",
-            "/======================\\",
-            "\\______________________/",
-        ]
+        "shape": read_ship_from_file("django.txt")
     },
     "flask": {
         "color": (150, 150, 255),
         "details": "Flask Scout\nType: Web Framework\nLanguage: Python\nSpecialty: Lightweight, Flexible\nFeatures: Routing, Templating, RESTful\nFounder: Armin Ronacher",
-        "shape": [
-            "    ___     ",
-            "   /   \\    ",
-            "  /     \\___",
-            " /         \\",
-            "/===========\\",
-            "\\___________/",
-        ]
+        "shape": read_ship_from_file("flask.txt")
     },
     "react": {
         "color": (100, 200, 255),
         "details": "React Interceptor\nType: Frontend Library\nLanguage: JavaScript\nSpecialty: UI Components\nFeatures: Virtual DOM, JSX, Component-based\nDeveloper: Facebook",
-        "shape": [
-            "    /\\    ",
-            "   /  \\   ",
-            "  /    \\  ",
-            " /======\\ ",
-            "/========\\",
-            "\\________/",
-        ]
+        "shape": read_ship_from_file("react.txt")
     },
 }
 
@@ -118,6 +85,12 @@ def display_ship_visualization(initial_ship_name):
     
     # Available ships and current selection
     available_ships = list(SHIP_CONFIGS.keys())
+    
+    # Make sure scout is the first ship
+    if "scout" in available_ships and available_ships[0] != "scout":
+        available_ships.remove("scout")
+        available_ships.insert(0, "scout")
+    
     current_ship_index = available_ships.index(initial_ship_name.lower()) if initial_ship_name.lower() in available_ships else 0
     ship_name = available_ships[current_ship_index]
     

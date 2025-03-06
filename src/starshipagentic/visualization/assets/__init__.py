@@ -6,4 +6,4 @@
 #
 # It is licensed under the GNU Affero General Public License (AGPL) v3 or later.
 # For full details, see the LICENSE.md file in the project root.
-"""Assets package for visualization."""
+"""Assets package for visualization module containing ship ASCII art files."""

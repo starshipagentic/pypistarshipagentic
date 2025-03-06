@@ -11,7 +11,7 @@ def visualize_ship_service(input):
     Returns:
         str: Confirmation message
     """
-    ship_name = input or 'enterprise'
+    ship_name = input or 'scout'
     
     # Launch the pygame visualization
     display_ship_visualization(ship_name)
