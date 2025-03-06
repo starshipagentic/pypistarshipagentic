@@ -2,78 +2,71 @@
 
 This document contains important technical details about how the Starship Agentic CLI works.
 
-## Command Aliases Implementation
+## Command Aliases and Dynamic Registration
 
-The Starship Agentic CLI uses a unique approach to implement command aliases:
+The Starship Agentic CLI employs a dynamic architecture to implement command aliases, register command groups, and provide rich, interactive help output.
 
 ### How Aliases Work
 
-1. **Entry Points in pyproject.toml** (SOURCE OF TRUTH):
-   - Aliases are implemented as separate executable entry points in `pyproject.toml`
-   - Each alias is a direct script that calls the corresponding command function
-   - Example: `mission = "starshipagentic.commands.mission_cmds:mission_brief_command"`
-   - This is the DEFINITIVE source of truth for aliases in the system
+1. **Entry Points in pyproject.toml (SOURCE OF TRUTH):**
+   - Aliases are implemented as separate executable entry points defined in `pyproject.toml`.
+   - Each alias is a direct script that calls the corresponding command function.
+   - Example: `mission = "starshipagentic.commands.mission_cmds:mission_brief_command"`.
+   - This file is the definitive source of truth for alias definitions.
 
-2. **Base Command Wrapper**:
-   - The `BaseCommand.parse_args_for_command()` function creates wrappers for direct command invocation
-   - These wrappers allow commands to be run directly without going through the Click command structure
-   - Example: `mission_brief_command = base_cmd.parse_args_for_command(mission_brief)`
+2. **Dynamic Group Registration:**
+   - The main CLI (`starshipagentic`) is assembled dynamically by combining static code (`cli_static.py`) with generated code (`cli_generated.py`).
+   - When the CLI module is imported, `register_dynamic_groups()` is called to register all command groups.
+   - Each command group (e.g., `fleet_commander`) is enhanced with custom callbacks for rich help display.
+   - This dynamic registration ensures that all commands defined in `commands-list.yml` and managed via `sync2_aliases.py` are available at runtime.
 
-3. **Documentation in commands-list.yml**:
-   - The `commands-list.yml` file documents the relationships between commands and their aliases
-   - This should be kept in sync with pyproject.toml but is not the source of truth
+3. **Direct Command Invocation via Group Run Functions:**
+   - Each command group has a `run_group()` function defined in its `__init__.py`, which resets `sys.argv` and calls the main CLI.
+   - This allows you to execute a command group directly (e.g., by running `fleet_commander`), triggering the dynamic registration and custom callback behavior.
+
+4. **Base Command Wrappers:**
+   - In some cases, helper functions wrap command functions to allow direct execution without going through Click's nested group resolution.
+   - However, the core alias resolution is governed by the entry points in `pyproject.toml`.
 
 ### Important Notes
 
-- Aliases are NOT implemented using Click's command resolution
-- When you run an alias (e.g., `mission`), you're executing a separate script, not using Click's command structure
-- The main CLI (`starshipagentic`) uses Click's standard command groups and commands
-- Do NOT use `aliases=[]` parameter in Click command decorators - Click doesn't support this
-- All validation tools and documentation generators should use pyproject.toml as the source of truth for aliases
-
-### Example
-
-When you run:
-- `mission` - You're executing the script defined by the entry point, which calls `mission_brief_command`
-- `starshipagentic mission` - You're using Click to execute the `mission` command group
+- **Dynamic Registration is Key:** The CLI is built at runtime by merging static and generated code. This process registers all command groups and their rich help callbacks before the CLI is invoked.
+- **Aliases Bypass Click's Native Resolution:** Running an alias invokes a separate script that directly calls the target command via the dynamic registration system.
+- **Source of Truth:** Always refer to `pyproject.toml` for the definitive list of command aliases, while `commands-list.yml` and the dynamic generation process maintain the CLI structure.
 
 ## Command Structure
 
 The CLI has a two-level command structure:
-1. Command groups (e.g., `vessel`, `mission`, `architecture`)
-2. Commands within each group (e.g., `tour-ship`, `mission-brief`)
+1. Command groups (e.g., `fleet_commander`, `mission`, `navigation_officer`)
+2. Commands within each group (e.g., `tour-ship`, `commission-ship`, `visualize-ship`)
 
 Each command has:
-- A long-form name used in the Click command structure
-- Potentially a short-form alias as a separate entry point
-- Documentation in the commands-list.yml file
+- A long-form name used within Click's command structure.
+- Optionally, a short alias provided via separate entry points.
+- Documentation in `commands-list.yml` that guides the dynamic generation process.
 
 ## Implementation Details
 
-- The `BaseCommand` class provides utilities for command implementation
-- The `interactive.py` module handles interactive prompts
-- Rich formatting is used for all console output
-- YAML configuration files control command sequences
-
-## Interactive Prompts
-
-The `interactive.py` module provides utilities for interactive command-line prompts:
-
-- `prompt_for_missing_param()` - Prompts the user for a parameter value if not provided
-- `confirm_action()` - Asks for confirmation before proceeding with an action
-
-These functions handle test environments gracefully by returning default values when running under pytest.
+- **Dynamic Registration:** The CLI is generated by merging `cli_static.py` and `cli_generated.py` using the `sync2_aliases.py` tool. This ensures all command groups and commands are registered at module load time.
+- **Rich Help and Callbacks:** When a command group is invoked without further subcommands, a custom callback displays a rich help panel with command details from a centralized command registry.
+- **Interactive Execution:** Entry points defined in `pyproject.toml` enable direct command execution, while the main CLI provides an interactive layer built with Click and Rich.
+- **Configuration Synchronization:** YAML configuration in `commands-list.yml` and definitions in `pyproject.toml` are synchronized by the `sync2_aliases.py` tool.
 
 ## Command Execution Flow
 
-1. User runs a command (either through the main CLI or a direct alias)
-2. Command function is called with arguments from the command line
-3. Missing parameters are prompted for using the interactive module
-4. Command executes its logic
-5. Results are displayed using rich formatting
+1. The user executes a command (via an alias or the main CLI, e.g., `starshipagentic fleet_commander`).
+2. The dynamic registration process (via `register_dynamic_groups()` in `cli_generated.py`) registers every command group.
+3. For group aliases, the group's `run_group()` function resets `sys.argv` and calls the main CLI, activating enhanced callbacks.
+4. If a command group is invoked without subcommands, its custom callback displays rich help detailing available commands and aliases.
+5. Command functions execute, with interactive prompts and rich output as needed.
+
+## Interactive Prompts
+
+- The `interactive.py` module handles interactive input, prompting users for missing parameters and confirmations.
+- Utilities such as `prompt_for_missing_param()` and `confirm_action()` ensure smooth execution and testing.
 
 ## Configuration
 
-- Configuration is loaded from YAML files in various locations
-- Command sequences can be defined in the configuration
-- The CLI checks multiple locations for configuration files
+- The CLI loads its configuration from YAML files (e.g., `commands-list.yml`), synchronizing its structure via the `sync2_aliases.py` tool.
+- `pyproject.toml` is the definitive source for command entry points.
+- The dynamic merging of `cli_static.py` and `cli_generated.py` produces the final CLI (`cli.py`) with all command groups registered.
