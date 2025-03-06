@@ -1,6 +1,19 @@
+from starshipagentic.visualization.pygame_display import display_ship_visualization
+
 def visualize_ship_service(input):
     """
-    Auto-generated service logic for visualize_ship.
-    Replace this stub with actual business logic.
+    Service function for visualize-ship command.
+    Launches a Pygame visualization of the specified ship.
+    
+    Args:
+        input (str): Name of the ship to visualize. If None, defaults to 'enterprise'.
+    
+    Returns:
+        str: Confirmation message
     """
-    return "Executed visualize_ship with input: " + str(input)
+    ship_name = input or 'enterprise'
+    
+    # Launch the pygame visualization
+    display_ship_visualization(ship_name)
+    
+    return f"Visualization of {ship_name} completed."
