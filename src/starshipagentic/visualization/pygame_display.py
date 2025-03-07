@@ -112,7 +112,7 @@ def display_ship_visualization(initial_ship_name):
     # Load ship images if available
     ship_images = {}
     for ship in available_ships:
-        image_path = Path(__file__).parent / "assets" / f"{ship}.jpg"
+        image_path = Path(__file__).parent / "assets" / f"{ship}.jpeg"
         if image_path.exists():
             try:
                 ship_images[ship] = pygame.image.load(str(image_path))
@@ -139,7 +139,7 @@ def display_ship_visualization(initial_ship_name):
                 ship_images[ship] = None
         else:
             ship_images[ship] = None
-            print(f"No image found for {ship}. Please add {ship}.jpg to the assets directory.")
+            print(f"No image found for {ship}. Please add {ship}.jpeg to the assets directory.")
     
     # Create buttons for common commands
     buttons = [
