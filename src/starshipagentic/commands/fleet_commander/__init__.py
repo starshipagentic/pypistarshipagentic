@@ -20,9 +20,18 @@ def run_group():
     import sys
     from starshipagentic.cli import main as cli_main
     original_args = sys.argv.copy()
+    
+    # When run as a standalone command (e.g., 'fleet_commander visualize-ship')
+    # we need to transform it to 'starshipagentic fleet_commander visualize-ship'
     if len(original_args) > 1:
-        additional_args = original_args[1:]
-        sys.argv = ['starshipagentic', 'fleet_commander'] + additional_args
+        # The command name is in original_args[0], subcommands start at index 1
+        command_name = original_args[0]
+        subcommands = original_args[1:]
+        
+        # If the first argument is a subcommand of this group, preserve it
+        sys.argv = ['starshipagentic', 'fleet_commander'] + subcommands
     else:
+        # No subcommands, just show the group help
         sys.argv = ['starshipagentic', 'fleet_commander']
+    
     cli_main()
