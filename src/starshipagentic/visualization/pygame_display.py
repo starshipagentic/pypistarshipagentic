@@ -44,21 +44,6 @@ SHIP_CONFIGS = {
         "details": "Scout Ship\nClass: Reconnaissance\nCrew: 15\nMax Speed: Warp 8\nWeapons: Light Phasers\nCaptain: First Officer",
         "shape": read_ship_from_file("scout-ship.txt")
     },
-    "enterprise": {
-        "color": (200, 200, 255),
-        "details": "USS Enterprise NCC-1701-D\nClass: Galaxy\nCrew: 1,014\nMax Speed: Warp 9.8\nWeapons: Phasers, Photon Torpedoes\nCaptain: Jean-Luc Picard",
-        "shape": read_ship_from_file("enterprise.txt")
-    },
-    "voyager": {
-        "color": (255, 200, 200),
-        "details": "USS Voyager NCC-74656\nClass: Intrepid\nCrew: 141\nMax Speed: Warp 9.975\nWeapons: Phasers, Photon & Quantum Torpedoes\nCaptain: Kathryn Janeway",
-        "shape": read_ship_from_file("voyager.txt")
-    },
-    "defiant": {
-        "color": (200, 255, 200),
-        "details": "USS Defiant NX-74205\nClass: Defiant\nCrew: 50\nMax Speed: Warp 9.5\nWeapons: Pulse Phasers, Quantum Torpedoes\nCaptain: Benjamin Sisko",
-        "shape": read_ship_from_file("defiant.txt")
-    },
     "django": {
         "color": (150, 255, 150),
         "details": "Django Cruiser\nType: Web Framework\nLanguage: Python\nSpecialty: Full-stack development\nFeatures: ORM, Admin Interface, Authentication\nFounder: Adrian Holovaty & Simon Willison",
