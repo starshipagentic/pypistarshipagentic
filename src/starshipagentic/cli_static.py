@@ -81,9 +81,11 @@ def enhance_group_help(group, name):
     
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
-        if value:
+        if value and ctx.invoked_subcommand is None:
+            # Only show group help if no subcommand is specified
             display_rich_help(ctx)
             ctx.exit()
+        # Otherwise, let the help flag pass through to the subcommand
     
     # Override the help option to use our custom callback
     for param in group.params:
