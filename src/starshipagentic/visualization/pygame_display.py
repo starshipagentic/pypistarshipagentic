@@ -14,6 +14,7 @@ import subprocess
 import threading
 from pathlib import Path
 from importlib import resources
+import pygame.image
 
 try:
     import pygame
@@ -107,6 +108,37 @@ def display_ship_visualization(initial_ship_name):
     ship_config = SHIP_CONFIGS[ship_name]
     ship_color = ship_config["color"]
     ship_shape = ship_config["shape"]
+    
+    # Load ship images if available
+    ship_images = {}
+    for ship in available_ships:
+        image_path = Path(__file__).parent / "assets" / f"{ship}.jpg"
+        if image_path.exists():
+            try:
+                ship_images[ship] = pygame.image.load(str(image_path))
+                # Scale image to fit display area
+                max_width, max_height = 500, 250
+                img = ship_images[ship]
+                img_ratio = img.get_width() / img.get_height()
+                
+                if img.get_width() > max_width:
+                    new_width = max_width
+                    new_height = int(new_width / img_ratio)
+                    if new_height > max_height:
+                        new_height = max_height
+                        new_width = int(new_height * img_ratio)
+                elif img.get_height() > max_height:
+                    new_height = max_height
+                    new_width = int(new_height * img_ratio)
+                else:
+                    new_width, new_height = img.get_width(), img.get_height()
+                
+                ship_images[ship] = pygame.transform.scale(img, (new_width, new_height))
+            except Exception as e:
+                print(f"Error loading image for {ship}: {e}")
+                ship_images[ship] = None
+        else:
+            ship_images[ship] = None
     
     # Create buttons for common commands
     buttons = [
@@ -203,12 +235,19 @@ def display_ship_visualization(initial_ship_name):
                 screen.blit(text_surface, (width // 2 - text_surface.get_width() // 2, y_offset))
                 y_offset += 30
         else:
-            # Draw ship ASCII art
-            y_offset = 120
-            for line in ship_shape:
-                text_surface = ship_font.render(line, True, ship_color)
-                screen.blit(text_surface, (width // 2 - text_surface.get_width() // 2, y_offset))
-                y_offset += 20
+            # Check if we have an image for this ship
+            if ship_name in ship_images and ship_images[ship_name] is not None:
+                # Draw ship image
+                img = ship_images[ship_name]
+                img_rect = img.get_rect(center=(width // 2, 200))
+                screen.blit(img, img_rect)
+            else:
+                # Draw ship ASCII art as fallback
+                y_offset = 120
+                for line in ship_shape:
+                    text_surface = ship_font.render(line, True, ship_color)
+                    screen.blit(text_surface, (width // 2 - text_surface.get_width() // 2, y_offset))
+                    y_offset += 20
         
         # Draw command output
         output_surface = info_font.render(output_text, True, TEXT_COLOR)
