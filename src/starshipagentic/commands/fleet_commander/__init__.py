@@ -19,5 +19,10 @@ def run_group():
     """Entry point for running the fleet_commander command group directly."""
     import sys
     from starshipagentic.cli import main as cli_main
-    sys.argv = ['starshipagentic', 'fleet_commander']
+    original_args = sys.argv.copy()
+    if len(original_args) > 1:
+        additional_args = original_args[1:]
+        sys.argv = ['starshipagentic', 'fleet_commander'] + additional_args
+    else:
+        sys.argv = ['starshipagentic', 'fleet_commander']
     cli_main()
