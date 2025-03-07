@@ -70,7 +70,7 @@ class TestCommandNesting(unittest.TestCase):
         """Test that nested command 'starshipagentic fleet_commander visualize-ship' works."""
         # Run the nested command with --help to avoid actual pygame execution
         stdout, stderr, returncode = self.run_command(
-            ["starshipagentic", "fleet_commander", "visualize-ship", "--help"]
+            ["starshipagentic", "fleet_commander", "visualize-ship"]
         )
         
         # Check the behavior - this test will pass if either:
