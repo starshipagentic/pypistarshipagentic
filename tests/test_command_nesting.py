@@ -70,26 +70,13 @@ class TestCommandNesting(unittest.TestCase):
         """Test that nested command 'starshipagentic fleet_commander visualize-ship' works."""
         # Run the nested command with --help to avoid actual pygame execution
         stdout, stderr, returncode = self.run_command(
-            ["starshipagentic", "fleet_commander", "visualize-ship"]
+            ["starshipagentic", "fleet_commander", "visualize-ship", "--help"]
         )
         
-        # Check the behavior - this test will pass if either:
-        # 1. The command executes successfully (returncode=0) and shows visualize-ship help
-        # 2. The command fails in an expected way (showing only fleet_commander help)
-        
-        # Current expected behavior (may fail if fixed):
-        # The command should show fleet_commander help, not visualize-ship help
-        if returncode == 0:
-            # Check if we got visualize-ship help or fleet_commander help
-            if "--ship" in stdout and "Ship to visualize" in stdout:
-                # We got visualize-ship help - nested command works!
-                self.assertTrue(True, "Nested command works correctly")
-            else:
-                # We got fleet_commander help - nested command doesn't work
-                self.assertIn("FLEET_COMMANDER", stdout, "Output doesn't contain group name")
-                self.assertIn("visualize-ship", stdout, "Output doesn't list visualize-ship command")
-        else:
-            self.fail(f"Command failed unexpectedly: {stderr}")
+        # Assert that the nested command shows visualize-ship help output.
+        self.assertEqual(returncode, 0, f"Command failed unexpectedly: {stderr}")
+        self.assertIn("--ship", stdout, "Expected '--ship' option not found in output")
+        self.assertIn("Ship to visualize", stdout, "Expected visualize-ship description not found")
 
     def test_hyphenated_group_name(self):
         """Test that hyphenated group name 'starshipagentic fleet-commander' fails."""
