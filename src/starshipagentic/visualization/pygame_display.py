@@ -139,6 +139,7 @@ def display_ship_visualization(initial_ship_name):
                 ship_images[ship] = None
         else:
             ship_images[ship] = None
+            print(f"No image found for {ship}. Please add {ship}.jpg to the assets directory.")
     
     # Create buttons for common commands
     buttons = [
@@ -235,19 +236,17 @@ def display_ship_visualization(initial_ship_name):
                 screen.blit(text_surface, (width // 2 - text_surface.get_width() // 2, y_offset))
                 y_offset += 30
         else:
-            # Check if we have an image for this ship
+            # Always use JPG images - no ASCII art fallback
             if ship_name in ship_images and ship_images[ship_name] is not None:
                 # Draw ship image
                 img = ship_images[ship_name]
                 img_rect = img.get_rect(center=(width // 2, 200))
                 screen.blit(img, img_rect)
             else:
-                # Draw ship ASCII art as fallback
-                y_offset = 120
-                for line in ship_shape:
-                    text_surface = ship_font.render(line, True, ship_color)
-                    screen.blit(text_surface, (width // 2 - text_surface.get_width() // 2, y_offset))
-                    y_offset += 20
+                # Display a message that image is missing
+                missing_text = f"Image for {ship_name} not found"
+                text_surface = ship_font.render(missing_text, True, (255, 100, 100))
+                screen.blit(text_surface, (width // 2 - text_surface.get_width() // 2, 200))
         
         # Draw command output
         output_surface = info_font.render(output_text, True, TEXT_COLOR)
