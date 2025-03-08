@@ -26,11 +26,17 @@ def enhanced_get_command(ctx, cmd_name):
     # Get the command using the original method
     cmd = original_get_command(ctx, cmd_name)
     
-    # If this is being called with a nested command, make sure we return it
-    if cmd_name == "visualize-ship" and "--help" in sys.argv:
-        console.print(f"[bold green]DEBUG: Special handling for visualize-ship --help[/bold green]")
-        # Return the visualize-ship command directly
-        return visualize_ship_command
+    # Special handling for nested commands
+    if cmd_name in ["visualize-ship", "tour-ship", "commission-ship"]:
+        console.print(f"[bold green]DEBUG: Special handling for {cmd_name}[/bold green]")
+        
+        # Return the appropriate command directly
+        if cmd_name == "visualize-ship":
+            return visualize_ship_command
+        elif cmd_name == "tour-ship":
+            return tour_ship_command
+        elif cmd_name == "commission-ship":
+            return commission_ship_command
     
     return cmd
 

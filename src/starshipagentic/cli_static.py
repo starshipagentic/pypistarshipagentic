@@ -124,6 +124,11 @@ def enhance_group_help(group, name):
 @click.pass_context
 def main(ctx, all_commands, commands_list):
     """Starship Agentic CLI - Your AI-powered command center."""
+    import sys
+    
+    # Debug the command line arguments
+    console.print(f"[bold blue]DEBUG: sys.argv: {sys.argv}[/bold blue]")
+    
     if ctx.invoked_subcommand is None:
         console.print(Panel("Welcome to Starship Agentic", title="🚀"))
         if all_commands:
@@ -138,17 +143,35 @@ def main(ctx, all_commands, commands_list):
         # Get the subcommand
         sub_cmd = ctx.command.get_command(ctx, ctx.invoked_subcommand)
         if sub_cmd:
-            # Check if this is a group with a subcommand
-            if hasattr(sub_cmd, 'commands') and len(ctx.args) > 0:
-                console.print(f"[bold blue]DEBUG: Found nested command: {ctx.args[0]}[/bold blue]")
-                # Get the nested subcommand
-                nested_cmd_name = ctx.args[0]
+            # Special handling for nested commands
+            if hasattr(sub_cmd, 'commands') and len(sys.argv) > 3:
+                # The format is: starshipagentic group_name command_name [options]
+                # So sys.argv[2] should be the command name
+                nested_cmd_name = sys.argv[2]
+                console.print(f"[bold blue]DEBUG: Looking for nested command: {nested_cmd_name}[/bold blue]")
+                
+                # Try to get the nested command from the group
                 nested_cmd = sub_cmd.get_command(ctx, nested_cmd_name)
                 if nested_cmd:
-                    # Remove the nested command from args to avoid double processing
-                    ctx.args = ctx.args[1:]
+                    console.print(f"[bold green]DEBUG: Found nested command: {nested_cmd_name}[/bold green]")
+                    
+                    # If --help is in the arguments, we need to show help for the nested command
+                    if '--help' in sys.argv:
+                        console.print(f"[bold green]DEBUG: Showing help for nested command: {nested_cmd_name}[/bold green]")
+                        help_ctx = click.Context(nested_cmd, parent=ctx, info_name=nested_cmd_name)
+                        click.echo(nested_cmd.get_help(help_ctx))
+                        return ctx.exit()
+                    
+                    # Otherwise, invoke the nested command with the remaining args
+                    # Remove the first 3 arguments (starshipagentic, group_name, command_name)
+                    remaining_args = sys.argv[3:]
+                    console.print(f"[bold blue]DEBUG: Remaining args for nested command: {remaining_args}[/bold blue]")
+                    
+                    # Create a new context for the nested command
+                    nested_ctx = click.Context(nested_cmd, parent=ctx, info_name=nested_cmd_name)
+                    
                     # Invoke the nested command directly
-                    return ctx.invoke(nested_cmd)
+                    return nested_cmd.main(remaining_args, standalone_mode=False)
             
             # Otherwise, invoke the subcommand normally
             return ctx.invoke(sub_cmd)
