@@ -11,6 +11,32 @@ fleet_commander_group.add_command(visualize_ship_command, "visualize-ship")
 fleet_commander_group.add_command(tour_ship_command, "tour-ship")
 fleet_commander_group.add_command(commission_ship_command, "commission-ship")
 
+# Add a special callback for the group to handle nested commands
+original_get_command = fleet_commander_group.get_command
+
+def enhanced_get_command(ctx, cmd_name):
+    """Enhanced get_command that handles nested commands better."""
+    import sys
+    from rich.console import Console
+    console = Console()
+    
+    console.print(f"[bold blue]DEBUG: Enhanced get_command called with {cmd_name}[/bold blue]")
+    console.print(f"[bold blue]DEBUG: sys.argv: {sys.argv}[/bold blue]")
+    
+    # Get the command using the original method
+    cmd = original_get_command(ctx, cmd_name)
+    
+    # If this is being called with a nested command, make sure we return it
+    if cmd_name == "visualize-ship" and "--help" in sys.argv:
+        console.print(f"[bold green]DEBUG: Special handling for visualize-ship --help[/bold green]")
+        # Return the visualize-ship command directly
+        return visualize_ship_command
+    
+    return cmd
+
+# Replace the get_command method with our enhanced version
+fleet_commander_group.get_command = enhanced_get_command
+
 __all__ = [
     "commission_ship",
     "tour_ship",
