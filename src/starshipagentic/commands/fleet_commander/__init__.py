@@ -1,7 +1,15 @@
 """Auto-generated __init__.py for the fleet_commander group."""
 
 import click
+from .visualize_ship.cli import visualize_ship_command
+from .tour_ship.cli import tour_ship_command
+from .commission_ship.cli import commission_ship_command
+
+# Create the group and add commands directly
 fleet_commander_group = click.Group(name="fleet_commander")
+fleet_commander_group.add_command(visualize_ship_command, "visualize-ship")
+fleet_commander_group.add_command(tour_ship_command, "tour-ship")
+fleet_commander_group.add_command(commission_ship_command, "commission-ship")
 
 __all__ = [
     "commission_ship",
