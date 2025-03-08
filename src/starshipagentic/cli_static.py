@@ -134,8 +134,23 @@ def main(ctx, all_commands, commands_list):
             console.print("Use --help for more information")
     else:
         console.print(f"[bold red]DEBUG: Delegating control to subcommand: {ctx.invoked_subcommand}[/bold red]")
+        
+        # Get the subcommand
         sub_cmd = ctx.command.get_command(ctx, ctx.invoked_subcommand)
         if sub_cmd:
+            # Check if this is a group with a subcommand
+            if hasattr(sub_cmd, 'commands') and len(ctx.args) > 0:
+                console.print(f"[bold blue]DEBUG: Found nested command: {ctx.args[0]}[/bold blue]")
+                # Get the nested subcommand
+                nested_cmd_name = ctx.args[0]
+                nested_cmd = sub_cmd.get_command(ctx, nested_cmd_name)
+                if nested_cmd:
+                    # Remove the nested command from args to avoid double processing
+                    ctx.args = ctx.args[1:]
+                    # Invoke the nested command directly
+                    return ctx.invoke(nested_cmd)
+            
+            # Otherwise, invoke the subcommand normally
             return ctx.invoke(sub_cmd)
         else:
             console.print(f"[bold red]DEBUG: Subcommand {ctx.invoked_subcommand} not found.[/bold red]")
