@@ -72,22 +72,25 @@ def build_package():
         print("No files were built. Check for errors.")
         sys.exit(1)
 
-def get_stored_token():
-    """Get stored PyPI token from ~/.pypi-keys.json file."""
+def get_stored_token(test=False):
+    """Get stored token from ~/.pypi-keys.json file."""
     token_file = Path.home() / ".pypi-keys.json"
+    key = 'testpypi' if test else 'pypi'
+    
     if token_file.exists():
         try:
             with open(token_file, 'r') as f:
                 tokens = json.load(f)
-                return tokens.get('pypi')
+                return tokens.get(key)
         except (json.JSONDecodeError, IOError):
             return None
     return None
 
-def store_token(token):
-    """Store PyPI token in ~/.pypi-keys.json file."""
+def store_token(token, test=False):
+    """Store token in ~/.pypi-keys.json file."""
     token_file = Path.home() / ".pypi-keys.json"
     tokens = {}
+    key = 'testpypi' if test else 'pypi'
     
     # Read existing tokens if file exists
     if token_file.exists():
@@ -98,7 +101,7 @@ def store_token(token):
             pass
     
     # Update token and write back to file
-    tokens['pypi'] = token
+    tokens[key] = token
     with open(token_file, 'w') as f:
         json.dump(tokens, f)
     
@@ -107,26 +110,27 @@ def store_token(token):
 
 def upload_to_pypi(test=False):
     """Upload the package to PyPI using twine."""
+    repository_name = "TestPyPI" if test else "PyPI"
     repository = '--repository-url https://test.pypi.org/legacy/' if test else ''
     
-    print("\n=== Uploading to PyPI ===")
+    print(f"\n=== Uploading to {repository_name} ===")
     
     # Try to get stored token
-    stored_token = get_stored_token()
+    stored_token = get_stored_token(test)
     if stored_token:
         # Display masked token
         masked_token = f"{stored_token[:6]}...{stored_token[-4:]}"
-        use_stored = input(f"Use stored token ({masked_token})? (y/n): ").lower() == 'y'
+        use_stored = input(f"Use stored {repository_name} token ({masked_token})? (y/n): ").lower() == 'y'
         if use_stored:
             token = stored_token
         else:
-            print("Please enter your PyPI API token:")
+            print(f"Please enter your {repository_name} API token:")
             token = getpass.getpass()
-            store_token(token)
+            store_token(token, test)
     else:
-        print("Please enter your PyPI API token:")
+        print(f"Please enter your {repository_name} API token:")
         token = getpass.getpass()
-        store_token(token)
+        store_token(token, test)
     
     # Set environment variables for twine
     env = os.environ.copy()
@@ -172,7 +176,7 @@ def upload_to_pypi(test=False):
     if test:
         print("\nYour package is now available on TestPyPI.")
         print("You can install it with:")
-        print(f"pip install --index-url https://test.pypi.org/simple/ your-package-name")
+        print(f"pip install --index-url https://test.pypi.org/simple/ starshipagentic")
     else:
         print("\nYour package is now available on PyPI.")
         print("Users can install it with:")
