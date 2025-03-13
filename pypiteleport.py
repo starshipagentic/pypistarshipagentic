@@ -253,20 +253,18 @@ def main():
     # Check for required dependencies
     check_dependencies()
     
-    # Ask if user wants to increment version
+    # Automatically increment version
     current_version = get_package_version()
     if current_version:
         print(f"\nCurrent package version: {current_version}")
-        increment = input("Increment version number? (y/n) [y]: ").lower()
-        if increment == '' or increment == 'y':
-            new_version = update_version_in_pyproject()
-            if not new_version:
-                print("Failed to update version. Please update manually in pyproject.toml.")
-                proceed = input("Continue anyway? (y/n): ").lower()
-                if proceed != 'y':
-                    sys.exit(1)
-        else:
-            print("Version not incremented. You can manually change it in pyproject.toml if needed.")
+        print("Automatically incrementing version number...")
+        print("(You can manually edit version in pyproject.toml if needed)")
+        new_version = update_version_in_pyproject()
+        if not new_version:
+            print("Failed to update version. Please update manually in pyproject.toml.")
+            proceed = input("Continue anyway? (y/n): ").lower()
+            if proceed != 'y':
+                sys.exit(1)
     
     # Clean dist directory
     clean_dist()
