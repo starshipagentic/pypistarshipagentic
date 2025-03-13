@@ -108,12 +108,30 @@ def store_token(token, test=False):
     # Set secure permissions
     os.chmod(token_file, 0o600)
 
+def get_package_version():
+    """Extract the package version from pyproject.toml."""
+    try:
+        with open('pyproject.toml', 'r') as f:
+            for line in f:
+                if line.strip().startswith('version = '):
+                    # Extract version from the line (handling quotes)
+                    version = line.split('=')[1].strip().strip('"\'')
+                    return version
+    except Exception as e:
+        print(f"Error reading version from pyproject.toml: {e}")
+    return None
+
 def upload_to_pypi(test=False):
     """Upload the package to PyPI using twine."""
     repository_name = "PyPI"
     repository = ''
     
-    print(f"\n=== Uploading to {repository_name} ===")
+    # Get the package version
+    version = get_package_version()
+    if version:
+        print(f"\n=== Uploading version {version} to {repository_name} ===")
+    else:
+        print(f"\n=== Uploading to {repository_name} ===")
     
     # Try to get stored token
     stored_token = get_stored_token(test=False)
@@ -166,6 +184,15 @@ def upload_to_pypi(test=False):
         if return_code != 0:
             print("\n--- Error ---")
             print(stderr)
+            
+            # Check for version conflict error
+            if "File already exists" in stderr and "See https://pypi.org/help/#file-name-reuse" in stderr:
+                print("\nERROR: Version conflict detected!")
+                print("You are trying to upload a version that already exists on PyPI.")
+                print("Please update the version number in pyproject.toml and try again.")
+                print("\nCurrent version in pyproject.toml:", get_package_version())
+                print("Suggestion: Increment the version number (e.g., from 0.1.0 to 0.1.1)")
+            
             sys.exit(1)
     except Exception as e:
         print(f"\nException during upload: {str(e)}")
