@@ -133,21 +133,38 @@ def upload_to_pypi(test=False):
     env['TWINE_USERNAME'] = '__token__'
     env['TWINE_PASSWORD'] = token
     
-    cmd = f"{sys.executable} -m twine upload {repository} dist/*"
+    cmd = f"{sys.executable} -m twine upload {repository} dist/* --verbose"
     print(f"\nRunning: {cmd}")
     
-    result = subprocess.run(
-        cmd,
-        shell=True,
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False
-    )
-    
-    if result.returncode != 0:
-        print("Error uploading to PyPI:")
-        print(result.stderr)
+    # Run with output streaming to console for better visibility
+    try:
+        process = subprocess.Popen(
+            cmd,
+            shell=True,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
+        
+        # Print output in real-time
+        print("\n--- Output ---")
+        for line in process.stdout:
+            print(line.strip())
+        
+        # Wait for process to complete
+        return_code = process.wait()
+        
+        # Get any remaining stderr
+        stderr = process.stderr.read()
+        
+        if return_code != 0:
+            print("\n--- Error ---")
+            print(stderr)
+            sys.exit(1)
+    except Exception as e:
+        print(f"\nException during upload: {str(e)}")
         sys.exit(1)
     
     print("\nPackage uploaded successfully!")
