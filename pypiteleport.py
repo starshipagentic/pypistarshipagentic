@@ -7,6 +7,7 @@ import os
 import sys
 import subprocess
 import getpass
+import json
 from pathlib import Path
 
 def check_dependencies():
@@ -71,13 +72,61 @@ def build_package():
         print("No files were built. Check for errors.")
         sys.exit(1)
 
+def get_stored_token():
+    """Get stored PyPI token from ~/.pypi-keys.json file."""
+    token_file = Path.home() / ".pypi-keys.json"
+    if token_file.exists():
+        try:
+            with open(token_file, 'r') as f:
+                tokens = json.load(f)
+                return tokens.get('pypi')
+        except (json.JSONDecodeError, IOError):
+            return None
+    return None
+
+def store_token(token):
+    """Store PyPI token in ~/.pypi-keys.json file."""
+    token_file = Path.home() / ".pypi-keys.json"
+    tokens = {}
+    
+    # Read existing tokens if file exists
+    if token_file.exists():
+        try:
+            with open(token_file, 'r') as f:
+                tokens = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+    
+    # Update token and write back to file
+    tokens['pypi'] = token
+    with open(token_file, 'w') as f:
+        json.dump(tokens, f)
+    
+    # Set secure permissions
+    os.chmod(token_file, 0o600)
+
 def upload_to_pypi(test=False):
     """Upload the package to PyPI using twine."""
     repository = '--repository-url https://test.pypi.org/legacy/' if test else ''
     
     print("\n=== Uploading to PyPI ===")
-    print("Please enter your PyPI API token:")
-    token = getpass.getpass()
+    
+    # Try to get stored token
+    stored_token = get_stored_token()
+    if stored_token:
+        # Display masked token
+        masked_token = f"{stored_token[:6]}...{stored_token[-4:]}"
+        use_stored = input(f"Use stored token ({masked_token})? (y/n): ").lower() == 'y'
+        if use_stored:
+            token = stored_token
+        else:
+            print("Please enter your PyPI API token:")
+            token = getpass.getpass()
+            store_token(token)
+    else:
+        print("Please enter your PyPI API token:")
+        token = getpass.getpass()
+        store_token(token)
     
     # Set environment variables for twine
     env = os.environ.copy()
