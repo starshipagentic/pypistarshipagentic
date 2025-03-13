@@ -110,13 +110,13 @@ def store_token(token, test=False):
 
 def upload_to_pypi(test=False):
     """Upload the package to PyPI using twine."""
-    repository_name = "TestPyPI" if test else "PyPI"
-    repository = '--repository-url https://test.pypi.org/legacy/' if test else ''
+    repository_name = "PyPI"
+    repository = ''
     
     print(f"\n=== Uploading to {repository_name} ===")
     
     # Try to get stored token
-    stored_token = get_stored_token(test)
+    stored_token = get_stored_token(test=False)
     if stored_token:
         # Display masked token
         masked_token = f"{stored_token[:6]}...{stored_token[-4:]}"
@@ -126,11 +126,11 @@ def upload_to_pypi(test=False):
         else:
             print(f"Please enter your {repository_name} API token:")
             token = getpass.getpass()
-            store_token(token, test)
+            store_token(token, test=False)
     else:
         print(f"Please enter your {repository_name} API token:")
         token = getpass.getpass()
-        store_token(token, test)
+        store_token(token, test=False)
     
     # Set environment variables for twine
     env = os.environ.copy()
@@ -173,14 +173,9 @@ def upload_to_pypi(test=False):
     
     print("\nPackage uploaded successfully!")
     
-    if test:
-        print("\nYour package is now available on TestPyPI.")
-        print("You can install it with:")
-        print(f"pip install --index-url https://test.pypi.org/simple/ starshipagentic")
-    else:
-        print("\nYour package is now available on PyPI.")
-        print("Users can install it with:")
-        print("pip install starshipagentic")
+    print("\nYour package is now available on PyPI.")
+    print("Users can install it with:")
+    print("pip install starshipagentic")
 
 def main():
     """Main function."""
@@ -195,16 +190,7 @@ def main():
     # Build the package
     build_package()
     
-    # Ask if user wants to upload to TestPyPI first
-    test_first = input("\nDo you want to upload to TestPyPI first? (y/n): ").lower() == 'y'
-    if test_first:
-        upload_to_pypi(test=True)
-        proceed = input("\nDo you want to proceed with uploading to PyPI? (y/n): ").lower() == 'y'
-        if not proceed:
-            print("Upload to PyPI canceled.")
-            return
-    
-    # Upload to PyPI
+    # Upload directly to PyPI
     upload_to_pypi()
 
 if __name__ == "__main__":
