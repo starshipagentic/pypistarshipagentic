@@ -121,6 +121,48 @@ def get_package_version():
         print(f"Error reading version from pyproject.toml: {e}")
     return None
 
+def increment_version(version_str):
+    """Increment the patch version number (last part of semver)."""
+    parts = version_str.split('.')
+    if len(parts) >= 3:
+        parts[-1] = str(int(parts[-1]) + 1)
+    elif len(parts) == 2:
+        parts.append('1')
+    elif len(parts) == 1:
+        parts.append('0')
+        parts.append('1')
+    return '.'.join(parts)
+
+def update_version_in_pyproject():
+    """Update the version in pyproject.toml by incrementing the patch version."""
+    current_version = get_package_version()
+    if not current_version:
+        print("Could not determine current version.")
+        return False
+    
+    new_version = increment_version(current_version)
+    print(f"Incrementing version: {current_version} -> {new_version}")
+    
+    # Read the entire file
+    try:
+        with open('pyproject.toml', 'r') as f:
+            content = f.read()
+        
+        # Replace the version
+        updated_content = content.replace(
+            f'version = "{current_version}"', 
+            f'version = "{new_version}"'
+        )
+        
+        # Write back to the file
+        with open('pyproject.toml', 'w') as f:
+            f.write(updated_content)
+        
+        return new_version
+    except Exception as e:
+        print(f"Error updating version in pyproject.toml: {e}")
+        return False
+
 def upload_to_pypi(test=False):
     """Upload the package to PyPI using twine."""
     repository_name = "PyPI"
@@ -210,6 +252,21 @@ def main():
     
     # Check for required dependencies
     check_dependencies()
+    
+    # Ask if user wants to increment version
+    current_version = get_package_version()
+    if current_version:
+        print(f"\nCurrent package version: {current_version}")
+        increment = input("Increment version number? (y/n) [y]: ").lower()
+        if increment == '' or increment == 'y':
+            new_version = update_version_in_pyproject()
+            if not new_version:
+                print("Failed to update version. Please update manually in pyproject.toml.")
+                proceed = input("Continue anyway? (y/n): ").lower()
+                if proceed != 'y':
+                    sys.exit(1)
+        else:
+            print("Version not incremented. You can manually change it in pyproject.toml if needed.")
     
     # Clean dist directory
     clean_dist()
