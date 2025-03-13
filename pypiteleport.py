@@ -120,8 +120,8 @@ def upload_to_pypi(test=False):
     if stored_token:
         # Display masked token
         masked_token = f"{stored_token[:6]}...{stored_token[-4:]}"
-        use_stored = input(f"Use stored {repository_name} token ({masked_token})? (y/n): ").lower() == 'y'
-        if use_stored:
+        response = input(f"Use stored {repository_name} token ({masked_token})? (y/n) [y]: ").lower()
+        if response == '' or response == 'y':
             token = stored_token
         else:
             print(f"Please enter your {repository_name} API token:")
