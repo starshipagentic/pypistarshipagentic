@@ -11,29 +11,60 @@ import json
 from pathlib import Path
 
 def check_dependencies():
-    """Check if required dependencies are installed."""
+    """Check if required dependencies are installed and install them if needed."""
     required = ['build', 'twine']
     missing = []
     
+    print("Checking for required dependencies...")
     for package in required:
         try:
-            subprocess.run(
+            # Try to import the package first (for packages that don't have CLI)
+            try:
+                __import__(package)
+                print(f"✓ {package} is installed")
+                continue
+            except ImportError:
+                pass
+                
+            # Try to run the package as a module
+            result = subprocess.run(
                 [sys.executable, '-m', package, '--help'], 
                 stdout=subprocess.PIPE, 
                 stderr=subprocess.PIPE,
                 check=False
             )
+            if result.returncode == 0:
+                print(f"✓ {package} is installed")
+            else:
+                missing.append(package)
+                print(f"✗ {package} is not installed or not working properly")
         except FileNotFoundError:
             missing.append(package)
+            print(f"✗ {package} is not installed")
     
     if missing:
-        print(f"Missing required packages: {', '.join(missing)}")
+        print(f"\nMissing required packages: {', '.join(missing)}")
         install = input("Install them now? (y/n): ").lower()
         if install == 'y':
-            subprocess.run([sys.executable, '-m', 'pip', 'install'] + missing, check=True)
+            print(f"\nInstalling: {', '.join(missing)}...")
+            try:
+                subprocess.run(
+                    [sys.executable, '-m', 'pip', 'install'] + missing, 
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                print("✓ Dependencies installed successfully!")
+            except subprocess.CalledProcessError as e:
+                print(f"Error installing dependencies: {e}")
+                print(e.stderr)
+                sys.exit(1)
         else:
             print("Please install the required packages and try again.")
             sys.exit(1)
+    else:
+        print("All required dependencies are installed.")
 
 def clean_dist():
     """Clean the dist directory."""
@@ -250,30 +281,38 @@ def main():
     """Main function."""
     print("🚀 PyPI Teleport - Build and upload packages to PyPI 🚀")
     
-    # Check for required dependencies
-    check_dependencies()
-    
-    # Automatically increment version
-    current_version = get_package_version()
-    if current_version:
-        print(f"\nCurrent package version: {current_version}")
-        print("Automatically incrementing version number...")
-        print("(You can manually edit version in pyproject.toml if needed)")
-        new_version = update_version_in_pyproject()
-        if not new_version:
-            print("Failed to update version. Please update manually in pyproject.toml.")
-            proceed = input("Continue anyway? (y/n): ").lower()
-            if proceed != 'y':
-                sys.exit(1)
-    
-    # Clean dist directory
-    clean_dist()
-    
-    # Build the package
-    build_package()
-    
-    # Upload directly to PyPI
-    upload_to_pypi()
+    try:
+        # Check for required dependencies
+        check_dependencies()
+        
+        # Automatically increment version
+        current_version = get_package_version()
+        if current_version:
+            print(f"\nCurrent package version: {current_version}")
+            print("Automatically incrementing version number...")
+            print("(You can manually edit version in pyproject.toml if needed)")
+            new_version = update_version_in_pyproject()
+            if not new_version:
+                print("Failed to update version. Please update manually in pyproject.toml.")
+                proceed = input("Continue anyway? (y/n): ").lower()
+                if proceed != 'y':
+                    sys.exit(1)
+        
+        # Clean dist directory
+        clean_dist()
+        
+        # Build the package
+        build_package()
+        
+        # Upload directly to PyPI
+        upload_to_pypi()
+        
+    except KeyboardInterrupt:
+        print("\n\nOperation cancelled by user.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\nAn unexpected error occurred: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
