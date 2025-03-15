@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "starshipagentic"
-version = "0.1.2"
+version = "0.1.4"
 description = "AI-assisted software development with a Star Trek-inspired interface"
 readme = "README.md"
 authors = [
