@@ -30,12 +30,76 @@ import os
 import sys
 import re
 from pathlib import Path
-import yaml
-import tomli
-import tomli_w
 import subprocess
-from rich.console import Console
-from rich.table import Table
+
+# Check and install required dependencies
+def check_dependencies():
+    """Check if required dependencies are installed and install them if needed."""
+    required = ['yaml', 'tomli', 'tomli_w', 'rich']
+    missing = []
+    
+    print("Checking for required dependencies...")
+    for package in required:
+        try:
+            # Try to import the package
+            __import__(package)
+            print(f"✓ {package} is installed")
+        except ImportError:
+            missing.append(package)
+            print(f"✗ {package} is not installed")
+    
+    if missing:
+        print(f"\nMissing required packages: {', '.join(missing)}")
+        install = input("Install them now? (y/n): ").lower()
+        if install == 'y':
+            print(f"\nInstalling: {', '.join(missing)}...")
+            try:
+                # Map package names to pip package names if needed
+                pip_packages = []
+                for pkg in missing:
+                    if pkg == 'yaml':
+                        pip_packages.append('pyyaml')
+                    else:
+                        pip_packages.append(pkg)
+                
+                subprocess.run(
+                    [sys.executable, '-m', 'pip', 'install'] + pip_packages, 
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                print("✓ Dependencies installed successfully!")
+                
+                # Now import the packages
+                if 'yaml' in missing:
+                    import yaml
+                if 'tomli' in missing:
+                    import tomli
+                if 'tomli_w' in missing:
+                    import tomli_w
+                if 'rich' in missing:
+                    from rich.console import Console
+                    from rich.table import Table
+            except subprocess.CalledProcessError as e:
+                print(f"Error installing dependencies: {e}")
+                print(e.stderr if hasattr(e, 'stderr') else "")
+                sys.exit(1)
+        else:
+            print("Please install the required packages and try again.")
+            sys.exit(1)
+    
+    # Now import all required packages
+    import yaml
+    import tomli
+    import tomli_w
+    from rich.console import Console
+    from rich.table import Table
+    
+    return yaml, tomli, tomli_w, Console, Table
+
+# Run dependency check at the start
+yaml, tomli, tomli_w, Console, Table = check_dependencies()
 
 # Define key paths
 BASE_DIR = Path(__file__).parent.parent
@@ -539,6 +603,10 @@ def sync_aliases():
 
 def main():
     import argparse
+    
+    # Check dependencies first
+    check_dependencies()
+    
     parser = argparse.ArgumentParser(description="Synchronize command aliases and scaffold command packages")
     parser.add_argument("--fix-file", help="Fix imports in a specific command file")
     args = parser.parse_args()
