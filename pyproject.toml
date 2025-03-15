@@ -50,6 +50,7 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 "starshipagentic.visualization" = ["assets/*", "assets/**/*"]
+"starshipagentic" = ["**/*.sh"]
 
 [project.scripts]
 fleet_commander = "starshipagentic.commands.fleet_commander:run_group"
