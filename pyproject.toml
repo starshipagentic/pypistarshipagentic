@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "starshipagentic"
-version = "0.1.4"
+version = "0.1.6"
 description = "AI-assisted software development with a Star Trek-inspired interface"
 readme = "README.md"
 authors = [
@@ -43,14 +43,6 @@ Website = "https://www.starshipagentic.com"
 "Social Media" = "https://youtube.com/@starshipagentic"
 Patreon = "https://www.patreon.com/c/starshipagentic"
 "Buy Me a Coffee" = "https://buymeacoffee.com/starshipagentic"
-
-[tool.setuptools]
-package-dir = {"" = "src"}
-include-package-data = true
-
-[tool.setuptools.package-data]
-"starshipagentic.visualization" = ["assets/*", "assets/**/*"]
-"starshipagentic" = ["**/*.sh"]
 
 [project.scripts]
 fleet_commander = "starshipagentic.commands.fleet_commander:run_group"
@@ -122,3 +114,18 @@ droid = "starshipagentic.commands.droids.droid_splain.cli:droid_splain_command"
 man-splain = "starshipagentic.commands.droids.man_splain.cli:man_splain_command"
 splain = "starshipagentic.commands.droids.man_splain.cli:man_splain_command"
 starshipagentic = "starshipagentic.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.package-data]
+"starshipagentic.visualization" = [
+    "assets/*",
+    "assets/**/*",
+]
+starshipagentic = [
+    "**/*.sh",
+]
