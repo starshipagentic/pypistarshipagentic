@@ -31,6 +31,8 @@ dependencies = [
     "requests>=2.25.0",
     "tinydb>=4.5.0",
     "pygame>=2.0.0",
+    "pyyaml>=6.0",
+    "tomli-w>=1.0.0",
 ]
 
 [project.license]
