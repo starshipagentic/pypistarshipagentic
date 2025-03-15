@@ -57,109 +57,109 @@ Without any arguments to start the guided process from the beginning, which will
 
 # Command Reference
 
-## Vessel Commands
+## Fleet_commander Commands
 
 Initialize and select project templates
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `vessel tour-ship` | `tour` | Browse available ship templates/frameworks |
-| `vessel commission-ship` | `commission` | Clone template and run initialization |
-| `vessel visualize-ship` | `` | Launch a Pygame visualization of the specified ship |
+| `fleet_commander tour-ship` | `tour` | Browse available ship templates/frameworks |
+| `fleet_commander commission-ship` | `commission` | Clone template and run initialization |
+| `fleet_commander visualize-ship` | `` | Launch a Pygame visualization of the specified ship |
 
-## Mission Commands
+## Number_two Commands
 
 Define and expand project requirements
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `mission mission-brief` | `mission` | Define project mission and requirements |
-| `mission expand-mission` | `expand` | Expand existing requirements |
+| `number_two mission-brief` | `mission` | Define project mission and requirements |
+| `number_two expand-mission` | `expand` | Expand existing requirements |
 
-## Architecture Commands
+## Engineering_officer Commands
 
 Review and configure system architecture
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `architecture review-schematics` | `schematics` | Review system architecture diagrams (MD documents for state diagram and DDD) |
-| `architecture calibrate-technology` | `calibrate` | Configure technology stack |
+| `engineering_officer review-schematics` | `schematics` | Review system architecture diagrams (MD documents for state diagram and DDD) |
+| `engineering_officer calibrate-technology` | `calibrate` | Configure technology stack |
 
-## Navigation Commands
+## Navigation_officer Commands
 
 Plan feature implementation
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `navigation plot-navigation` | `navigation` | Generate and review BDD gherkin feature files |
-| `navigation set-waypoints` | `waypoints` | Create order for working on features (project plan checklist) |
+| `navigation_officer plot-navigation` | `navigation` | Generate and review BDD gherkin feature files |
+| `navigation_officer set-waypoints` | `waypoints` | Create order for working on features (project plan checklist) |
 
-## Transmission Commands
+## Communications_officer Commands
 
 Manage external data and API connections
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `transmission authorize-codes` | `authorize` | Configure API credentials needed for features |
-| `transmission scan-sector` | `scan` | Search for topic to find URLs for scraping |
-| `transmission receive-transmission` | `transmission` | Scrape or directly input information from a known URL |
+| `communications_officer authorize-codes` | `authorize` | Configure API credentials needed for features |
+| `communications_officer scan-sector` | `scan` | Search for topic to find URLs for scraping |
+| `communications_officer receive-transmission` | `transmission` | Scrape or directly input information from a known URL |
 
-## Probe Commands
+## Insterstellar_officer Commands
 
 Generate initial code tracks and connect the top down BDD step coverage
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `probe map-planet` | `map` | Lightweight: create initial folder, and file names scaffolding, not the BDD steps yet |
-| `probe build-landing-zone` | `buildlz` | Create initial code tracks within the files that map-planet created |
-| `probe fabricate-infrastructure` | `fabricate` | Generate BDD steps to connect the code laid down in the landing zone |
+| `insterstellar_officer map-planet` | `map` | Lightweight: create initial folder, and file names scaffolding, not the BDD steps yet |
+| `insterstellar_officer build-landing-zone` | `buildlz` | Create initial code tracks within the files that map-planet created |
+| `insterstellar_officer fabricate-infrastructure` | `fabricate` | Generate BDD steps to connect the code laid down in the landing zone |
 
-## Exploration Commands
+## Captains_orders Commands
 
 Execute and test your implementation
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `exploration warp-speed` | `warp` | Top-down BDD behave driven loop (get behave errors and feed to AI to fix) |
-| `exploration trycoder` | `trycoder` | Bottom-up unit test driven loop (get errors and feed to AI to fix) |
-| `exploration engage` | `engage` | Run warp cycle and trycoder to repeat full set of waypoints N times |
+| `captains_orders warp-speed` | `warp` | Top-down BDD behave driven loop (get behave errors and feed to AI to fix) |
+| `captains_orders trycoder` | `trycoder` | Bottom-up unit test driven loop (get errors and feed to AI to fix) |
+| `captains_orders engage` | `engage` | Run warp cycle and trycoder to repeat full set of waypoints N times |
 
-## Weapons Commands
+## Tactical_officer Commands
 
 Remove problematic code and tests
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `weapons fire-photons` | `photons` | Remove specified steps that are causing trouble |
-| `weapons aim-lasers` | `lasers` | Remove specified code that is causing trouble |
-| `weapons shields-up` | `shields` | Protect code from changes (placeholder) |
+| `tactical_officer fire-photons` | `photons` | Remove specified steps that are causing trouble |
+| `tactical_officer aim-lasers` | `lasers` | Remove specified code that is causing trouble |
+| `tactical_officer shields-up` | `shields` | Protect code from changes (placeholder) |
 
-## Engineering Commands
+## Maintenance_officer Commands
 
 Manage project state and analyze code quality
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `engineering create-checkpoint` | `checkpoint` | Create a copy of entire folder and/or git tags |
-| `engineering restore-checkpoint` | `restore` | Roll code back to checkpoint (git or folder copy) |
-| `engineering inspect-vessel` | `inspect` | Run framework-specific checks to report on integrity |
-| `engineering complexity-report` | `complexity` | Run radon mi and radon cc to report on code complexity issues |
+| `maintenance_officer create-checkpoint` | `checkpoint` | Create a copy of entire folder and/or git tags |
+| `maintenance_officer restore-checkpoint` | `restore` | Roll code back to checkpoint (git or folder copy) |
+| `maintenance_officer inspect-vessel` | `inspect` | Run framework-specific checks to report on integrity |
+| `maintenance_officer complexity-report` | `complexity` | Run radon mi and radon cc to report on code complexity issues |
 
-## Cosmic Commands
+## Red_buttons Commands
 
 Special operations
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `cosmic supernova` | `supernova` | Remove all git stuff (searches through all sub-folders) |
+| `red_buttons supernova` | `supernova` | Remove all git stuff (searches through all sub-folders) |
 
-## Beam Commands
+## Gitmaster Commands
 
 Git-related operations
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `beam teleport` | `teleport` | Take pieces of code and make a new git repo almost automatically |
+| `gitmaster teleport` | `teleport` | Take pieces of code and make a new git repo almost automatically |
 
 ## Mcars Commands
 
@@ -170,14 +170,14 @@ Code repository and search system
 | `mcars search` | `search` | Search for code in the MCARS database |
 | `mcars transport` | `transport` | Store pointers/copies of code with AI-generated summaries in tinydb |
 
-## Droid Commands
+## Droids Commands
 
 Explanation and assistance commands
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `droid droid-splain` | `droid` | Get explanation from droid assistant |
-| `droid man-splain` | `splain` | Get manual page for a topic |
+| `droids droid-splain` | `droid` | Get explanation from droid assistant |
+| `droids man-splain` | `splain` | Get manual page for a topic |
 
 
 ## Examples

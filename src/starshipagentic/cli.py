@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+# Starship Agentic License Header
+#
+# Copyright (c) 2025 Travis Somerville and David Samson
+#
+# This file is part of Starship Agentic.
+#
+# It is licensed under the GNU Affero General Public License (AGPL) v3 or later.
+# For full details, see the LICENSE.md file in the project root.
 """
 Starship Agentic CLI - Static Content
 This file contains the static parts of the CLI that don't change during generation.
@@ -73,9 +81,11 @@ def enhance_group_help(group, name):
     
     # Create a custom callback for the help option
     def custom_help_callback(ctx, param, value):
-        if value:
+        if value and ctx.invoked_subcommand is None:
+            # Only show group help if no subcommand is specified
             display_rich_help(ctx)
             ctx.exit()
+        # Otherwise, let the help flag pass through to the subcommand
     
     # Override the help option to use our custom callback
     for param in group.params:
