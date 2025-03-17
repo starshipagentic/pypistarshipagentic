@@ -24,6 +24,9 @@ from starshipagentic.commands.fleet_commander.tour_ship.cli import tour_ship_com
 from starshipagentic.commands.fleet_commander.commission_ship.cli import commission_ship_command as commission_ship
 from starshipagentic.commands.fleet_commander.commission_ship.cli import commission_ship_command as commission
 from starshipagentic.commands.fleet_commander.visualize_ship.cli import visualize_ship_command as visualize_ship
+from starshipagentic.commands.fleet_commander.visualize_ship.cli import visualize_ship_command as visualize
+from starshipagentic.commands.fleet_commander.visualize_ship.cli import visualize_ship_command as ships
+from starshipagentic.commands.fleet_commander.visualize_ship.cli import visualize_ship_command as fleet
 from starshipagentic.commands.number_two.mission_brief.cli import mission_brief_command as mission_brief
 from starshipagentic.commands.number_two.mission_brief.cli import mission_brief_command as mission
 from starshipagentic.commands.number_two.expand_mission.cli import expand_mission_command as expand_mission

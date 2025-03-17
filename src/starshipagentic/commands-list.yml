@@ -18,7 +18,7 @@ fleet_commander:
       description: Launch a Pygame visualization of the specified ship
       options:
       - '--ship: Ship to visualize'
-      aliases: []
+      aliases: [visualize,ships,fleet]
 number_two:
   description: Define and expand project requirements
   commands:
